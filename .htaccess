@@ -1,0 +1,56 @@
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Set base directory
+RewriteBase /groupcompanies/
+
+# Protect sensitive directories
+RewriteRule ^includes/ - [F,L]
+RewriteRule ^vendor/ - [F,L]
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect .htaccess file
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect config files
+<FilesMatch "\.(ini|log|sql|bak|config)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Custom error pages
+ErrorDocument 404 /groupcompanies/error/404.php
+ErrorDocument 403 /groupcompanies/error/403.php
+ErrorDocument 500 /groupcompanies/error/500.php
+
+# Redirect to HTTPS (uncomment when live)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Remove .php extension (optional)
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME}\.php -f
+# RewriteRule ^(.*)$ $1.php [L]
+
+# Cache static files
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|woff|woff2|ttf)$">
+    Header set Cache-Control "max-age=2592000, public"
+</FilesMatch>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Compress output
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

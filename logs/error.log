@@ -1,0 +1,328 @@
+[17-Feb-2026 12:31:42 Africa/Nairobi] PHP Parse error:  syntax error, unexpected identifier "Files" in C:\xampp\htdocs\company\includes\functions.php on line 277
+[17-Feb-2026 12:49:04 Africa/Nairobi] PHP Parse error:  syntax error, unexpected identifier "Files" in C:\xampp\htdocs\company\includes\functions.php on line 277
+[17-Feb-2026 13:31:20 Africa/Nairobi] PHP Parse error:  syntax error, unexpected identifier "Files" in C:\xampp\htdocs\company\includes\functions.php on line 277
+[17-Feb-2026 13:31:27 Africa/Nairobi] PHP Parse error:  syntax error, unexpected identifier "Files" in C:\xampp\htdocs\company\includes\functions.php on line 277
+[17-Feb-2026 13:32:23 Africa/Nairobi] PHP Parse error:  syntax error, unexpected identifier "Files" in C:\xampp\htdocs\company\includes\functions.php on line 277
+[17-Feb-2026 13:35:03 Africa/Nairobi] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\company\includes\config.php:124) in C:\xampp\htdocs\company\includes\functions.php on line 422
+[17-Feb-2026 13:35:05 Africa/Nairobi] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\company\includes\config.php:124) in C:\xampp\htdocs\company\includes\functions.php on line 422
+[17-Feb-2026 13:39:23 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'group_companies_db.login_attempts' doesn't exist in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('INSERT INTO log...')
+#1 C:\xampp\htdocs\company\login.php(91): Database->prepare('INSERT INTO log...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[17-Feb-2026 13:54:14 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:544
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 544
+[17-Feb-2026 13:57:11 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:544
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 544
+[17-Feb-2026 13:59:12 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:544
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 544
+[17-Feb-2026 15:28:37 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:544
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 544
+[17-Feb-2026 15:30:07 Africa/Nairobi] PHP Fatal error:  Cannot redeclare timeAgo() (previously declared in C:\xampp\htdocs\company\admin\dashboard.php:174) in C:\xampp\htdocs\company\includes\functions.php on line 165
+[17-Feb-2026 15:34:36 Africa/Nairobi] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\company\includes\config.php:137) in C:\xampp\htdocs\company\includes\functions.php on line 422
+[17-Feb-2026 15:34:37 Africa/Nairobi] PHP Fatal error:  Cannot redeclare redirect() (previously declared in C:\xampp\htdocs\company\includes\config.php:137) in C:\xampp\htdocs\company\includes\functions.php on line 422
+[17-Feb-2026 15:37:23 Africa/Nairobi] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\company\includes\functions.php:459) in C:\xampp\htdocs\company\includes\session.php on line 265
+[17-Feb-2026 15:37:23 Africa/Nairobi] PHP Fatal error:  Cannot redeclare isLoggedIn() (previously declared in C:\xampp\htdocs\company\includes\functions.php:459) in C:\xampp\htdocs\company\includes\session.php on line 265
+[17-Feb-2026 15:40:50 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:651
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 651
+[17-Feb-2026 15:46:07 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:674
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 674
+[17-Feb-2026 15:51:12 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 15:51:13 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 15:55:54 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 15:55:55 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:00:57 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:00:58 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:00:59 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:07:06 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:07:09 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:07:12 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:12:03 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:16:59 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function get_avatar_letter() in C:\xampp\htdocs\company\admin\dashboard.php:737
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\dashboard.php on line 737
+[17-Feb-2026 16:27:39 Africa/Nairobi] PHP Fatal error:  Uncaught Error: Call to undefined function currentUser() in C:\xampp\htdocs\company\admin\users.php:12
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\company\admin\users.php on line 12
+[17-Feb-2026 16:32:35 Africa/Nairobi] PHP Warning:  include(../includes/sidebar.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\company\admin\users.php on line 281
+[17-Feb-2026 16:32:35 Africa/Nairobi] PHP Warning:  include(): Failed opening '../includes/sidebar.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\company\admin\users.php on line 281
+[17-Feb-2026 16:32:35 Africa/Nairobi] PHP Warning:  include(../includes/top-nav.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\company\admin\users.php on line 286
+[17-Feb-2026 16:32:35 Africa/Nairobi] PHP Warning:  include(): Failed opening '../includes/top-nav.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\company\admin\users.php on line 286
+[17-Feb-2026 16:39:38 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\index.php(668): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[17-Feb-2026 16:39:55 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND status = 'Active'' at line 1 in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT supplier...')
+#1 C:\xampp\htdocs\company\modules\procurement\index.php(766): Database->query('SELECT supplier...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[17-Feb-2026 16:40:00 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'r.is_global' in 'where clause' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT r.*, u.f...')
+#1 C:\xampp\htdocs\company\reports\index.php(17): Database->prepare('SELECT r.*, u.f...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[17-Feb-2026 16:41:55 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\index.php(668): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 14:54:07 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:07 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:07 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:19 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:19 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:25 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:25 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 14:54:25 Africa/Nairobi] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\xampp\htdocs\company\includes\functions.php on line 377
+[21-Feb-2026 15:00:19 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\maintenance.php(144): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:07:16 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'company_id' in 'where clause' in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT tenant_i...')
+#1 C:\xampp\htdocs\company\modules\estate\payments.php(139): Database->query('SELECT tenant_i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[21-Feb-2026 15:13:28 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants
+                    ...' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(213): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:17:44 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants t
+                  ...' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(216): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:17:45 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants t
+                  ...' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(216): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:22:23 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(217): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:22:58 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(217): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[21-Feb-2026 15:22:59 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'terminated
+                        FROM estate_tenants' at line 5 in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\reports.php(217): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 12:37:50 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'where clause' in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\dashboard.php(57): Database->query('SELECT COUNT(*)...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 12:38:23 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'where clause' in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\dashboard.php(57): Database->query('SELECT COUNT(*)...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 12:41:39 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'where clause' in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT COUNT(*)...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\dashboard.php(57): Database->query('SELECT COUNT(*)...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 13:30:23 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.customer_phone' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT d.*, s.i...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(219): Database->prepare('SELECT d.*, s.i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 13:32:59 Africa/Nairobi] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'c.customer_phone' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT d.*, s.i...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(219): Database->prepare('SELECT d.*, s.i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:38:43 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:46:07 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(236): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:48:17 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\estate\index.php(668): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:48:42 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(236): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:54:15 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND s.delivery_status != 'Delivered'
+                            HAVING rema...' at line 7 in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT s.sale_i...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(242): Database->query('SELECT s.sale_i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 10:54:16 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND s.delivery_status != 'Delivered'
+                            HAVING rema...' at line 7 in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT s.sale_i...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(242): Database->query('SELECT s.sale_i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 10:54:20 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND s.delivery_status != 'Delivered'
+                            HAVING rema...' at line 7 in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT s.sale_i...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\deliveries.php(242): Database->query('SELECT s.sale_i...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[23-Feb-2026 10:59:26 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 10:59:49 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 11:06:33 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'stock_quantity' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 11:06:34 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'stock_quantity' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 11:06:48 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 11:06:49 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'current_stock' in 'field list' in C:\xampp\htdocs\company\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\company\modules\blockfactory\index.php(26): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 46
+[23-Feb-2026 11:07:03 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND status = 'Active'' at line 1 in C:\xampp\htdocs\company\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\company\includes\db_connection.php(40): mysqli->query('SELECT supplier...')
+#1 C:\xampp\htdocs\company\modules\procurement\index.php(766): Database->query('SELECT supplier...')
+#2 {main}
+  thrown in C:\xampp\htdocs\company\includes\db_connection.php on line 40
+[24-Feb-2026 11:28:41 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\consika\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\consika\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\consika\modules\estate\index.php(668): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\consika\includes\db_connection.php on line 46
+[24-Feb-2026 11:28:53 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND status = 'Active'' at line 1 in C:\xampp\htdocs\consika\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\consika\includes\db_connection.php(40): mysqli->query('SELECT supplier...')
+#1 C:\xampp\htdocs\consika\modules\procurement\index.php(766): Database->query('SELECT supplier...')
+#2 {main}
+  thrown in C:\xampp\htdocs\consika\includes\db_connection.php on line 40
+[24-Feb-2026 11:29:11 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'AND role IN ('Manager', 'CompanyAdmin')' at line 1 in C:\xampp\htdocs\consika\includes\db_connection.php:40
+Stack trace:
+#0 C:\xampp\htdocs\consika\includes\db_connection.php(40): mysqli->query('SELECT user_id,...')
+#1 C:\xampp\htdocs\consika\modules\works\index.php(896): Database->query('SELECT user_id,...')
+#2 {main}
+  thrown in C:\xampp\htdocs\consika\includes\db_connection.php on line 40
+[24-Feb-2026 12:00:43 Africa/Accra] PHP Fatal error:  Uncaught mysqli_sql_exception: Column 'status' in field list is ambiguous in C:\xampp\htdocs\consika\includes\db_connection.php:46
+Stack trace:
+#0 C:\xampp\htdocs\consika\includes\db_connection.php(46): mysqli->prepare('SELECT \r\n      ...')
+#1 C:\xampp\htdocs\consika\modules\estate\index.php(668): Database->prepare('SELECT \r\n      ...')
+#2 {main}
+  thrown in C:\xampp\htdocs\consika\includes\db_connection.php on line 46
