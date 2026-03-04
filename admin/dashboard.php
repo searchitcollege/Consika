@@ -516,6 +516,12 @@ if ($result && $result->num_rows > 0) {
         .dropdown-item i {
             width: 20px;
         }
+
+        .chart-container {
+            position: relative;
+            height: 300px; /* set your desired height */
+            width: 100%;
+        }
         
         /* Stats Cards */
         .stats-grid {
@@ -1101,7 +1107,9 @@ if ($result && $result->num_rows > 0) {
                             <option value="<?php echo date('Y')-1; ?>"><?php echo date('Y')-1; ?></option>
                         </select>
                     </div>
-                    <canvas id="monthlyChart" height="300"></canvas>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart" height="300"></canvas>
+                    </div>
                 </div>
                 
                 <div class="chart-card">

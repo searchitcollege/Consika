@@ -78,132 +78,9 @@ $pending_deliveries = $stmt->get_result();
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
     
-    <style>
-        .module-header {
-            background: linear-gradient(135deg, #4cc9f0, #4895ef);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #4cc9f0, #4895ef);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin: 0;
-        }
-        
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .low-stock-item {
-            border-left: 4px solid #dc3545;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #fff8f8;
-            border-radius: 8px;
-        }
-        
-        .po-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s;
-        }
-        
-        .po-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-color: transparent;
-        }
-        
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .quick-action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .quick-action-btn {
-            background: white;
-            border: 2px dashed #dee2e6;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .quick-action-btn:hover {
-            border-color: #4cc9f0;
-            background: #f8f9fa;
-            transform: translateY(-3px);
-        }
-        
-        .quick-action-btn i {
-            font-size: 28px;
-            color: #4cc9f0;
-            margin-bottom: 10px;
-        }
-        
-        .quick-action-btn span {
-            display: block;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .nav-tabs .nav-link {
-            color: #666;
-            font-weight: 500;
-            border: none;
-            padding: 10px 20px;
-        }
-        
-        .nav-tabs .nav-link.active {
-            color: #4cc9f0;
-            background: none;
-            border-bottom: 3px solid #4cc9f0;
-        }
-    </style>
+    <!-- Custom CSS For jus Procuremnt Pages-->
+    <link href="../../assets/css/procurement/style.css" rel="stylesheet">
+
 </head>
 <body class="module-procurement">
     <div class="wrapper">
@@ -458,7 +335,9 @@ $pending_deliveries = $stmt->get_result();
                                             <p class="text-muted small">Today</p>
                                         </div>
                                     </div>
-                                    <canvas id="monthlyChart" height="200"></canvas>
+                                    <div style="position: relative; height: 300px;">
+                                        <canvas id="monthlyChart" height="200"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
