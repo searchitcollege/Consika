@@ -1,6 +1,7 @@
 /* Main Content margin to include sidebar */
 .main-content {
     margin-left: 288px;
+    max-width: calc(100% - 290px);
 }
 
 .module-header {
@@ -126,4 +127,26 @@
     color: #4cc9f0;
     background: none;
     border-bottom: 3px solid #4cc9f0;
+}
+
+/* Supplies Page  */
+.card.supplier-table {
+    max-width: calc(100vw - 300px);
+}
+
+/* Products Page  */
+.module-procurement.products .main-content .stat-card {
+    margin-left: 10px;
+    margin-right: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.module-procurement.products .main-content .stat-card div {
+    display: flex;
+    flex-direction: row;
+}
+
+.module-procurement.products .main-content .stat-card .stat-icon {
+    margin-top: 10px;
 }

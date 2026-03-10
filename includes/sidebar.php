@@ -145,15 +145,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo baseUrl('modules/procurement/purchase-orders.php'); ?>" class="nav-link">
+                    <a href="<?php echo baseUrl('modules/procurement/purchase.php'); ?>" class="nav-link">
                         <i class="fas fa-file-invoice"></i>
                         <span>Purchase Orders</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo baseUrl('modules/procurement/inventory.php'); ?>" class="nav-link">
+                    <a href="<?php echo baseUrl('modules/procurement/approvals.php'); ?>" class="nav-link">
                         <i class="fas fa-warehouse"></i>
-                        <span>Inventory</span>
+                        <span>Approvals</span>
                     </a>
                 </li>
             

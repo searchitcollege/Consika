@@ -11,13 +11,51 @@ $company_id = $session->getCompanyId();
 $role = $session->getRole();
 
 // Access check
-if ($current_user['company_type'] != 'Procurement' && $role != 'SuperAdmin') {
+if ($current_user['company_type'] != 'Procurement' && ($role != 'SuperAdmin' && $role != 'CompanyAdmin' && $role != 'Manager')) {
     $_SESSION['error'] = 'Access denied. Procurement department only.';
     header('Location: ../../login.php');
     exit();
 }
 
 global $db;
+
+// Handle product actions (add)
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] == 'add') {
+        // Process add supplier form
+        $supplier_code = $db->escapeString($_POST['supplier_code']);
+        $supplier_name = $db->escapeString($_POST['supplier_name']);
+        $contact_person = $db->escapeString($_POST['contact_person']);
+        $phone = $db->escapeString($_POST['phone']);
+        $email = $db->escapeString($_POST['email']);
+        $website = $db->escapeString($_POST['website']);
+        $address = $db->escapeString($_POST['address']);
+        $category = $db->escapeString($_POST['category']);
+        $tax_number = $db->escapeString($_POST['tax_number']);
+        $payment_terms = $db->escapeString($_POST['payment_terms']);
+        $credit_limit = floatval($_POST['credit_limit']);
+
+        // Insert into database
+        $sql = "INSERT INTO procurement_suppliers 
+                (company_id, supplier_code, supplier_name, contact_person, phone, email, website, address, category, tax_number, payment_terms, credit_limit) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $db->prepare($sql);
+        $stmt->bind_param("issssssssssd", $company_id, $supplier_code, $supplier_name, $contact_person, $phone, $email, $website, $address, $category, $tax_number, $payment_terms, $credit_limit);
+
+        if ($stmt->execute()) {
+            $_SESSION['success'] = "Supplier added successfully";
+            log_activity(
+                $current_user['user_id'],
+                'Add Supplier',
+                "Added supplier: $supplier_name"
+            );
+        } else {
+            $_SESSION['error'] = "Error adding supplier";
+        }
+        header('Location: suppliers.php');
+        exit();
+    }
+}
 
 // Fetch suppliers for this company
 $stmt = $db->prepare("SELECT * FROM procurement_suppliers WHERE company_id = ? ORDER BY created_at DESC");
@@ -48,7 +86,7 @@ $stmt->bind_param("i", $company_id);
 $stmt->execute();
 $top_suppliers = $stmt->get_result();
 
-$page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
+$page_title = 'Suppliers';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,7 +101,7 @@ $page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
     <link href="../../assets/css/style.css" rel="stylesheet">
 
     <!-- Custom CSS For jus Procuremnt Pages-->
-    <link href="../../assets/css/procurement/dashboard.css" rel="stylesheet">
+    <link href="../../assets/css/procurement/style.css" rel="stylesheet">
 
 </head>
 
@@ -141,73 +179,73 @@ $page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
                             </div>
                         </div> -->
 
-                        <!-- Suppliers Tab -->
-                            <div class="card">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Suppliers</h5>
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                                        <i class="fas fa-plus-circle me-2"></i>Add Supplier
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover" id="suppliersTable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Code</th>
-                                                    <th>Supplier Name</th>
-                                                    <th>Contact Person</th>
-                                                    <th>Phone</th>
-                                                    <th>Email</th>
-                                                    <th>Category</th>
-                                                    <th>Rating</th>
-                                                    <th>Status</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                $suppliers_query = "SELECT * FROM procurement_suppliers 
+                        <!-- Suppliers Table -->
+                        <div class="card supplier-table mb-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Suppliers</h5>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                                    <i class="fas fa-plus-circle me-2"></i>Add Supplier
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="suppliersTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Supplier Name</th>
+                                                <th>Contact Person</th>
+                                                <th>Phone</th>
+                                                <th>Email</th>
+                                                <th>Category</th>
+                                                <th>Rating</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $suppliers_query = "SELECT * FROM procurement_suppliers 
                                                            WHERE company_id = ? 
                                                            ORDER BY supplier_name ASC";
-                                                $stmt = $db->prepare($suppliers_query);
-                                                $stmt->bind_param("i", $company_id);
-                                                $stmt->execute();
-                                                $suppliers = $stmt->get_result();
-                                                while ($supplier = $suppliers->fetch_assoc()):
-                                                ?>
-                                                    <tr>
-                                                        <td><?php echo $supplier['supplier_code']; ?></td>
-                                                        <td><?php echo htmlspecialchars($supplier['supplier_name']); ?></td>
-                                                        <td><?php echo htmlspecialchars($supplier['contact_person']); ?></td>
-                                                        <td><?php echo $supplier['phone']; ?></td>
-                                                        <td><?php echo $supplier['email']; ?></td>
-                                                        <td><?php echo $supplier['category']; ?></td>
-                                                        <td>
-                                                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                                <i class="fas fa-star <?php echo $i <= $supplier['rating'] ? 'text-warning' : 'text-secondary'; ?>"></i>
-                                                            <?php endfor; ?>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge bg-<?php echo $supplier['status'] == 'Active' ? 'success' : 'secondary'; ?>">
-                                                                <?php echo $supplier['status']; ?>
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-info" onclick="viewSupplier(<?php echo $supplier['supplier_id']; ?>)">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-primary" onclick="editSupplier(<?php echo $supplier['supplier_id']; ?>)">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                <?php endwhile; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                            $stmt = $db->prepare($suppliers_query);
+                                            $stmt->bind_param("i", $company_id);
+                                            $stmt->execute();
+                                            $suppliers = $stmt->get_result();
+                                            while ($supplier = $suppliers->fetch_assoc()):
+                                            ?>
+                                                <tr>
+                                                    <td><?php echo $supplier['supplier_code']; ?></td>
+                                                    <td><?php echo htmlspecialchars($supplier['supplier_name']); ?></td>
+                                                    <td><?php echo htmlspecialchars($supplier['contact_person']); ?></td>
+                                                    <td><?php echo $supplier['phone']; ?></td>
+                                                    <td><?php echo $supplier['email']; ?></td>
+                                                    <td><?php echo $supplier['category']; ?></td>
+                                                    <td>
+                                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                            <i class="fas fa-star <?php echo $i <= $supplier['rating'] ? 'text-warning' : 'text-secondary'; ?>"></i>
+                                                        <?php endfor; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-<?php echo $supplier['status'] == 'Active' ? 'success' : 'secondary'; ?>">
+                                                            <?php echo $supplier['status']; ?>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" onclick="viewEntity('../../api/get_supplier.php',<?php echo $supplier['supplier_id']; ?>,'Supplier')">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <!-- <button class="btn btn-sm btn-primary" onclick="editSupplier(<?php echo $supplier['supplier_id']; ?>)">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button> -->
+                                                    </td>
+                                                </tr>
+                                            <?php endwhile; ?>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+                        </div>
 
                         <!-- Add Supplier Modal -->
                         <div class="modal fade" id="addSupplierModal" tabindex="-1">
@@ -217,7 +255,8 @@ $page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
                                         <h5 class="modal-title">Add New Supplier</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <form action="process/add-supplier.php" method="POST">
+                                    <form action="suppliers.php" method="POST">
+                                        <input type="hidden" name="action" value="add">
                                         <div class="modal-body">
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
@@ -296,8 +335,71 @@ $page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
                 </div>
             </div>
         </div>
-    </div>å
+        <div class="modal fade" id="viewModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="modalBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
+
     <script>
+        // / FOR REUSABK MODAL VIEWING INSTANCE
+        let viewModalInstance;
+
+        function showModal(title, data) {
+            let html = '<div class="container-fluid">';
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    // For nested arrays (like PO line items)
+                    html += `<h6 class="mt-3">${key.replace(/_/g,' ')}</h6><ul>`;
+                    data[key].forEach(item => {
+                        html += '<li>' + Object.entries(item)
+                            .map(([k, v]) => `${k}: ${v}`)
+                            .join(', ') + '</li>';
+                    });
+                    html += '</ul>';
+                } else {
+                    html += `<p><strong>${key.replace(/_/g,' ')}</strong>: ${data[key]}</p>`;
+                }
+            }
+            html += '</div>';
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.querySelector('#viewModal .modal-title').innerText = title;
+
+            if (!viewModalInstance) {
+                viewModalInstance = new bootstrap.Modal(document.getElementById('viewModal'));
+            }
+            viewModalInstance.show();
+        }
+
+        function viewEntity(endpoint, id, title) {
+            fetch(`${endpoint}?id=${id}`)
+                .then(res => res.json())
+                .then(data => showModal(title, data))
+                .catch(err => alert('Error loading data: ' + err));
+        }
+
+// /////////////////////////////////////////////////////
+
         function reorderProduct(id) {
             window.location.href = 'create-po.php?product=' + id;
         }
@@ -306,10 +408,6 @@ $page_title = 'Suppliers'; // ← not 'Procurement Dashboard'
             // Initialize DataTables
             $('#suppliersTable').DataTable();
         });
-
-        function viewSupplier(id) {
-            window.location.href = 'view-supplier.php?id=' + id;
-        }
 
         function editSupplier(id) {
             window.location.href = 'edit-supplier.php?id=' + id;
