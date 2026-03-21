@@ -16,7 +16,7 @@ ini_set('session.gc_divisor', 100);
 // ============================================
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'password');
 define('DB_NAME', 'group_companies_db');
 
 // ============================================
@@ -24,7 +24,7 @@ define('DB_NAME', 'group_companies_db');
 // ============================================
 define('APP_NAME', 'Consika Companies Management System');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost/consika');
+define('APP_URL', 'http://localhost:8000');
 define('APP_ROOT', dirname(dirname(__FILE__)));
 
 // ============================================

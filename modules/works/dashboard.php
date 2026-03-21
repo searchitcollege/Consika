@@ -70,12 +70,14 @@ $active_projects = $stmt->get_result();
 
 // Recent daily reports
 $recent_reports = [];
+// Get recent daily reports
 $reports_query = "SELECT dr.*, p.project_name, u.full_name as reporter_name
-                 FROM works_daily_reports dr
-                 JOIN works_projects p ON dr.project_id = p.project_id
-                 JOIN users u ON dr.submitted_by = u.user_id
-                 WHERE p.company_id = ?
-                 ORDER BY dr.created_at DESC LIMIT 10";
+    FROM works_daily_reports dr
+    JOIN works_projects p ON dr.project_id = p.project_id
+    LEFT JOIN users u ON dr.submitted_by = u.user_id
+    WHERE p.company_id = ?
+    ORDER BY dr.created_at DESC
+    LIMIT 5";
 $stmt = $db->prepare($reports_query);
 $stmt->bind_param("i", $company_id);
 $stmt->execute();

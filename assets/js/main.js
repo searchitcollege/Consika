@@ -342,7 +342,7 @@ function showToast(message, type = 'info') {
  * @returns {string} Formatted currency
  */
 function formatCurrency(amount) {
-    return 'KES ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    return 'GHS ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
 /**

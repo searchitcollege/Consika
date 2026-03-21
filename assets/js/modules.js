@@ -203,7 +203,7 @@ const ProcurementModule = {
         let subtotal = 0;
         $('.po-item').each(function() {
             let totalText = $(this).find('.total-price').text();
-            subtotal += parseFloat(totalText.replace('KES ', '').replace(',', '')) || 0;
+            subtotal += parseFloat(totalText.replace('GHS ', '').replace(',', '')) || 0;
         });
         
         let tax = subtotal * 0.16;
@@ -492,7 +492,7 @@ const BlockFactoryModule = {
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return 'KES ' + value.toLocaleString();
+                                        return 'GHS ' + value.toLocaleString();
                                     }
                                 }
                             }

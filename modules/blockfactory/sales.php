@@ -757,7 +757,7 @@ $page_title = 'Sales';
                 var subtotal = qty * price;
                 var tax = subtotal * 0.16;
                 var total = subtotal + tax - discount;
-                $('#totalAmount').val('KES ' + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                $('#totalAmount').val('GHS ' + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
             }
         });
         
@@ -773,9 +773,9 @@ $page_title = 'Sales';
             $.get('ajax/get-sale.php', {id: id}, function(data) {
                 $('#payment_sale_id').val(data.sale_id);
                 $('#payment_invoice').val(data.invoice_number);
-                $('#payment_total').val('KES ' + data.total_amount.toFixed(2));
-                $('#payment_paid').val('KES ' + data.amount_paid.toFixed(2));
-                $('#payment_balance').val('KES ' + data.balance.toFixed(2));
+                $('#payment_total').val('GHS ' + data.total_amount.toFixed(2));
+                $('#payment_paid').val('GHS ' + data.amount_paid.toFixed(2));
+                $('#payment_balance').val('GHS ' + data.balance.toFixed(2));
                 $('#paymentModal').modal('show');
             }, 'json');
         }

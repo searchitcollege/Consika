@@ -644,7 +644,7 @@ $recent_deliveries = $stmt->get_result();
             }
 
             function formatMoney(amount) {
-                return 'KES ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                return 'GHS ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             }
 
             // Load PO items for receiving

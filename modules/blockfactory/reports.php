@@ -895,7 +895,7 @@ $page_title = 'Reports';
                                                 beginAtZero: true,
                                                 ticks: {
                                                     callback: function(value) {
-                                                        return 'KES ' + value.toLocaleString();
+                                                        return 'GHS ' + value.toLocaleString();
                                                     }
                                                 }
                                             }

@@ -19,7 +19,7 @@ $stats_query = "SELECT
                 (SELECT COUNT(*) FROM works_projects WHERE company_id = ? AND status = 'In Progress') as active_projects,
                 (SELECT COUNT(*) FROM works_projects WHERE company_id = ? AND status = 'Completed') as completed_projects,
                 (SELECT COUNT(*) FROM works_employees WHERE status = 'Active') as total_employees,
-                (SELECT COUNT(*) FROM works_materials WHERE current_stock <= minimum_stock) as low_materials,
+                (SELECT COUNT(*) FROM procurement_products WHERE category = 'Building Materials' AND current_stock <= minimum_stock) as low_materials,
                 (SELECT COALESCE(SUM(budget), 0) FROM works_projects WHERE company_id = ? AND status != 'Completed') as total_budget,
                 (SELECT COALESCE(SUM(actual_cost), 0) FROM works_projects WHERE company_id = ?) as total_cost";
 $stmt = $db->prepare($stats_query);
@@ -38,11 +38,12 @@ $active_projects = $stmt->get_result();
 
 // Get recent daily reports
 $reports_query = "SELECT dr.*, p.project_name, u.full_name as reporter_name
-                 FROM works_daily_reports dr
-                 JOIN works_projects p ON dr.project_id = p.project_id
-                 JOIN users u ON dr.submitted_by = u.user_id
-                 WHERE p.company_id = ?
-                 ORDER BY dr.created_at DESC LIMIT 10";
+    FROM works_daily_reports dr
+    JOIN works_projects p ON dr.project_id = p.project_id
+    LEFT JOIN users u ON dr.submitted_by = u.user_id
+    WHERE p.company_id = ?
+    ORDER BY dr.created_at DESC
+    LIMIT 10";
 $stmt = $db->prepare($reports_query);
 $stmt->bind_param("i", $company_id);
 $stmt->execute();
@@ -62,238 +63,44 @@ $upcoming_deadlines = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Works & Construction - <?php echo APP_NAME; ?></title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- FullCalendar -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
-    
+
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    
+
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    
+
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
-    
-    <style>
-        .module-header {
-            background: linear-gradient(135deg, #f72585, #b5179e);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #f72585, #b5179e);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333;
-            margin: 0;
-        }
-        
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-            margin: 0;
-        }
-        
-        .project-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            transition: all 0.3s;
-            border: 1px solid #e9ecef;
-        }
-        
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .project-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .project-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .project-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .project-body {
-            padding: 20px;
-        }
-        
-        .progress-section {
-            margin-bottom: 15px;
-        }
-        
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 13px;
-        }
-        
-        .progress {
-            height: 10px;
-            border-radius: 5px;
-        }
-        
-        .deadline-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .report-item {
-            padding: 15px;
-            border-left: 3px solid #f72585;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .quick-action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .quick-action-btn {
-            background: white;
-            border: 2px dashed #dee2e6;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .quick-action-btn:hover {
-            border-color: #f72585;
-            background: #f8f9fa;
-            transform: translateY(-3px);
-        }
-        
-        .quick-action-btn i {
-            font-size: 28px;
-            color: #f72585;
-            margin-bottom: 10px;
-        }
-        
-        .quick-action-btn span {
-            display: block;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .nav-tabs .nav-link {
-            color: #666;
-            font-weight: 500;
-            border: none;
-            padding: 10px 20px;
-        }
-        
-        .nav-tabs .nav-link.active {
-            color: #f72585;
-            background: none;
-            border-bottom: 3px solid #f72585;
-        }
-        
-        .gantt-container {
-            height: 400px;
-            overflow-x: auto;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-        }
-        
-        .employee-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #f72585;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .material-alert {
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-    </style>
+
+    <!-- Custom Styles Specific to workd -->
+    <link href="../../assets/css/works/style.css" rel="stylesheet">
 </head>
+
 <body class="module-works">
-    <div class="wrapper">
+    <div class="wrapper container-fluid p-0">
         <!-- Include sidebar -->
         <?php include '../../includes/sidebar.php'; ?>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navigation -->
             <?php include '../../includes/top-nav.php'; ?>
-            
+
             <!-- Module Header -->
             <div class="module-header">
                 <div class="row align-items-center">
@@ -311,7 +118,7 @@ $upcoming_deadlines = $stmt->get_result();
                     </div>
                 </div>
             </div>
-            
+
             <!-- Quick Actions -->
             <div class="quick-action-grid mb-4">
                 <div class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#newProjectModal">
@@ -335,7 +142,7 @@ $upcoming_deadlines = $stmt->get_result();
                     <span>Site Visits</span>
                 </div>
             </div>
-            
+
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -347,7 +154,7 @@ $upcoming_deadlines = $stmt->get_result();
                         <p class="stat-label">Active Projects</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #4cc9f0, #4895ef);">
@@ -357,7 +164,7 @@ $upcoming_deadlines = $stmt->get_result();
                         <p class="stat-label">Completed</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f8961e, #f3722c);">
@@ -367,7 +174,7 @@ $upcoming_deadlines = $stmt->get_result();
                         <p class="stat-label">Employees</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545, #b02a37);">
@@ -378,7 +185,7 @@ $upcoming_deadlines = $stmt->get_result();
                     </div>
                 </div>
             </div>
-            
+
             <!-- Budget Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
@@ -407,13 +214,12 @@ $upcoming_deadlines = $stmt->get_result();
                         <div class="card-body">
                             <h5 class="card-title">Upcoming Deadlines</h5>
                             <?php if ($upcoming_deadlines->num_rows > 0): ?>
-                                <?php while($deadline = $upcoming_deadlines->fetch_assoc()): ?>
+                                <?php while ($deadline = $upcoming_deadlines->fetch_assoc()): ?>
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <span><?php echo htmlspecialchars($deadline['project_name']); ?></span>
-                                        <span class="deadline-badge bg-<?php 
-                                            echo $deadline['days_left'] <= 7 ? 'danger' : 
-                                                ($deadline['days_left'] <= 14 ? 'warning' : 'info'); 
-                                        ?> text-white">
+                                        <span class="deadline-badge bg-<?php
+                                                                        echo $deadline['days_left'] <= 7 ? 'danger' : ($deadline['days_left'] <= 14 ? 'warning' : 'info');
+                                                                        ?> text-white">
                                             <?php echo $deadline['days_left']; ?> days left
                                         </span>
                                     </div>
@@ -425,7 +231,7 @@ $upcoming_deadlines = $stmt->get_result();
                     </div>
                 </div>
             </div>
-            
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mb-4" id="worksTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -454,104 +260,103 @@ $upcoming_deadlines = $stmt->get_result();
                     </button>
                 </li>
             </ul>
-            
+
             <!-- Tab Content -->
             <div class="tab-content" id="worksTabContent">
                 <!-- Projects Tab -->
                 <div class="tab-pane fade show active" id="projects" role="tabpanel">
                     <div class="row">
-                        <?php 
+                        <?php
                         $all_projects_query = "SELECT * FROM works_projects WHERE company_id = ? ORDER BY created_at DESC";
                         $stmt = $db->prepare($all_projects_query);
                         $stmt->bind_param("i", $company_id);
                         $stmt->execute();
                         $all_projects = $stmt->get_result();
-                        
-                        while($project = $all_projects->fetch_assoc()): 
+
+                        while ($project = $all_projects->fetch_assoc()):
                         ?>
-                        <div class="col-md-6">
-                            <div class="project-card">
-                                <div class="project-header">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="project-title"><?php echo htmlspecialchars($project['project_name']); ?></h5>
-                                            <p class="project-meta">
-                                                <span><i class="fas fa-code"></i> <?php echo $project['project_code']; ?></span>
-                                                <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($project['location']); ?></span>
-                                            </p>
-                                        </div>
-                                        <span class="badge bg-<?php 
-                                            echo $project['status'] == 'In Progress' ? 'primary' : 
-                                                ($project['status'] == 'Completed' ? 'success' : 
-                                                ($project['status'] == 'On Hold' ? 'warning' : 'secondary')); 
-                                        ?>">
-                                            <?php echo $project['status']; ?>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="project-body">
-                                    <div class="progress-section">
-                                        <div class="progress-label">
-                                            <span>Progress</span>
-                                            <span><?php echo $project['progress_percentage']; ?>%</span>
-                                        </div>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-primary" style="width: <?php echo $project['progress_percentage']; ?>%"></div>
+                            <div class="col-md-6">
+                                <div class="project-card">
+                                    <div class="project-header">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h5 class="project-title"><?php echo htmlspecialchars($project['project_name']); ?></h5>
+                                                <p class="project-meta">
+                                                    <span><i class="fas fa-code"></i> <?php echo $project['project_code']; ?></span>
+                                                    <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($project['location']); ?></span>
+                                                </p>
+                                            </div>
+                                            <span class="badge bg-<?php
+                                                                    echo $project['status'] == 'In Progress' ? 'primary' : ($project['status'] == 'Completed' ? 'success' : ($project['status'] == 'On Hold' ? 'warning' : 'secondary'));
+                                                                    ?>">
+                                                <?php echo $project['status']; ?>
+                                            </span>
                                         </div>
                                     </div>
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-6">
-                                            <small class="text-muted d-block">Start Date</small>
-                                            <strong><?php echo format_date($project['start_date']); ?></strong>
+                                    <div class="project-body">
+                                        <div class="progress-section">
+                                            <div class="progress-label">
+                                                <span>Progress</span>
+                                                <span><?php echo $project['progress_percentage']; ?>%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-primary" style="width: <?php echo $project['progress_percentage']; ?>%"></div>
+                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                            <small class="text-muted d-block">End Date</small>
-                                            <strong><?php echo $project['end_date'] ? format_date($project['end_date']) : 'TBD'; ?></strong>
+
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Start Date</small>
+                                                <strong><?php echo format_date($project['start_date']); ?></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">End Date</small>
+                                                <strong><?php echo $project['end_date'] ? format_date($project['end_date']) : 'TBD'; ?></strong>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="row mb-3">
-                                        <div class="col-6">
-                                            <small class="text-muted d-block">Budget</small>
-                                            <strong><?php echo format_money($project['budget']); ?></strong>
+
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Budget</small>
+                                                <strong><?php echo format_money($project['budget']); ?></strong>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted d-block">Actual Cost</small>
+                                                <strong><?php echo format_money($project['actual_cost']); ?></strong>
+                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                            <small class="text-muted d-block">Actual Cost</small>
-                                            <strong><?php echo format_money($project['actual_cost']); ?></strong>
+
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-primary" onclick="viewProject(<?php echo $project['project_id']; ?>)">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="updateProgress(<?php echo $project['project_id']; ?>)">
+                                                <i class="fas fa-chart-line"></i> Update
+                                            </button>
+                                            <button class="btn btn-sm btn-info" onclick="dailyReport(<?php echo $project['project_id']; ?>)">
+                                                <i class="fas fa-clipboard-list"></i> Report
+                                            </button>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-primary" onclick="viewProject(<?php echo $project['project_id']; ?>)">
-                                            <i class="fas fa-eye"></i> View
-                                        </button>
-                                        <button class="btn btn-sm btn-success" onclick="updateProgress(<?php echo $project['project_id']; ?>)">
-                                            <i class="fas fa-chart-line"></i> Update
-                                        </button>
-                                        <button class="btn btn-sm btn-info" onclick="dailyReport(<?php echo $project['project_id']; ?>)">
-                                            <i class="fas fa-clipboard-list"></i> Report
-                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         <?php endwhile; ?>
                     </div>
                 </div>
-                
+
                 <!-- Timeline Tab -->
                 <div class="tab-pane fade" id="timeline" role="tabpanel">
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0">Project Timeline</h5>
+                            <h7 id="projectName"></h7>
                         </div>
                         <div class="card-body">
                             <div id="calendar"></div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Employees Tab -->
                 <div class="tab-pane fade" id="employees" role="tabpanel">
                     <div class="card">
@@ -577,42 +382,42 @@ $upcoming_deadlines = $stmt->get_result();
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $employees_query = "SELECT * FROM works_employees ORDER BY full_name ASC";
                                         $employees = $db->query($employees_query);
-                                        while($emp = $employees->fetch_assoc()): 
+                                        while ($emp = $employees->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><?php echo $emp['employee_code']; ?></td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="employee-avatar me-2">
-                                                        <?php echo get_avatar_letter($emp['full_name']); ?>
+                                            <tr>
+                                                <td><?php echo $emp['employee_code']; ?></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="employee-avatar me-2">
+                                                            <?php echo get_avatar_letter($emp['full_name']); ?>
+                                                        </div>
+                                                        <?php echo htmlspecialchars($emp['full_name']); ?>
                                                     </div>
-                                                    <?php echo htmlspecialchars($emp['full_name']); ?>
-                                                </div>
-                                            </td>
-                                            <td><?php echo $emp['position']; ?></td>
-                                            <td><?php echo $emp['department']; ?></td>
-                                            <td><?php echo $emp['phone']; ?></td>
-                                            <td><?php echo format_date($emp['hire_date']); ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $emp['status'] == 'Active' ? 'success' : 'secondary'; ?>">
-                                                    <?php echo $emp['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewEmployee(<?php echo $emp['employee_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" onclick="editEmployee(<?php echo $emp['employee_id']; ?>)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" onclick="assignToProject(<?php echo $emp['employee_id']; ?>)">
-                                                    <i class="fas fa-tasks"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td><?php echo $emp['position']; ?></td>
+                                                <td><?php echo $emp['department']; ?></td>
+                                                <td><?php echo $emp['phone']; ?></td>
+                                                <td><?php echo format_date($emp['hire_date']); ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php echo $emp['status'] == 'Active' ? 'success' : 'secondary'; ?>">
+                                                        <?php echo $emp['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewEmployee(<?php echo $emp['employee_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary" onclick="editEmployee(<?php echo $emp['employee_id']; ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" onclick="assignToProject(<?php echo $emp['employee_id']; ?>)">
+                                                        <i class="fas fa-tasks"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -620,7 +425,7 @@ $upcoming_deadlines = $stmt->get_result();
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Materials Tab -->
                 <div class="tab-pane fade" id="materials" role="tabpanel">
                     <div class="row">
@@ -648,47 +453,46 @@ $upcoming_deadlines = $stmt->get_result();
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php 
-                                                $materials_query = "SELECT * FROM works_materials ORDER BY material_name ASC";
+                                                <?php
+                                                $materials_query = "SELECT * FROM procurement_products WHERE category = 'Building Materials' ORDER BY product_name ASC";
                                                 $materials = $db->query($materials_query);
-                                                while($mat = $materials->fetch_assoc()): 
+                                                while ($mat = $materials->fetch_assoc()):
                                                 ?>
-                                                <tr>
-                                                    <td><?php echo $mat['material_code']; ?></td>
-                                                    <td><?php echo htmlspecialchars($mat['material_name']); ?></td>
-                                                    <td><?php echo $mat['category']; ?></td>
-                                                    <td><?php echo $mat['unit']; ?></td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <span class="<?php echo $mat['current_stock'] <= $mat['minimum_stock'] ? 'text-danger fw-bold' : ''; ?>">
-                                                                <?php echo $mat['current_stock']; ?>
+                                                    <tr>
+                                                        <td><?php echo $mat['product_code']; ?></td>
+                                                        <td><?php echo htmlspecialchars($mat['product_name']); ?></td>
+                                                        <td><?php echo $mat['category']; ?></td>
+                                                        <td><?php echo $mat['unit']; ?></td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="<?php echo $mat['current_stock'] <= $mat['minimum_stock'] ? 'text-danger fw-bold' : ''; ?>">
+                                                                    <?php echo $mat['current_stock']; ?>
+                                                                </span>
+                                                                <?php if ($mat['current_stock'] <= $mat['minimum_stock']): ?>
+                                                                    <i class="fas fa-exclamation-circle text-danger ms-2"></i>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </td>
+                                                        <td><?php echo format_money($mat['unit_price']); ?></td>
+                                                        <td>
+                                                            <span class="badge bg-<?php
+                                                                                    echo $mat['status'] == 'Available' ? 'success' : ($mat['status'] == 'Low Stock' ? 'warning' : 'danger');
+                                                                                    ?>">
+                                                                <?php echo $mat['status']; ?>
                                                             </span>
-                                                            <?php if($mat['current_stock'] <= $mat['minimum_stock']): ?>
-                                                                <i class="fas fa-exclamation-circle text-danger ms-2"></i>
-                                                            <?php endif; ?>
-                                                        </div>
-                                                    </td>
-                                                    <td><?php echo format_money($mat['unit_cost']); ?></td>
-                                                    <td>
-                                                        <span class="badge bg-<?php 
-                                                            echo $mat['status'] == 'Available' ? 'success' : 
-                                                                ($mat['status'] == 'Low Stock' ? 'warning' : 'danger'); 
-                                                        ?>">
-                                                            <?php echo $mat['status']; ?>
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $mat['material_id']; ?>)">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $mat['material_id']; ?>)">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-success" onclick="issueMaterial(<?php echo $mat['material_id']; ?>)">
-                                                            <i class="fas fa-arrow-right"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $mat['product_id']; ?>)">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $mat['product_id']; ?>)">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-success" onclick="issueMaterial(<?php echo $mat['product_id']; ?>)">
+                                                                <i class="fas fa-arrow-right"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
                                                 <?php endwhile; ?>
                                             </tbody>
                                         </table>
@@ -696,80 +500,80 @@ $upcoming_deadlines = $stmt->get_result();
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="mb-0">Low Stock Alert</h5>
                                 </div>
                                 <div class="card-body">
-                                    <?php 
-                                    $low_stock_query = "SELECT * FROM works_materials WHERE current_stock <= minimum_stock AND status != 'Out of Stock'";
+                                    <?php
+                                    $low_stock_query = "SELECT * FROM procurement_products WHERE category = 'Building Materials' AND current_stock <= minimum_stock";
                                     $low_stock = $db->query($low_stock_query);
                                     if ($low_stock->num_rows > 0):
-                                        while($material = $low_stock->fetch_assoc()):
+                                        while ($material = $low_stock->fetch_assoc()):
                                     ?>
-                                    <div class="material-alert">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <strong><?php echo htmlspecialchars($material['material_name']); ?></strong>
-                                                <br>
-                                                <small>Current: <?php echo $material['current_stock']; ?> <?php echo $material['unit']; ?></small>
-                                                <br>
-                                                <small>Min: <?php echo $material['minimum_stock']; ?> <?php echo $material['unit']; ?></small>
+                                            <div class="material-alert">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <strong><?php echo htmlspecialchars($material['product_name']); ?></strong>
+                                                        <br>
+                                                        <small>Current: <?php echo $material['current_stock']; ?> <?php echo $material['unit']; ?></small>
+                                                        <br>
+                                                        <small>Min: <?php echo $material['minimum_stock']; ?> <?php echo $material['unit']; ?></small>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-warning" onclick="orderMaterial(<?php echo $material['product_id']; ?>)">
+                                                        Order
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <button class="btn btn-sm btn-warning" onclick="orderMaterial(<?php echo $material['material_id']; ?>)">
-                                                Order
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <?php 
+                                        <?php
                                         endwhile;
                                     else:
-                                    ?>
-                                    <p class="text-muted text-center">No low stock items</p>
+                                        ?>
+                                        <p class="text-muted text-center">No low stock items</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            
+
                             <div class="card mt-4">
                                 <div class="card-header">
                                     <h5 class="mb-0">Material Usage Today</h5>
                                 </div>
                                 <div class="card-body">
-                                    <?php 
-                                    $usage_query = "SELECT pm.*, m.material_name, p.project_name
+                                    <?php
+                                    $usage_query = "SELECT pm.*, m.product_name, p.project_name, m.unit
                                                    FROM works_project_materials pm
-                                                   JOIN works_materials m ON pm.material_id = m.material_id
+                                                   JOIN procurement_products m ON pm.material_id = m.product_id
                                                    JOIN works_projects p ON pm.project_id = p.project_id
                                                    WHERE DATE(pm.date_used) = CURDATE()
                                                    ORDER BY pm.created_at DESC LIMIT 5";
                                     $usage = $db->query($usage_query);
                                     if ($usage->num_rows > 0):
-                                        while($use = $usage->fetch_assoc()):
+                                        while ($use = $usage->fetch_assoc()):
                                     ?>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div>
-                                            <strong><?php echo htmlspecialchars($use['material_name']); ?></strong>
-                                            <br>
-                                            <small class="text-muted"><?php echo $use['project_name']; ?></small>
-                                        </div>
-                                        <span class="badge bg-info">
-                                            <?php echo $use['quantity']; ?> <?php echo $use['unit']; ?>
-                                        </span>
-                                    </div>
-                                    <?php 
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <strong><?php echo htmlspecialchars($use['product_name']); ?></strong>
+                                                    <br>
+                                                    <small class="text-muted"><?php echo $use['project_name']; ?></small>
+                                                </div>
+                                                <span class="badge bg-info">
+                                                    <?php echo $use['quantity']; ?> <?php echo $use['unit']; ?>
+                                                </span>
+                                            </div>
+                                        <?php
                                         endwhile;
                                     else:
-                                    ?>
-                                    <p class="text-muted text-center">No usage recorded today</p>
+                                        ?>
+                                        <p class="text-muted text-center">No usage recorded today</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Daily Reports Tab -->
                 <div class="tab-pane fade" id="reports" role="tabpanel">
                     <div class="card">
@@ -781,7 +585,7 @@ $upcoming_deadlines = $stmt->get_result();
                         </div>
                         <div class="card-body">
                             <?php if ($recent_reports->num_rows > 0): ?>
-                                <?php while($report = $recent_reports->fetch_assoc()): ?>
+                                <?php while ($report = $recent_reports->fetch_assoc()): ?>
                                     <div class="report-item">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <div>
@@ -800,7 +604,7 @@ $upcoming_deadlines = $stmt->get_result();
                                             <button class="btn btn-sm btn-outline-primary" onclick="viewReport(<?php echo $report['report_id']; ?>)">
                                                 Read More
                                             </button>
-                                            <?php if($report['photos']): ?>
+                                            <?php if ($report['photos']): ?>
                                                 <button class="btn btn-sm btn-outline-info" onclick="viewPhotos('<?php echo $report['photos']; ?>')">
                                                     <i class="fas fa-images"></i> Photos
                                                 </button>
@@ -817,7 +621,7 @@ $upcoming_deadlines = $stmt->get_result();
             </div>
         </div>
     </div>
-    
+
     <!-- New Project Modal -->
     <div class="modal fade" id="newProjectModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -838,7 +642,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="project_name" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Project Type</label>
@@ -855,12 +659,12 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="client_name">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Location</label>
                             <input type="text" class="form-control" name="location" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Start Date</label>
@@ -871,7 +675,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="date" class="form-control" name="end_date">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Budget</label>
@@ -882,21 +686,21 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="number" step="0.01" class="form-control" name="contingency" value="0">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Project Description</label>
                             <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Project Manager</label>
                             <select class="form-control" name="project_manager">
                                 <option value="">Select Manager</option>
-                                <?php 
+                                <?php
                                 $users = $db->query("SELECT user_id, full_name FROM users WHERE company_id = $company_id AND role IN ('Manager', 'CompanyAdmin')");
-                                while($user = $users->fetch_assoc()):
+                                while ($user = $users->fetch_assoc()):
                                 ?>
-                                <option value="<?php echo $user['user_id']; ?>"><?php echo $user['full_name']; ?></option>
+                                    <option value="<?php echo $user['user_id']; ?>"><?php echo $user['full_name']; ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
@@ -909,7 +713,7 @@ $upcoming_deadlines = $stmt->get_result();
             </div>
         </div>
     </div>
-    
+
     <!-- Add Employee Modal -->
     <div class="modal fade" id="addEmployeeModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -930,7 +734,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="full_name" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">ID Number</label>
@@ -941,7 +745,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="phone" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Position</label>
@@ -952,7 +756,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="department">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Hire Date</label>
@@ -968,7 +772,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Hourly Rate</label>
@@ -983,7 +787,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="number" step="0.01" class="form-control" name="monthly_salary">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Emergency Contact</label>
@@ -1003,7 +807,7 @@ $upcoming_deadlines = $stmt->get_result();
             </div>
         </div>
     </div>
-    
+
     <!-- Add Material Modal -->
     <div class="modal fade" id="addMaterialModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1018,12 +822,12 @@ $upcoming_deadlines = $stmt->get_result();
                             <label class="form-label">Material Code</label>
                             <input type="text" class="form-control" name="material_code" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Material Name</label>
                             <input type="text" class="form-control" name="material_name" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Category</label>
@@ -1050,7 +854,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit Cost</label>
@@ -1061,7 +865,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="number" step="0.01" class="form-control" name="current_stock" value="0">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Minimum Stock</label>
@@ -1072,7 +876,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="text" class="form-control" name="supplier">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="2"></textarea>
@@ -1086,7 +890,7 @@ $upcoming_deadlines = $stmt->get_result();
             </div>
         </div>
     </div>
-    
+
     <!-- Daily Report Modal -->
     <div class="modal fade" id="dailyReportModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -1101,15 +905,15 @@ $upcoming_deadlines = $stmt->get_result();
                             <label class="form-label">Project</label>
                             <select class="form-control" name="project_id" required>
                                 <option value="">Select Project</option>
-                                <?php 
+                                <?php
                                 $projects = $db->query("SELECT project_id, project_name FROM works_projects WHERE company_id = $company_id AND status = 'In Progress'");
-                                while($proj = $projects->fetch_assoc()):
+                                while ($proj = $projects->fetch_assoc()):
                                 ?>
-                                <option value="<?php echo $proj['project_id']; ?>"><?php echo $proj['project_name']; ?></option>
+                                    <option value="<?php echo $proj['project_id']; ?>"><?php echo $proj['project_name']; ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Report Date</label>
@@ -1125,12 +929,12 @@ $upcoming_deadlines = $stmt->get_result();
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Work Description</label>
                             <textarea class="form-control" name="work_description" rows="4" required></textarea>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Employees Present</label>
@@ -1141,7 +945,7 @@ $upcoming_deadlines = $stmt->get_result();
                                 <input type="number" step="0.5" class="form-control" name="hours_worked" required>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Materials Used</label>
                             <div id="materialsUsed">
@@ -1149,11 +953,11 @@ $upcoming_deadlines = $stmt->get_result();
                                     <div class="col-md-5">
                                         <select class="form-control" name="materials[0][id]">
                                             <option value="">Select Material</option>
-                                            <?php 
-                                            $mats = $db->query("SELECT material_id, material_name FROM works_materials");
-                                            while($mat = $mats->fetch_assoc()):
+                                            <?php
+                                            $mats = $db->query("SELECT product_id, product_name FROM procurement_products WHERE category = 'Building Materials' ORDER BY product_name ASC");
+                                            while ($mat = $mats->fetch_assoc()):
                                             ?>
-                                            <option value="<?php echo $mat['material_id']; ?>"><?php echo $mat['material_name']; ?></option>
+                                                <option value="<?php echo $mat['product_id']; ?>"><?php echo $mat['product_name']; ?></option>
                                             <?php endwhile; ?>
                                         </select>
                                     </div>
@@ -1168,12 +972,12 @@ $upcoming_deadlines = $stmt->get_result();
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Equipment Used</label>
                             <textarea class="form-control" name="equipment_used" rows="2" placeholder="List equipment used today"></textarea>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Challenges</label>
@@ -1184,12 +988,12 @@ $upcoming_deadlines = $stmt->get_result();
                                 <textarea class="form-control" name="achievements" rows="2"></textarea>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Plan for Tomorrow</label>
                             <textarea class="form-control" name="next_plan" rows="2"></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Site Photos</label>
                             <input type="file" class="form-control" name="photos[]" multiple accept="image/*">
@@ -1204,7 +1008,7 @@ $upcoming_deadlines = $stmt->get_result();
             </div>
         </div>
     </div>
-    
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1214,13 +1018,13 @@ $upcoming_deadlines = $stmt->get_result();
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js'></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/modules.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             // Initialize DataTables
             $('#employeesTable').DataTable();
             $('#materialsTable').DataTable();
-            
+
             // Initialize FullCalendar
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -1237,19 +1041,20 @@ $upcoming_deadlines = $stmt->get_result();
             });
             calendar.render();
         });
-        
+
         let materialCount = 1;
+
         function addMaterialField() {
             let html = `
                 <div class="row mb-2">
                     <div class="col-md-5">
                         <select class="form-control" name="materials[${materialCount}][id]">
                             <option value="">Select Material</option>
-                            <?php 
-                            $mats = $db->query("SELECT material_id, material_name FROM works_materials");
-                            while($mat = $mats->fetch_assoc()):
+                            <?php
+                            $mats = $db->query("SELECT product_id, product_name FROM procurement_products WHERE category = 'Building Materials' ORDER BY product_name ASC");
+                            while ($mat = $mats->fetch_assoc()):
                             ?>
-                            <option value="<?php echo $mat['material_id']; ?>"><?php echo $mat['material_name']; ?></option>
+                            <option value="<?php echo $mat['product_id']; ?>"><?php echo $mat['product_name']; ?></option>
                             <?php endwhile; ?>
                         </select>
                     </div>
@@ -1266,11 +1071,11 @@ $upcoming_deadlines = $stmt->get_result();
             $('#materialsUsed').append(html);
             materialCount++;
         }
-        
+
         function viewProject(id) {
             window.location.href = 'view-project.php?id=' + id;
         }
-        
+
         function updateProgress(id) {
             let progress = prompt('Enter new progress percentage (0-100):');
             if (progress !== null) {
@@ -1282,50 +1087,51 @@ $upcoming_deadlines = $stmt->get_result();
                 });
             }
         }
-        
+
         function dailyReport(projectId) {
             $('#dailyReportModal select[name="project_id"]').val(projectId);
             $('#dailyReportModal').modal('show');
         }
-        
+
         function viewEmployee(id) {
             window.location.href = 'view-employee.php?id=' + id;
         }
-        
+
         function editEmployee(id) {
             window.location.href = 'edit-employee.php?id=' + id;
         }
-        
+
         function assignToProject(employeeId) {
             // Open assignment modal
             $('#assignEmployeeModal select[name="employee_id"]').val(employeeId);
             $('#assignEmployeeModal').modal('show');
         }
-        
+
         function viewMaterial(id) {
             window.location.href = 'view-material.php?id=' + id;
         }
-        
+
         function editMaterial(id) {
             window.location.href = 'edit-material.php?id=' + id;
         }
-        
+
         function issueMaterial(id) {
             window.location.href = 'issue-material.php?id=' + id;
         }
-        
+
         function orderMaterial(id) {
             window.location.href = '../procurement/create-po.php?material=' + id;
         }
-        
+
         function viewReport(id) {
             window.location.href = 'view-report.php?id=' + id;
         }
-        
+
         function viewPhotos(photos) {
             // Open photo gallery modal
             $('#photoGallery').modal('show');
         }
     </script>
 </body>
+
 </html>

@@ -1,0 +1,259 @@
+.main-content {
+    margin-left: 288px;
+    padding: 2px;
+    max-width: calc(100% - 300px);
+}
+
+.module-header {
+    background: linear-gradient(135deg, #f72585, #b5179e);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f72585, #b5179e);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.project-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    transition: all 0.3s;
+    border: 1px solid #e9ecef;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.project-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.project-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.project-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.project-body {
+    padding: 20px;
+}
+
+.progress-section {
+    margin-bottom: 15px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 13px;
+}
+
+.progress {
+    height: 10px;
+    border-radius: 5px;
+}
+
+.deadline-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.report-item {
+    padding: 15px;
+    border-left: 3px solid #f72585;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.quick-action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.quick-action-btn {
+    background: white;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.quick-action-btn:hover {
+    border-color: #f72585;
+    background: #f8f9fa;
+    transform: translateY(-3px);
+}
+
+.quick-action-btn i {
+    font-size: 28px;
+    color: #f72585;
+    margin-bottom: 10px;
+}
+
+.quick-action-btn span {
+    display: block;
+    font-weight: 600;
+    color: #333;
+}
+
+.nav-tabs .nav-link {
+    color: #666;
+    font-weight: 500;
+    border: none;
+    padding: 10px 20px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #f72585;
+    background: none;
+    border-bottom: 3px solid #f72585;
+}
+
+.gantt-container {
+    height: 400px;
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.employee-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #f72585;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.material-alert {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Mostly for the projects [page] */
+#modalActivityTimeline .tl-item {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+#modalActivityTimeline .tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 28px;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+#modalActivityTimeline .tl-dot {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    z-index: 1;
+}
+
+#modalActivityTimeline .tl-body {
+    flex: 1;
+    min-width: 0;
+}
+
+#modalActivityTimeline .tl-date {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: #6c757d;
+}
+
+#modalActivityTimeline .tl-desc {
+    font-size: 0.85rem;
+    color: #343a40;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#modalActivityTimeline .tl-meta {
+    font-size: 0.75rem;
+    color: #adb5bd;
+}

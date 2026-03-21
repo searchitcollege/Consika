@@ -528,7 +528,7 @@ if ($role == 'SuperAdmin') {
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between mb-1">
                                             <span>Total Revenue</span>
-                                            <strong id="totalRevenue">KES 0</strong>
+                                            <strong id="totalRevenue">GHS 0</strong>
                                         </div>
                                         <div class="progress" style="height: 5px;">
                                             <div class="progress-bar bg-success" style="width: 75%"></div>
@@ -558,7 +558,7 @@ if ($role == 'SuperAdmin') {
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between mb-1">
                                             <span>Inventory Value</span>
-                                            <strong id="inventoryValue">KES 0</strong>
+                                            <strong id="inventoryValue">GHS 0</strong>
                                         </div>
                                         <div class="progress" style="height: 5px;">
                                             <div class="progress-bar bg-warning" style="width: 30%"></div>
@@ -887,7 +887,7 @@ if ($role == 'SuperAdmin') {
         }
         
         function formatMoney(amount) {
-            return 'KES ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            return 'GHS ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
     </script>
 </body>

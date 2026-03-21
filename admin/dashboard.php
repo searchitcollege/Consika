@@ -1226,7 +1226,7 @@ if ($result && $result->num_rows > 0) {
                                     beginAtZero: true,
                                     ticks: {
                                         callback: function(value) {
-                                            return 'KES ' + value.toLocaleString();
+                                            return 'GHS ' + value.toLocaleString();
                                         }
                                     }
                                 }

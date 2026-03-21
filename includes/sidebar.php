@@ -9,7 +9,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="sidebar-header">
-        <h3><?php echo defined('APP_NAME') ? APP_NAME : 'Company Management'; ?></h3>
+        <h3 style="color: #fff;"><?php echo defined('APP_NAME') ? APP_NAME : 'Company Management'; ?></h3>
         <p>
             <?php 
             if ($role == 'SuperAdmin') {
