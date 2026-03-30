@@ -121,11 +121,19 @@ $upcoming_deadlines = $stmt->get_result();
         <!-- Main content -->
         <div class="main-content">
             <!-- Module Header -->
-            <div class="module-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="h3 mb-2">Works & Construction - PROJECTS</h1>
-                        <!-- <p class="mb-0 opacity-75">Manage projects, employees, and construction materials</p> -->
+            <div class="department-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-2">Works & Construction - Projects</h1>
+                        <p class="mb-0 opacity-75 text-white">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark p-2">
+                            <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
+                        </span>
+                        <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -906,7 +914,7 @@ $upcoming_deadlines = $stmt->get_result();
                 $.each(data.materials, function(_, m) {
                     $tm.append(
                         '<tr><td>' + escHtml(m.product_name) +
-                        '<td>' + m.quantity + 
+                        '<td>' + m.quantity +
                         ' <small class="text-muted">(' + escHtml(m.unit) + ')</small></td>' +
                         '<td>GHS ' + formatNumber(m.total_cost) + '</td>' +
                         '<td>' + formatDate(m.date_used) + '</td></tr>'

@@ -443,13 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <span class="divider">|</span>
                     <a href="#">Terms of Use</a>
                 </div>
-                
-                <div class="mt-3 text-center">
-                    <small class="text-muted">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Demo Credentials: admin / Admin@123
-                    </small>
-                </div>
+            
             </div>
         </div>
     </div>

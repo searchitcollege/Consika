@@ -5,7 +5,7 @@
 }
 
 .module-header {
-    background: linear-gradient(135deg, #4cc9f0, #4895ef);
+    background: linear-gradient(135deg, #f72585, #b5179e);
     color: white;
     padding: 30px;
     border-radius: 15px;
@@ -149,4 +149,25 @@
 
 .module-procurement.products .main-content .stat-card .stat-icon {
     margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        /* width: 100vw !important; */
+        max-width: 100vw !important;
+    }
+
+    /* Products Page  */
+    .module-procurement.products .main-content .stat-card {
+        margin-left: 10px;
+        margin-right: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .card.supplier-table {
+        margin-left: 10px;
+        max-width: 100vw;
+    }
 }

@@ -4,7 +4,7 @@
 }
 
 .department-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: linear-gradient(135deg, #f72585, #b5179e);
     color: white;
     padding: 30px;
     border-radius: 15px;

@@ -101,12 +101,19 @@ $mats_result = $db->query("
         <div class="main-content">
 
             <!-- Header -->
-            <div class="module-header">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="h3 mb-2">Works & Construction – Daily Reports</h1>
+            <div class="department-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-2">Works & Construction - PROJECTS</h1>
+                        <p class="mb-0 opacity-75 text-white">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
                     </div>
-                    <div class="col-md-4 text-end">
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark p-2">
+                            <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
+                        </span>
+                        <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#dailyReportModal">
                             <i class="fas fa-plus-circle me-2"></i>New Report
                         </button>
@@ -695,7 +702,7 @@ $mats_result = $db->query("
                 '</div>'
             );
         }
-        
+
         $(document).on('click', '.remove-mat-row', function() {
             $(this).closest('.material-row').remove();
         });

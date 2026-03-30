@@ -108,6 +108,7 @@ $page_title = 'Works Dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,11 +118,6 @@ $page_title = 'Works Dashboard';
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="../../assets/css/style.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #f72585;
-            --secondary-color: #b5179e;
-        }
-        
         .department-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -130,22 +126,22 @@ $page_title = 'Works Dashboard';
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(247, 37, 133, 0.3);
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             transition: transform 0.3s, box-shadow 0.3s;
             border-left: 4px solid var(--primary-color);
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .stat-icon {
             width: 50px;
             height: 50px;
@@ -158,32 +154,40 @@ $page_title = 'Works Dashboard';
             font-size: 24px;
             margin-bottom: 15px;
         }
-        
+
         .project-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
             border-left: 4px solid;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        
-        .project-card.in-progress { border-left-color: #f72585; }
-        .project-card.completed { border-left-color: #43e97b; }
-        .project-card.on-hold { border-left-color: #f8961e; }
-        
+
+        .project-card.in-progress {
+            border-left-color: #f72585;
+        }
+
+        .project-card.completed {
+            border-left-color: #43e97b;
+        }
+
+        .project-card.on-hold {
+            border-left-color: #f8961e;
+        }
+
         .progress {
             height: 8px;
             border-radius: 4px;
         }
-        
+
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 25px;
         }
-        
+
         .quick-action-btn {
             background: white;
             border: 2px dashed #dee2e6;
@@ -193,31 +197,42 @@ $page_title = 'Works Dashboard';
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .quick-action-btn:hover {
             border-color: var(--primary-color);
             background: #f8f9fa;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(247, 37, 133, 0.2);
         }
-        
+
         .quick-action-btn i {
             font-size: 28px;
             color: var(--primary-color);
             margin-bottom: 10px;
         }
-        
+
         .deadline-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
-        
-        .deadline-urgent { background: #f8d7da; color: #721c24; }
-        .deadline-warning { background: #fff3cd; color: #856404; }
-        .deadline-normal { background: #d4edda; color: #155724; }
-        
+
+        .deadline-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .deadline-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .deadline-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
         .sidebar {
             width: 280px;
             background: linear-gradient(135deg, #1e1e2f, #2a2a40);
@@ -226,39 +241,41 @@ $page_title = 'Works Dashboard';
             position: fixed;
             overflow-y: auto;
         }
-        
+
         .main-content {
             margin-left: 280px;
             padding: 20px;
         }
-        
+
         .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             padding: 12px 20px;
             transition: all 0.3s;
         }
-        
+
         .nav-link:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             padding-left: 30px;
         }
-        
+
         .nav-link.active {
             background: var(--primary-color);
             color: white;
         }
-        
+
         @media (max-width: 768px) {
             .sidebar {
                 left: -280px;
             }
+
             .main-content {
                 margin-left: 0;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
@@ -269,7 +286,7 @@ $page_title = 'Works Dashboard';
                         <h4>Works & Construction</h4>
                         <p class="small text-muted">Project Management</p>
                     </div>
-                    
+
                     <div class="user-info text-center mb-4 p-3 bg-white bg-opacity-10 rounded">
                         <div class="avatar mx-auto mb-2" style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
                             <?php echo getAvatarLetter($current_user['full_name']); ?>
@@ -277,7 +294,7 @@ $page_title = 'Works Dashboard';
                         <strong><?php echo htmlspecialchars($current_user['full_name']); ?></strong>
                         <p class="small text-muted"><?php echo $current_user['company_name'] ?? 'Works Dept'; ?></p>
                     </div>
-                    
+
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a href="dashboard.php" class="nav-link active">
@@ -317,7 +334,7 @@ $page_title = 'Works Dashboard';
                     </ul>
                 </div>
             </div>
-            
+
             <!-- Main Content -->
             <div class="col">
                 <div class="main-content">
@@ -326,16 +343,19 @@ $page_title = 'Works Dashboard';
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h2 class="mb-2">Works & Construction Dashboard</h2>
-                                <p class="mb-0 opacity-75">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                                <p class="mb-0 opacity-75 text-white">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
                             </div>
                             <div class="text-end">
                                 <span class="badge bg-light text-dark p-2">
                                     <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
                                 </span>
+                                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                                    <i class="fas fa-bars"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Stats Row -->
                     <div class="row">
                         <div class="col-md-3">
@@ -387,96 +407,96 @@ $page_title = 'Works Dashboard';
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Second Row -->
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="stat-card">
                                 <h5 class="mb-3">Active Projects</h5>
                                 <?php if ($active_projects && $active_projects->num_rows > 0): ?>
-                                    <?php while($project = $active_projects->fetch_assoc()): ?>
-                                    <div class="project-card in-progress">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <h6 class="mb-1"><?php echo htmlspecialchars($project['project_name']); ?></h6>
-                                                <small class="text-muted">Code: <?php echo $project['project_code']; ?></small>
+                                    <?php while ($project = $active_projects->fetch_assoc()): ?>
+                                        <div class="project-card in-progress">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <h6 class="mb-1"><?php echo htmlspecialchars($project['project_name']); ?></h6>
+                                                    <small class="text-muted">Code: <?php echo $project['project_code']; ?></small>
+                                                </div>
+                                                <span class="badge bg-primary"><?php echo $project['progress_percentage']; ?>%</span>
                                             </div>
-                                            <span class="badge bg-primary"><?php echo $project['progress_percentage']; ?>%</span>
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar bg-primary" style="width: <?php echo $project['progress_percentage']; ?>%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <small>
+                                                    <i class="far fa-calendar me-1"></i>Ends: <?php echo $project['end_date'] ? date('d/m/Y', strtotime($project['end_date'])) : 'TBD'; ?>
+                                                </small>
+                                                <small>
+                                                    <i class="fas fa-map-marker-alt me-1"></i><?php echo htmlspecialchars($project['location']); ?>
+                                                </small>
+                                            </div>
                                         </div>
-                                        <div class="progress mb-2">
-                                            <div class="progress-bar bg-primary" style="width: <?php echo $project['progress_percentage']; ?>%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <small>
-                                                <i class="far fa-calendar me-1"></i>Ends: <?php echo $project['end_date'] ? date('d/m/Y', strtotime($project['end_date'])) : 'TBD'; ?>
-                                            </small>
-                                            <small>
-                                                <i class="fas fa-map-marker-alt me-1"></i><?php echo htmlspecialchars($project['location']); ?>
-                                            </small>
-                                        </div>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No active projects</p>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <div class="stat-card mt-3">
                                 <h5 class="mb-3">Today's Material Usage</h5>
                                 <?php if ($today_usage && $today_usage->num_rows > 0): ?>
-                                    <?php while($usage = $today_usage->fetch_assoc()): ?>
-                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-                                        <div>
-                                            <strong><?php echo htmlspecialchars($usage['material_name']); ?></strong>
-                                            <br>
-                                            <small><?php echo htmlspecialchars($usage['project_name']); ?></small>
+                                    <?php while ($usage = $today_usage->fetch_assoc()): ?>
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                            <div>
+                                                <strong><?php echo htmlspecialchars($usage['material_name']); ?></strong>
+                                                <br>
+                                                <small><?php echo htmlspecialchars($usage['project_name']); ?></small>
+                                            </div>
+                                            <span class="badge bg-info">
+                                                <?php echo $usage['quantity']; ?> units
+                                            </span>
                                         </div>
-                                        <span class="badge bg-info">
-                                            <?php echo $usage['quantity']; ?> units
-                                        </span>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No material usage recorded today</p>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="stat-card">
                                 <h5 class="mb-3">Upcoming Deadlines</h5>
                                 <?php if ($upcoming_deadlines && $upcoming_deadlines->num_rows > 0): ?>
-                                    <?php while($deadline = $upcoming_deadlines->fetch_assoc()): 
+                                    <?php while ($deadline = $upcoming_deadlines->fetch_assoc()):
                                         $days_left = $deadline['days_left'];
                                         $badge_class = $days_left <= 7 ? 'deadline-urgent' : ($days_left <= 14 ? 'deadline-warning' : 'deadline-normal');
                                     ?>
-                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-                                        <div>
-                                            <strong><?php echo htmlspecialchars($deadline['project_name']); ?></strong>
-                                            <br>
-                                            <small>Progress: <?php echo $deadline['progress_percentage']; ?>%</small>
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                            <div>
+                                                <strong><?php echo htmlspecialchars($deadline['project_name']); ?></strong>
+                                                <br>
+                                                <small>Progress: <?php echo $deadline['progress_percentage']; ?>%</small>
+                                            </div>
+                                            <span class="deadline-badge <?php echo $badge_class; ?>">
+                                                <?php echo $days_left; ?> days left
+                                            </span>
                                         </div>
-                                        <span class="deadline-badge <?php echo $badge_class; ?>">
-                                            <?php echo $days_left; ?> days left
-                                        </span>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No upcoming deadlines</p>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <div class="stat-card mt-3">
                                 <h5 class="mb-3">Recent Daily Reports</h5>
                                 <?php if ($recent_reports && $recent_reports->num_rows > 0): ?>
-                                    <?php while($report = $recent_reports->fetch_assoc()): ?>
-                                    <div class="p-2 border-bottom">
-                                        <div class="d-flex justify-content-between">
-                                            <strong><?php echo htmlspecialchars($report['project_name']); ?></strong>
-                                            <small class="text-muted"><?php echo timeAgo($report['created_at']); ?></small>
+                                    <?php while ($report = $recent_reports->fetch_assoc()): ?>
+                                        <div class="p-2 border-bottom">
+                                            <div class="d-flex justify-content-between">
+                                                <strong><?php echo htmlspecialchars($report['project_name']); ?></strong>
+                                                <small class="text-muted"><?php echo timeAgo($report['created_at']); ?></small>
+                                            </div>
+                                            <p class="small mb-0"><?php echo substr(htmlspecialchars($report['work_description']), 0, 100); ?>...</p>
                                         </div>
-                                        <p class="small mb-0"><?php echo substr(htmlspecialchars($report['work_description']), 0, 100); ?>...</p>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No recent reports</p>
@@ -484,7 +504,7 @@ $page_title = 'Works Dashboard';
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Quick Actions -->
                     <div class="quick-actions mt-4">
                         <div class="quick-action-btn" onclick="window.location.href='new-project.php'">
@@ -512,8 +532,11 @@ $page_title = 'Works Dashboard';
             </div>
         </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
 </body>
+
 </html>

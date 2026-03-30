@@ -158,179 +158,196 @@ $delivered_orders = $db->query($delivered_sql);
 </head>
 
 <body>
-
-    <div class="container-fluid p-0 module-procurement">
+    <div class="container-fluid p-0">
+        <!-- Include sidebar -->
         <?php include '../../includes/sidebar.php'; ?>
-        <div class="main-content">
-            <div class="department-header">
-                <h3>Purchase Order Approvals</h3>
-                <p>Review and approve procurement orders.</p>
-            </div>
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success">
-                    <?php echo $_SESSION['success'];
-                    unset($_SESSION['success']); ?>
-                </div>
-            <?php endif; ?>
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-danger">
-                    <?php echo $_SESSION['error'];
-                    unset($_SESSION['error']); ?>
-                </div>
-            <?php endif; ?>
 
-            <div class="card">
-                <div class="card-header">
-                    <h5>Pending Approvals</h5>
+        <!-- Main content -->
+        <div class="col">
+            <div class="main-content">
+                <!-- Header -->
+                <div class="module-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-2">Procurement - Purchase Order Approvals</h2>
+                            <p class="mb-0 opacity-75 text-white">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-dark p-2">
+                                <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
+                            </span>
+                            <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>PO Number</th>
-                                    <th>Supplier</th>
-                                    <th>Order Date</th>
-                                    <th>Total</th>
-                                    <th>Created By</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($result->num_rows > 0): ?>
-                                    <?php while ($row = $result->fetch_assoc()): ?>
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success">
+                        <?php echo $_SESSION['success'];
+                        unset($_SESSION['success']); ?>
+                    </div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="alert alert-danger">
+                        <?php echo $_SESSION['error'];
+                        unset($_SESSION['error']); ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Pending Approvals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>PO Number</th>
+                                        <th>Supplier</th>
+                                        <th>Order Date</th>
+                                        <th>Total</th>
+                                        <th>Created By</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if ($result->num_rows > 0): ?>
+                                        <?php while ($row = $result->fetch_assoc()): ?>
+                                            <tr>
+                                                <td><strong><?php echo $row['po_number']; ?></strong></td>
+                                                <td><?php echo htmlspecialchars($row['supplier_name']); ?></td>
+                                                <td><?php echo format_date($row['order_date']); ?></td>
+                                                <td><?php echo format_money($row['total_amount']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['created_by']); ?></td>
+                                                <td>
+                                                    <button
+                                                        class="btn btn-sm btn-success"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#approveModal"
+                                                        data-id="<?php echo $row['po_id']; ?>">
+                                                        Approve
+                                                    </button>
+
+                                                    <button
+                                                        class="btn btn-sm btn-danger"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#rejectModal"
+                                                        data-id="<?php echo $row['po_id']; ?>">
+                                                        Reject
+                                                    </button>
+
+                                                    <a onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $row['po_id']; ?>, 'Purchase Order')" class="btn btn-sm btn-info">
+                                                        View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
                                         <tr>
-                                            <td><strong><?php echo $row['po_number']; ?></strong></td>
-                                            <td><?php echo htmlspecialchars($row['supplier_name']); ?></td>
-                                            <td><?php echo format_date($row['order_date']); ?></td>
+                                            <td colspan="6" class="text-center text-muted">No pending approvals.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Approved Orders (Awaiting Delivery)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>PO</th>
+                                        <th>Supplier</th>
+                                        <th>Total</th>
+                                        <th>Order Date</th>
+                                        <th>Action</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = $approved_orders->fetch_assoc()): ?>
+                                        <tr>
+                                            <td><?php echo $row['po_number']; ?></td>
+                                            <td><?php echo $row['supplier_name']; ?></td>
                                             <td><?php echo format_money($row['total_amount']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['created_by']); ?></td>
+                                            <td><?php echo format_date($row['order_date']); ?></td>
+                                            <td><?php echo nl2br(htmlspecialchars($row['notes'] ?? '')); ?></td>
                                             <td>
                                                 <button
-                                                    class="btn btn-sm btn-success"
+                                                    class="btn btn-warning btn-sm"
                                                     data-bs-toggle="modal"
-                                                    data-bs-target="#approveModal"
+                                                    data-bs-target="#deliverModal"
                                                     data-id="<?php echo $row['po_id']; ?>">
-                                                    Approve
+                                                    Mark Delivered
                                                 </button>
-
                                                 <button
-                                                    class="btn btn-sm btn-danger"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#rejectModal"
-                                                    data-id="<?php echo $row['po_id']; ?>">
-                                                    Reject
-                                                </button>
-
-                                                <a onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $row['po_id']; ?>, 'Purchase Order')" class="btn btn-sm btn-info">
+                                                    class="btn btn-info btn-sm"
+                                                    onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $row['po_id']; ?>, 'Purchase Order')">
                                                     View
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">No pending approvals.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5>Approved Orders (Awaiting Delivery)</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Delivered Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>PO</th>
                                     <th>Supplier</th>
                                     <th>Total</th>
                                     <th>Order Date</th>
-                                    <th>Action</th>
-                                    <th>Notes</th>
+                                    <th>Approval</th>
+                                    <th>Payment</th>
+                                    <th>Delivery</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($row = $approved_orders->fetch_assoc()): ?>
+                                <?php while ($row = $delivered_orders->fetch_assoc()): ?>
                                     <tr>
                                         <td><?php echo $row['po_number']; ?></td>
                                         <td><?php echo $row['supplier_name']; ?></td>
                                         <td><?php echo format_money($row['total_amount']); ?></td>
                                         <td><?php echo format_date($row['order_date']); ?></td>
-                                        <td><?php echo nl2br(htmlspecialchars($row['notes'] ?? '')); ?></td>
+
                                         <td>
-                                            <button
-                                                class="btn btn-warning btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deliverModal"
-                                                data-id="<?php echo $row['po_id']; ?>">
-                                                Mark Delivered
-                                            </button>
-                                            <button
-                                                class="btn btn-info btn-sm"
-                                                onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $row['po_id']; ?>, 'Purchase Order')">
-                                                View
-                                            </button>
+                                            <span class="badge bg-<?php echo $row['approval_status'] == 'Approved' ? 'success' : 'secondary'; ?>">
+                                                <?php echo $row['approval_status']; ?>
+                                            </span>
                                         </td>
+
+                                        <td>
+                                            <span class="badge bg-<?php echo $row['payment_status'] == 'Paid' ? 'success' : 'danger'; ?>">
+                                                <?php echo $row['payment_status']; ?>
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-success">
+                                                <?php echo $row['delivery_status']; ?>
+                                            </span>
+                                        </td>
+
                                     </tr>
                                 <?php endwhile; ?>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5>Delivered Orders</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>PO</th>
-                                <th>Supplier</th>
-                                <th>Total</th>
-                                <th>Order Date</th>
-                                <th>Approval</th>
-                                <th>Payment</th>
-                                <th>Delivery</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $delivered_orders->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?php echo $row['po_number']; ?></td>
-                                    <td><?php echo $row['supplier_name']; ?></td>
-                                    <td><?php echo format_money($row['total_amount']); ?></td>
-                                    <td><?php echo format_date($row['order_date']); ?></td>
-
-                                    <td>
-                                        <span class="badge bg-<?php echo $row['approval_status'] == 'Approved' ? 'success' : 'secondary'; ?>">
-                                            <?php echo $row['approval_status']; ?>
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-<?php echo $row['payment_status'] == 'Paid' ? 'success' : 'danger'; ?>">
-                                            <?php echo $row['payment_status']; ?>
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-success">
-                                            <?php echo $row['delivery_status']; ?>
-                                        </span>
-                                    </td>
-
-                                </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
@@ -359,7 +376,6 @@ $delivered_orders = $db->query($delivered_sql);
             </div>
         </div>
     </div>
-
 
     <!-- REJECT MODAL -->
     <div class="modal fade" id="rejectModal">

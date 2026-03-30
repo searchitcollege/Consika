@@ -102,7 +102,10 @@ $upcoming_deadlines = $stmt->get_result();
             <?php include '../../includes/top-nav.php'; ?>
 
             <!-- Module Header -->
-            <div class="module-header">
+                        <div class="module-header">
+<button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+    <i class="fas fa-bars"></i>
+</button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Works & Construction Management</h1>

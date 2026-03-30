@@ -173,12 +173,15 @@ $page_title = 'Procurement Dashboard';
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h2 class="mb-2">Procurement Dashboard</h2>
-                                <p class="mb-0 opacity-75">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                                <p class="mb-0 opacity-75 text-white">Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
                             </div>
                             <div class="text-end">
                                 <span class="badge bg-light text-dark p-2">
                                     <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
                                 </span>
+                                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                                    <i class="fas fa-bars"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -394,6 +397,8 @@ $page_title = 'Procurement Dashboard';
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
 
     <script>
         const monthlyPurchases = <?php echo json_encode(array_values($monthly_data)); ?>;

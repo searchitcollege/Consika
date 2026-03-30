@@ -68,26 +68,27 @@ $deliveries = $db->query($deliveries_query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block Factory - <?php echo APP_NAME; ?></title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    
+
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    
+
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
-    
+
     <style>
         .module-header {
             background: linear-gradient(135deg, #43e97b, #38f9d7);
@@ -96,21 +97,21 @@ $deliveries = $db->query($deliveries_query);
             border-radius: 15px;
             margin-bottom: 30px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             transition: transform 0.3s;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .stat-icon {
             width: 50px;
             height: 50px;
@@ -123,38 +124,38 @@ $deliveries = $db->query($deliveries_query);
             font-size: 24px;
             margin-bottom: 15px;
         }
-        
+
         .stat-value {
             font-size: 28px;
             font-weight: 700;
             color: #333;
             margin: 0;
         }
-        
+
         .stat-label {
             color: #666;
             font-size: 14px;
             margin: 0;
         }
-        
+
         .production-card {
             background: white;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
             border-left: 4px solid #43e97b;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        
+
         .sale-card {
             background: white;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
             border-left: 4px solid #38f9d7;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
-        
+
         .material-alert {
             background: #fff3cd;
             border: 1px solid #ffeeba;
@@ -163,14 +164,14 @@ $deliveries = $db->query($deliveries_query);
             border-radius: 8px;
             margin-bottom: 10px;
         }
-        
+
         .quick-action-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 30px;
         }
-        
+
         .quick-action-btn {
             background: white;
             border: 2px dashed #dee2e6;
@@ -180,50 +181,50 @@ $deliveries = $db->query($deliveries_query);
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .quick-action-btn:hover {
             border-color: #43e97b;
             background: #f8f9fa;
             transform: translateY(-3px);
         }
-        
+
         .quick-action-btn i {
             font-size: 28px;
             color: #43e97b;
             margin-bottom: 10px;
         }
-        
+
         .quick-action-btn span {
             display: block;
             font-weight: 600;
             color: #333;
         }
-        
+
         .nav-tabs .nav-link {
             color: #666;
             font-weight: 500;
             border: none;
             padding: 10px 20px;
         }
-        
+
         .nav-tabs .nav-link.active {
             color: #43e97b;
             background: none;
             border-bottom: 3px solid #43e97b;
         }
-        
+
         .quality-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .defect-rate {
             font-size: 13px;
             color: #dc3545;
         }
-        
+
         .stock-indicator {
             width: 10px;
             height: 10px;
@@ -231,24 +232,36 @@ $deliveries = $db->query($deliveries_query);
             display: inline-block;
             margin-right: 5px;
         }
-        
-        .stock-good { background-color: #28a745; }
-        .stock-low { background-color: #ffc107; }
-        .stock-critical { background-color: #dc3545; }
+
+        .stock-good {
+            background-color: #28a745;
+        }
+
+        .stock-low {
+            background-color: #ffc107;
+        }
+
+        .stock-critical {
+            background-color: #dc3545;
+        }
     </style>
 </head>
+
 <body class="module-blockfactory">
     <div class="wrapper">
         <!-- Include sidebar -->
         <?php include '../../includes/sidebar.php'; ?>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navigation -->
             <?php include '../../includes/top-nav.php'; ?>
-            
+
             <!-- Module Header -->
             <div class="module-header">
+                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Block Factory Management</h1>
@@ -264,7 +277,7 @@ $deliveries = $db->query($deliveries_query);
                     </div>
                 </div>
             </div>
-            
+
             <!-- Quick Actions -->
             <div class="quick-action-grid mb-4">
                 <div class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#productionModal">
@@ -288,7 +301,7 @@ $deliveries = $db->query($deliveries_query);
                     <span>Schedule Delivery</span>
                 </div>
             </div>
-            
+
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -300,7 +313,7 @@ $deliveries = $db->query($deliveries_query);
                         <p class="stat-label">Blocks in Stock</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f72585, #b5179e);">
@@ -310,7 +323,7 @@ $deliveries = $db->query($deliveries_query);
                         <p class="stat-label">Produced Today</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f8961e, #f3722c);">
@@ -320,7 +333,7 @@ $deliveries = $db->query($deliveries_query);
                         <p class="stat-label">Sales Today</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #dc3545, #b02a37);">
@@ -331,7 +344,7 @@ $deliveries = $db->query($deliveries_query);
                     </div>
                 </div>
             </div>
-            
+
             <!-- Second Row Stats -->
             <div class="row mb-4">
                 <div class="col-md-4">
@@ -359,7 +372,7 @@ $deliveries = $db->query($deliveries_query);
                     </div>
                 </div>
             </div>
-            
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mb-4" id="blockTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -398,7 +411,7 @@ $deliveries = $db->query($deliveries_query);
                     </button>
                 </li>
             </ul>
-            
+
             <!-- Tab Content -->
             <div class="tab-content" id="blockTabContent">
                 <!-- Dashboard Tab -->
@@ -413,7 +426,7 @@ $deliveries = $db->query($deliveries_query);
                                 </div>
                                 <div class="card-body">
                                     <?php if ($recent_production->num_rows > 0): ?>
-                                        <?php while($prod = $recent_production->fetch_assoc()): ?>
+                                        <?php while ($prod = $recent_production->fetch_assoc()): ?>
                                             <div class="production-card">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <div>
@@ -429,7 +442,7 @@ $deliveries = $db->query($deliveries_query);
                                                         <i class="far fa-calendar me-1"></i> <?php echo format_date($prod['production_date']); ?>
                                                         <i class="fas fa-user ms-2 me-1"></i> <?php echo $prod['supervisor']; ?>
                                                     </small>
-                                                    <?php if($prod['defect_rate'] > 5): ?>
+                                                    <?php if ($prod['defect_rate'] > 5): ?>
                                                         <span class="defect-rate">Defect rate: <?php echo $prod['defect_rate']; ?>%</span>
                                                     <?php endif; ?>
                                                 </div>
@@ -440,7 +453,7 @@ $deliveries = $db->query($deliveries_query);
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            
+
                             <!-- Pending Deliveries -->
                             <div class="card mt-4">
                                 <div class="card-header">
@@ -448,7 +461,7 @@ $deliveries = $db->query($deliveries_query);
                                 </div>
                                 <div class="card-body">
                                     <?php if ($deliveries->num_rows > 0): ?>
-                                        <?php while($delivery = $deliveries->fetch_assoc()): ?>
+                                        <?php while ($delivery = $deliveries->fetch_assoc()): ?>
                                             <div class="d-flex justify-content-between align-items-center mb-3 p-2 border-bottom">
                                                 <div>
                                                     <strong>Delivery #<?php echo $delivery['delivery_note']; ?></strong>
@@ -458,10 +471,9 @@ $deliveries = $db->query($deliveries_query);
                                                     </small>
                                                 </div>
                                                 <div class="text-end">
-                                                    <span class="badge bg-<?php 
-                                                        echo $delivery['status'] == 'Scheduled' ? 'info' : 
-                                                            ($delivery['status'] == 'In Transit' ? 'warning' : 'secondary'); 
-                                                    ?>">
+                                                    <span class="badge bg-<?php
+                                                                            echo $delivery['status'] == 'Scheduled' ? 'info' : ($delivery['status'] == 'In Transit' ? 'warning' : 'secondary');
+                                                                            ?>">
                                                         <?php echo $delivery['status']; ?>
                                                     </span>
                                                     <br>
@@ -475,7 +487,7 @@ $deliveries = $db->query($deliveries_query);
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Recent Sales & Low Materials -->
                         <div class="col-md-6">
                             <div class="card">
@@ -485,7 +497,7 @@ $deliveries = $db->query($deliveries_query);
                                 </div>
                                 <div class="card-body">
                                     <?php if ($recent_sales->num_rows > 0): ?>
-                                        <?php while($sale = $recent_sales->fetch_assoc()): ?>
+                                        <?php while ($sale = $recent_sales->fetch_assoc()): ?>
                                             <div class="sale-card">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <div>
@@ -499,10 +511,9 @@ $deliveries = $db->query($deliveries_query);
                                                         <i class="far fa-calendar me-1"></i> <?php echo format_date($sale['sale_date']); ?>
                                                         <i class="fas fa-cubes ms-2 me-1"></i> <?php echo $sale['quantity']; ?> units
                                                     </small>
-                                                    <span class="badge bg-<?php 
-                                                        echo $sale['payment_status'] == 'Paid' ? 'success' : 
-                                                            ($sale['payment_status'] == 'Partial' ? 'warning' : 'danger'); 
-                                                    ?>">
+                                                    <span class="badge bg-<?php
+                                                                            echo $sale['payment_status'] == 'Paid' ? 'success' : ($sale['payment_status'] == 'Partial' ? 'warning' : 'danger');
+                                                                            ?>">
                                                         <?php echo $sale['payment_status']; ?>
                                                     </span>
                                                 </div>
@@ -513,7 +524,7 @@ $deliveries = $db->query($deliveries_query);
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            
+
                             <!-- Low Raw Materials Alert -->
                             <div class="card mt-4">
                                 <div class="card-header">
@@ -521,7 +532,7 @@ $deliveries = $db->query($deliveries_query);
                                 </div>
                                 <div class="card-body">
                                     <?php if ($low_materials->num_rows > 0): ?>
-                                        <?php while($material = $low_materials->fetch_assoc()): ?>
+                                        <?php while ($material = $low_materials->fetch_assoc()): ?>
                                             <div class="material-alert">
                                                 <div class="d-flex justify-content-between align-items-start">
                                                     <div>
@@ -545,7 +556,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Production Tab -->
                 <div class="tab-pane fade" id="production" role="tabpanel">
                     <div class="card">
@@ -573,7 +584,7 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $all_production_query = "SELECT p.*, pr.product_name 
                                                                 FROM blockfactory_production p
                                                                 JOIN blockfactory_products pr ON p.product_id = pr.product_id
@@ -583,34 +594,33 @@ $deliveries = $db->query($deliveries_query);
                                         $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_production = $stmt->get_result();
-                                        while($prod = $all_production->fetch_assoc()): 
+                                        while ($prod = $all_production->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><strong><?php echo $prod['batch_number']; ?></strong></td>
-                                            <td><?php echo htmlspecialchars($prod['product_name']); ?></td>
-                                            <td><?php echo format_date($prod['production_date']); ?></td>
-                                            <td><?php echo $prod['shift']; ?></td>
-                                            <td><?php echo $prod['supervisor']; ?></td>
-                                            <td><?php echo $prod['produced_quantity']; ?></td>
-                                            <td><?php echo $prod['good_quantity']; ?></td>
-                                            <td><?php echo $prod['defective_quantity']; ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $prod['defect_rate'] <= 2 ? 'success' : 
-                                                        ($prod['defect_rate'] <= 5 ? 'warning' : 'danger'); 
-                                                ?>">
-                                                    <?php echo $prod['defect_rate']; ?>%
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewBatch(<?php echo $prod['production_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-warning" onclick="recordQuality(<?php echo $prod['production_id']; ?>)">
-                                                    <i class="fas fa-clipboard-check"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><strong><?php echo $prod['batch_number']; ?></strong></td>
+                                                <td><?php echo htmlspecialchars($prod['product_name']); ?></td>
+                                                <td><?php echo format_date($prod['production_date']); ?></td>
+                                                <td><?php echo $prod['shift']; ?></td>
+                                                <td><?php echo $prod['supervisor']; ?></td>
+                                                <td><?php echo $prod['produced_quantity']; ?></td>
+                                                <td><?php echo $prod['good_quantity']; ?></td>
+                                                <td><?php echo $prod['defective_quantity']; ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php
+                                                                            echo $prod['defect_rate'] <= 2 ? 'success' : ($prod['defect_rate'] <= 5 ? 'warning' : 'danger');
+                                                                            ?>">
+                                                        <?php echo $prod['defect_rate']; ?>%
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewBatch(<?php echo $prod['production_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-warning" onclick="recordQuality(<?php echo $prod['production_id']; ?>)">
+                                                        <i class="fas fa-clipboard-check"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -618,7 +628,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Products Tab -->
                 <div class="tab-pane fade" id="products" role="tabpanel">
                     <div class="card">
@@ -644,41 +654,40 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $products_query = "SELECT * FROM blockfactory_products WHERE company_id = ? ORDER BY product_name ASC";
                                         $stmt = $db->prepare($products_query);
                                         $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $products = $stmt->get_result();
-                                        while($product = $products->fetch_assoc()): 
+                                        while ($product = $products->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><?php echo $product['product_code']; ?></td>
-                                            <td><?php echo htmlspecialchars($product['product_name']); ?></td>
-                                            <td><?php echo $product['product_type']; ?></td>
-                                            <td><?php echo $product['dimensions']; ?></td>
-                                            <td><?php echo format_money($product['price_per_unit']); ?></td>
-                                            <td>
-                                                <span class="stock-indicator stock-<?php 
-                                                    echo $product['current_stock'] <= $product['reorder_level'] ? 'critical' : 
-                                                        ($product['current_stock'] <= $product['reorder_level'] * 2 ? 'low' : 'good'); 
-                                                ?>"></span>
-                                                <?php echo $product['current_stock']; ?>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $product['status'] == 'Active' ? 'success' : 'secondary'; ?>">
-                                                    <?php echo $product['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewProduct(<?php echo $product['product_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" onclick="editProduct(<?php echo $product['product_id']; ?>)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><?php echo $product['product_code']; ?></td>
+                                                <td><?php echo htmlspecialchars($product['product_name']); ?></td>
+                                                <td><?php echo $product['product_type']; ?></td>
+                                                <td><?php echo $product['dimensions']; ?></td>
+                                                <td><?php echo format_money($product['price_per_unit']); ?></td>
+                                                <td>
+                                                    <span class="stock-indicator stock-<?php
+                                                                                        echo $product['current_stock'] <= $product['reorder_level'] ? 'critical' : ($product['current_stock'] <= $product['reorder_level'] * 2 ? 'low' : 'good');
+                                                                                        ?>"></span>
+                                                    <?php echo $product['current_stock']; ?>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<?php echo $product['status'] == 'Active' ? 'success' : 'secondary'; ?>">
+                                                        <?php echo $product['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewProduct(<?php echo $product['product_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary" onclick="editProduct(<?php echo $product['product_id']; ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -686,7 +695,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Sales Tab -->
                 <div class="tab-pane fade" id="sales" role="tabpanel">
                     <div class="card">
@@ -713,7 +722,7 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $all_sales_query = "SELECT s.*, pr.product_name, c.customer_name
                                                            FROM blockfactory_sales s
                                                            JOIN blockfactory_products pr ON s.product_id = pr.product_id
@@ -724,45 +733,43 @@ $deliveries = $db->query($deliveries_query);
                                         $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_sales = $stmt->get_result();
-                                        while($sale = $all_sales->fetch_assoc()): 
+                                        while ($sale = $all_sales->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><strong><?php echo $sale['invoice_number']; ?></strong></td>
-                                            <td><?php echo format_date($sale['sale_date']); ?></td>
-                                            <td><?php echo htmlspecialchars($sale['customer_name'] ?: $sale['customer_name_custom']); ?></td>
-                                            <td><?php echo htmlspecialchars($sale['product_name']); ?></td>
-                                            <td><?php echo $sale['quantity']; ?></td>
-                                            <td><?php echo format_money($sale['total_amount']); ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $sale['payment_status'] == 'Paid' ? 'success' : 
-                                                        ($sale['payment_status'] == 'Partial' ? 'warning' : 'danger'); 
-                                                ?>">
-                                                    <?php echo $sale['payment_status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $sale['delivery_status'] == 'Delivered' ? 'success' : 
-                                                        ($sale['delivery_status'] == 'Partial' ? 'warning' : 'info'); 
-                                                ?>">
-                                                    <?php echo $sale['delivery_status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewSale(<?php echo $sale['sale_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" onclick="printInvoice(<?php echo $sale['sale_id']; ?>)">
-                                                    <i class="fas fa-print"></i>
-                                                </button>
-                                                <?php if($sale['delivery_status'] != 'Delivered'): ?>
-                                                <button class="btn btn-sm btn-warning" onclick="scheduleDelivery(<?php echo $sale['sale_id']; ?>)">
-                                                    <i class="fas fa-truck"></i>
-                                                </button>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><strong><?php echo $sale['invoice_number']; ?></strong></td>
+                                                <td><?php echo format_date($sale['sale_date']); ?></td>
+                                                <td><?php echo htmlspecialchars($sale['customer_name'] ?: $sale['customer_name_custom']); ?></td>
+                                                <td><?php echo htmlspecialchars($sale['product_name']); ?></td>
+                                                <td><?php echo $sale['quantity']; ?></td>
+                                                <td><?php echo format_money($sale['total_amount']); ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php
+                                                                            echo $sale['payment_status'] == 'Paid' ? 'success' : ($sale['payment_status'] == 'Partial' ? 'warning' : 'danger');
+                                                                            ?>">
+                                                        <?php echo $sale['payment_status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-<?php
+                                                                            echo $sale['delivery_status'] == 'Delivered' ? 'success' : ($sale['delivery_status'] == 'Partial' ? 'warning' : 'info');
+                                                                            ?>">
+                                                        <?php echo $sale['delivery_status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewSale(<?php echo $sale['sale_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" onclick="printInvoice(<?php echo $sale['sale_id']; ?>)">
+                                                        <i class="fas fa-print"></i>
+                                                    </button>
+                                                    <?php if ($sale['delivery_status'] != 'Delivered'): ?>
+                                                        <button class="btn btn-sm btn-warning" onclick="scheduleDelivery(<?php echo $sale['sale_id']; ?>)">
+                                                            <i class="fas fa-truck"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -770,7 +777,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Customers Tab -->
                 <div class="tab-pane fade" id="customers" role="tabpanel">
                     <div class="card">
@@ -796,35 +803,35 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $customers_query = "SELECT * FROM blockfactory_customers ORDER BY customer_name ASC";
                                         $customers = $db->query($customers_query);
-                                        while($customer = $customers->fetch_assoc()): 
+                                        while ($customer = $customers->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><?php echo $customer['customer_code']; ?></td>
-                                            <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($customer['contact_person']); ?></td>
-                                            <td><?php echo $customer['phone']; ?></td>
-                                            <td><?php echo $customer['email']; ?></td>
-                                            <td><?php echo $customer['customer_type']; ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $customer['status'] == 'Active' ? 'success' : 'secondary'; ?>">
-                                                    <?php echo $customer['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewCustomer(<?php echo $customer['customer_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" onclick="editCustomer(<?php echo $customer['customer_id']; ?>)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" onclick="newSale(<?php echo $customer['customer_id']; ?>)">
-                                                    <i class="fas fa-shopping-cart"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><?php echo $customer['customer_code']; ?></td>
+                                                <td><?php echo htmlspecialchars($customer['customer_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($customer['contact_person']); ?></td>
+                                                <td><?php echo $customer['phone']; ?></td>
+                                                <td><?php echo $customer['email']; ?></td>
+                                                <td><?php echo $customer['customer_type']; ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php echo $customer['status'] == 'Active' ? 'success' : 'secondary'; ?>">
+                                                        <?php echo $customer['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewCustomer(<?php echo $customer['customer_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary" onclick="editCustomer(<?php echo $customer['customer_id']; ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" onclick="newSale(<?php echo $customer['customer_id']; ?>)">
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -832,7 +839,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Raw Materials Tab -->
                 <div class="tab-pane fade" id="materials" role="tabpanel">
                     <div class="card">
@@ -859,47 +866,45 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $materials_query = "SELECT * FROM blockfactory_raw_materials ORDER BY material_name ASC";
                                         $materials = $db->query($materials_query);
-                                        while($material = $materials->fetch_assoc()): 
+                                        while ($material = $materials->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><?php echo $material['material_code']; ?></td>
-                                            <td><?php echo htmlspecialchars($material['material_name']); ?></td>
-                                            <td><?php echo $material['material_type']; ?></td>
-                                            <td><?php echo $material['supplier']; ?></td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="stock-indicator stock-<?php 
-                                                        echo $material['current_stock'] <= $material['minimum_stock'] ? 'critical' : 
-                                                            ($material['current_stock'] <= $material['reorder_level'] ? 'low' : 'good'); 
-                                                    ?>"></span>
-                                                    <?php echo $material['current_stock']; ?>
-                                                </div>
-                                            </td>
-                                            <td><?php echo $material['unit']; ?></td>
-                                            <td><?php echo format_money($material['unit_cost']); ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $material['status'] == 'Available' ? 'success' : 
-                                                        ($material['status'] == 'Low Stock' ? 'warning' : 'danger'); 
-                                                ?>">
-                                                    <?php echo $material['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $material['material_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $material['material_id']; ?>)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" onclick="receiveMaterial(<?php echo $material['material_id']; ?>)">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><?php echo $material['material_code']; ?></td>
+                                                <td><?php echo htmlspecialchars($material['material_name']); ?></td>
+                                                <td><?php echo $material['material_type']; ?></td>
+                                                <td><?php echo $material['supplier']; ?></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="stock-indicator stock-<?php
+                                                                                            echo $material['current_stock'] <= $material['minimum_stock'] ? 'critical' : ($material['current_stock'] <= $material['reorder_level'] ? 'low' : 'good');
+                                                                                            ?>"></span>
+                                                        <?php echo $material['current_stock']; ?>
+                                                    </div>
+                                                </td>
+                                                <td><?php echo $material['unit']; ?></td>
+                                                <td><?php echo format_money($material['unit_cost']); ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php
+                                                                            echo $material['status'] == 'Available' ? 'success' : ($material['status'] == 'Low Stock' ? 'warning' : 'danger');
+                                                                            ?>">
+                                                        <?php echo $material['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $material['material_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $material['material_id']; ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" onclick="receiveMaterial(<?php echo $material['material_id']; ?>)">
+                                                        <i class="fas fa-arrow-down"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -907,7 +912,7 @@ $deliveries = $db->query($deliveries_query);
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Deliveries Tab -->
                 <div class="tab-pane fade" id="deliveries" role="tabpanel">
                     <div class="card">
@@ -935,7 +940,7 @@ $deliveries = $db->query($deliveries_query);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $all_deliveries_query = "SELECT d.*, s.invoice_number, s.quantity as sale_qty, 
                                                                 pr.product_name, c.customer_name
                                                                 FROM blockfactory_deliveries d
@@ -944,36 +949,35 @@ $deliveries = $db->query($deliveries_query);
                                                                 JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                                                                 ORDER BY d.delivery_date DESC";
                                         $all_deliveries = $db->query($all_deliveries_query);
-                                        while($delivery = $all_deliveries->fetch_assoc()): 
+                                        while ($delivery = $all_deliveries->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><strong><?php echo $delivery['delivery_note']; ?></strong></td>
-                                            <td><?php echo $delivery['invoice_number']; ?></td>
-                                            <td><?php echo htmlspecialchars($delivery['customer_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($delivery['product_name']); ?></td>
-                                            <td><?php echo $delivery['quantity']; ?></td>
-                                            <td><?php echo format_date($delivery['delivery_date']); ?></td>
-                                            <td><?php echo $delivery['vehicle_number']; ?></td>
-                                            <td><?php echo $delivery['driver_name']; ?></td>
-                                            <td>
-                                                <span class="badge bg-<?php 
-                                                    echo $delivery['status'] == 'Delivered' ? 'success' : 
-                                                        ($delivery['status'] == 'In Transit' ? 'warning' : 'info'); 
-                                                ?>">
-                                                    <?php echo $delivery['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="viewDelivery(<?php echo $delivery['delivery_id']; ?>)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <?php if($delivery['status'] != 'Delivered'): ?>
-                                                <button class="btn btn-sm btn-success" onclick="markDelivered(<?php echo $delivery['delivery_id']; ?>)">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><strong><?php echo $delivery['delivery_note']; ?></strong></td>
+                                                <td><?php echo $delivery['invoice_number']; ?></td>
+                                                <td><?php echo htmlspecialchars($delivery['customer_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($delivery['product_name']); ?></td>
+                                                <td><?php echo $delivery['quantity']; ?></td>
+                                                <td><?php echo format_date($delivery['delivery_date']); ?></td>
+                                                <td><?php echo $delivery['vehicle_number']; ?></td>
+                                                <td><?php echo $delivery['driver_name']; ?></td>
+                                                <td>
+                                                    <span class="badge bg-<?php
+                                                                            echo $delivery['status'] == 'Delivered' ? 'success' : ($delivery['status'] == 'In Transit' ? 'warning' : 'info');
+                                                                            ?>">
+                                                        <?php echo $delivery['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="viewDelivery(<?php echo $delivery['delivery_id']; ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <?php if ($delivery['status'] != 'Delivered'): ?>
+                                                        <button class="btn btn-sm btn-success" onclick="markDelivered(<?php echo $delivery['delivery_id']; ?>)">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -984,7 +988,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Production Modal -->
     <div class="modal fade" id="productionModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -1000,11 +1004,11 @@ $deliveries = $db->query($deliveries_query);
                                 <label class="form-label">Product</label>
                                 <select class="form-control" name="product_id" required>
                                     <option value="">Select Product</option>
-                                    <?php 
+                                    <?php
                                     $products = $db->query("SELECT product_id, product_name FROM blockfactory_products WHERE company_id = $company_id AND status = 'Active'");
-                                    while($prod = $products->fetch_assoc()):
+                                    while ($prod = $products->fetch_assoc()):
                                     ?>
-                                    <option value="<?php echo $prod['product_id']; ?>"><?php echo $prod['product_name']; ?></option>
+                                        <option value="<?php echo $prod['product_id']; ?>"><?php echo $prod['product_name']; ?></option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>
@@ -1013,7 +1017,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="date" class="form-control" name="production_date" value="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Shift</label>
@@ -1028,7 +1032,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="supervisor" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Planned Quantity</label>
@@ -1043,7 +1047,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" class="form-control" name="good_quantity" required>
                             </div>
                         </div>
-                        
+
                         <h6 class="mt-3">Raw Materials Used</h6>
                         <div class="row">
                             <div class="col-md-3 mb-3">
@@ -1063,7 +1067,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="water_used">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Notes</label>
                             <textarea class="form-control" name="notes" rows="2"></textarea>
@@ -1077,7 +1081,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Sale Modal -->
     <div class="modal fade" id="saleModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -1093,11 +1097,11 @@ $deliveries = $db->query($deliveries_query);
                                 <label class="form-label">Customer</label>
                                 <select class="form-control select2" name="customer_id" id="customerSelect">
                                     <option value="">Select Customer</option>
-                                    <?php 
+                                    <?php
                                     $customers = $db->query("SELECT customer_id, customer_name FROM blockfactory_customers WHERE status = 'Active'");
-                                    while($cust = $customers->fetch_assoc()):
+                                    while ($cust = $customers->fetch_assoc()):
                                     ?>
-                                    <option value="<?php echo $cust['customer_id']; ?>"><?php echo $cust['customer_name']; ?></option>
+                                        <option value="<?php echo $cust['customer_id']; ?>"><?php echo $cust['customer_name']; ?></option>
                                     <?php endwhile; ?>
                                     <option value="new">+ Add New Customer</option>
                                 </select>
@@ -1106,7 +1110,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="new_customer_name" placeholder="Customer Name">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Sale Date</label>
@@ -1116,15 +1120,15 @@ $deliveries = $db->query($deliveries_query);
                                 <label class="form-label">Product</label>
                                 <select class="form-control" name="product_id" id="productSelect" required>
                                     <option value="">Select Product</option>
-                                    <?php 
+                                    <?php
                                     $products = $db->query("SELECT product_id, product_name, price_per_unit, current_stock FROM blockfactory_products WHERE company_id = $company_id AND status = 'Active'");
-                                    while($prod = $products->fetch_assoc()):
+                                    while ($prod = $products->fetch_assoc()):
                                     ?>
-                                    <option value="<?php echo $prod['product_id']; ?>" 
+                                        <option value="<?php echo $prod['product_id']; ?>"
                                             data-price="<?php echo $prod['price_per_unit']; ?>"
                                             data-stock="<?php echo $prod['current_stock']; ?>">
-                                        <?php echo $prod['product_name']; ?> (Stock: <?php echo $prod['current_stock']; ?>)
-                                    </option>
+                                            <?php echo $prod['product_name']; ?> (Stock: <?php echo $prod['current_stock']; ?>)
+                                        </option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>
@@ -1133,7 +1137,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" class="form-control" name="quantity" id="quantity" required min="1">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Unit Price</label>
@@ -1148,7 +1152,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" id="totalAmount" readonly>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Payment Method</label>
@@ -1165,12 +1169,12 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="amount_paid" id="amountPaid" value="0">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Delivery Address</label>
                             <textarea class="form-control" name="delivery_address" rows="2"></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Notes</label>
                             <textarea class="form-control" name="notes" rows="2"></textarea>
@@ -1184,7 +1188,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Add Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1199,12 +1203,12 @@ $deliveries = $db->query($deliveries_query);
                             <label class="form-label">Product Code</label>
                             <input type="text" class="form-control" name="product_code" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Product Name</label>
                             <input type="text" class="form-control" name="product_name" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Product Type</label>
@@ -1221,7 +1225,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="dimensions" placeholder="e.g., 400x200x200" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Weight (kg)</label>
@@ -1232,7 +1236,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="strength_mpa">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Price per Unit</label>
@@ -1243,7 +1247,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="cost_per_unit">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Min Stock</label>
@@ -1258,7 +1262,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" class="form-control" name="reorder_level" value="200">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="2"></textarea>
@@ -1272,7 +1276,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Add Customer Modal -->
     <div class="modal fade" id="addCustomerModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1287,12 +1291,12 @@ $deliveries = $db->query($deliveries_query);
                             <label class="form-label">Customer Code</label>
                             <input type="text" class="form-control" name="customer_code" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Customer Name</label>
                             <input type="text" class="form-control" name="customer_name" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Contact Person</label>
@@ -1303,7 +1307,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="phone" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Email</label>
@@ -1319,12 +1323,12 @@ $deliveries = $db->query($deliveries_query);
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Address</label>
                             <textarea class="form-control" name="address" rows="2"></textarea>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tax Number</label>
@@ -1344,7 +1348,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Add Material Modal -->
     <div class="modal fade" id="addMaterialModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1359,12 +1363,12 @@ $deliveries = $db->query($deliveries_query);
                             <label class="form-label">Material Code</label>
                             <input type="text" class="form-control" name="material_code" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Material Name</label>
                             <input type="text" class="form-control" name="material_name" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Material Type</label>
@@ -1387,7 +1391,7 @@ $deliveries = $db->query($deliveries_query);
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit Cost</label>
@@ -1398,7 +1402,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="current_stock" value="0">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Min Stock</label>
@@ -1413,7 +1417,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="reorder_level" value="100">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Supplier</label>
                             <input type="text" class="form-control" name="supplier">
@@ -1427,7 +1431,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Delivery Modal -->
     <div class="modal fade" id="deliveryModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1442,25 +1446,25 @@ $deliveries = $db->query($deliveries_query);
                             <label class="form-label">Select Sale</label>
                             <select class="form-control" name="sale_id" required>
                                 <option value="">Select Invoice</option>
-                                <?php 
+                                <?php
                                 $pending_sales = $db->query("SELECT s.sale_id, s.invoice_number, c.customer_name, s.delivery_address
                                                             FROM blockfactory_sales s
                                                             JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                                                             WHERE s.delivery_status != 'Delivered'");
-                                while($sale = $pending_sales->fetch_assoc()):
+                                while ($sale = $pending_sales->fetch_assoc()):
                                 ?>
-                                <option value="<?php echo $sale['sale_id']; ?>" data-address="<?php echo $sale['delivery_address']; ?>">
-                                    <?php echo $sale['invoice_number']; ?> - <?php echo $sale['customer_name']; ?>
-                                </option>
+                                    <option value="<?php echo $sale['sale_id']; ?>" data-address="<?php echo $sale['delivery_address']; ?>">
+                                        <?php echo $sale['invoice_number']; ?> - <?php echo $sale['customer_name']; ?>
+                                    </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Delivery Date</label>
                             <input type="date" class="form-control" name="delivery_date" required>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Vehicle Number</label>
@@ -1471,7 +1475,7 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="text" class="form-control" name="driver_name" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Driver Phone</label>
@@ -1482,12 +1486,12 @@ $deliveries = $db->query($deliveries_query);
                                 <input type="number" step="0.01" class="form-control" name="delivery_charges" value="0">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Destination</label>
                             <textarea class="form-control" name="destination" rows="2" required></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Notes</label>
                             <textarea class="form-control" name="notes" rows="2"></textarea>
@@ -1501,7 +1505,7 @@ $deliveries = $db->query($deliveries_query);
             </div>
         </div>
     </div>
-    
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1510,29 +1514,35 @@ $deliveries = $db->query($deliveries_query);
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/modules.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             // Initialize DataTables
             $('#productionTable').DataTable({
-                order: [[2, 'desc']]
+                order: [
+                    [2, 'desc']
+                ]
             });
             $('#productsTable').DataTable();
             $('#salesTable').DataTable({
-                order: [[1, 'desc']]
+                order: [
+                    [1, 'desc']
+                ]
             });
             $('#customersTable').DataTable();
             $('#materialsTable').DataTable();
             $('#deliveriesTable').DataTable({
-                order: [[5, 'asc']]
+                order: [
+                    [5, 'asc']
+                ]
             });
-            
+
             // Initialize Select2
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $('#saleModal')
             });
-            
+
             // Handle customer select
             $('#customerSelect').change(function() {
                 if ($(this).val() == 'new') {
@@ -1543,27 +1553,27 @@ $deliveries = $db->query($deliveries_query);
                     $('#newCustomerFields input').prop('required', false);
                 }
             });
-            
+
             // Calculate total amount
             function calculateTotal() {
                 let quantity = parseFloat($('#quantity').val()) || 0;
                 let price = parseFloat($('#unitPrice').val()) || 0;
                 let discount = parseFloat($('#discount').val()) || 0;
-                
+
                 let subtotal = quantity * price;
                 let total = subtotal - discount;
-                
+
                 $('#totalAmount').val(formatMoney(total));
             }
-            
+
             $('#quantity, #unitPrice, #discount').on('input', calculateTotal);
-            
+
             // Set unit price when product selected
             $('#productSelect').change(function() {
                 let price = $(this).find(':selected').data('price');
                 let stock = $(this).find(':selected').data('stock');
                 $('#unitPrice').val(price);
-                
+
                 // Validate quantity against stock
                 $('#quantity').attr('max', stock);
                 $('#quantity').next('.invalid-feedback').remove();
@@ -1572,87 +1582,90 @@ $deliveries = $db->query($deliveries_query);
                     $('#quantity').after('<div class="invalid-feedback">Out of stock</div>');
                 }
             });
-            
+
             // Update delivery address when sale selected
             $('select[name="sale_id"]').change(function() {
                 let address = $(this).find(':selected').data('address');
                 $('textarea[name="destination"]').val(address);
             });
-            
+
             function formatMoney(amount) {
                 return 'GHS ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             }
         });
-        
+
         function viewBatch(id) {
             window.location.href = 'view-batch.php?id=' + id;
         }
-        
+
         function recordQuality(id) {
             window.location.href = 'quality-check.php?id=' + id;
         }
-        
+
         function viewProduct(id) {
             window.location.href = 'view-product.php?id=' + id;
         }
-        
+
         function editProduct(id) {
             window.location.href = 'edit-product.php?id=' + id;
         }
-        
+
         function viewSale(id) {
             window.location.href = 'view-sale.php?id=' + id;
         }
-        
+
         function printInvoice(id) {
             window.open('print-invoice.php?id=' + id, '_blank');
         }
-        
+
         function scheduleDelivery(saleId) {
             $('#deliveryModal select[name="sale_id"]').val(saleId).trigger('change');
             $('#deliveryModal').modal('show');
         }
-        
+
         function viewCustomer(id) {
             window.location.href = 'view-customer.php?id=' + id;
         }
-        
+
         function editCustomer(id) {
             window.location.href = 'edit-customer.php?id=' + id;
         }
-        
+
         function newSale(customerId) {
             $('#saleModal').modal('show');
             $('#customerSelect').val(customerId).trigger('change');
         }
-        
+
         function viewMaterial(id) {
             window.location.href = 'view-material.php?id=' + id;
         }
-        
+
         function editMaterial(id) {
             window.location.href = 'edit-material.php?id=' + id;
         }
-        
+
         function receiveMaterial(id) {
             window.location.href = 'receive-material.php?id=' + id;
         }
-        
+
         function orderMaterial(id) {
             window.location.href = '../procurement/create-po.php?material=' + id + '&source=blockfactory';
         }
-        
+
         function viewDelivery(id) {
             window.location.href = 'view-delivery.php?id=' + id;
         }
-        
+
         function markDelivered(id) {
             if (confirm('Mark this delivery as delivered?')) {
-                $.post('ajax/mark-delivered.php', {id: id}, function() {
+                $.post('ajax/mark-delivered.php', {
+                    id: id
+                }, function() {
                     location.reload();
                 });
             }
         }
     </script>
 </body>
+
 </html>

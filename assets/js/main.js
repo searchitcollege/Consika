@@ -632,3 +632,21 @@ $(document).on('keydown', function(e) {
         $('.modal.show').modal('hide');
     }
 });
+
+// ============================================
+//  HAMBURGER MENU
+// ============================================
+// Toggle sidebar
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.querySelector('.sidebar').classList.toggle('active');
+});
+
+// Close when clicking outside
+document.addEventListener('click', function (e) {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+        sidebar.classList.remove('active');
+    }
+});

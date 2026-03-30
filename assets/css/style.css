@@ -22,9 +22,9 @@
     --gray-light: #e9ecef;
     --gray-dark: #343a40;
     --border-color: #dee2e6;
-    --shadow: 0 5px 20px rgba(0,0,0,0.05);
-    --shadow-hover: 0 8px 25px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+    --shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
     --transition: all 0.3s ease;
     --border-radius: 12px;
     --border-radius-sm: 8px;
@@ -41,18 +41,40 @@ body {
 /* ============================================
    TYPOGRAPHY
    ============================================ */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     margin-bottom: 1rem;
     color: var(--dark-color);
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.75rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
 
 p {
     margin-bottom: 1rem;
@@ -72,22 +94,65 @@ a:hover {
 /* ============================================
    UTILITY CLASSES
    ============================================ */
-.text-primary { color: var(--primary-color) !important; }
-.text-success { color: var(--success-color) !important; }
-.text-warning { color: var(--warning-color) !important; }
-.text-danger { color: var(--danger-color) !important; }
-.text-info { color: var(--info-color) !important; }
-.text-dark { color: var(--dark-color) !important; }
-.text-light { color: var(--light-color) !important; }
-.text-muted { color: var(--gray-color) !important; }
+.text-primary {
+    color: var(--primary-color) !important;
+}
 
-.bg-primary { background-color: var(--primary-color) !important; }
-.bg-success { background-color: var(--success-color) !important; }
-.bg-warning { background-color: var(--warning-color) !important; }
-.bg-danger { background-color: var(--danger-color) !important; }
-.bg-info { background-color: var(--info-color) !important; }
-.bg-dark { background-color: var(--dark-color) !important; }
-.bg-light { background-color: var(--light-color) !important; }
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}
+
+.text-dark {
+    color: var(--dark-color) !important;
+}
+
+.text-light {
+    color: var(--light-color) !important;
+}
+
+.text-muted {
+    color: var(--gray-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+.bg-dark {
+    background-color: var(--dark-color) !important;
+}
+
+.bg-light {
+    background-color: var(--light-color) !important;
+}
 
 /* ============================================
    BUTTONS
@@ -296,7 +361,7 @@ select.form-control {
 }
 
 .table-striped tbody tr:nth-child(even) {
-    background-color: rgba(0,0,0,0.02);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* ============================================
@@ -314,12 +379,29 @@ select.form-control {
     border-radius: 50px;
 }
 
-.badge.bg-primary { background: var(--primary-color) !important; }
-.badge.bg-success { background: var(--success-color) !important; }
-.badge.bg-warning { background: var(--warning-color) !important; }
-.badge.bg-danger { background: var(--danger-color) !important; }
-.badge.bg-info { background: var(--info-color) !important; }
-.badge.bg-secondary { background: var(--gray-color) !important; }
+.badge.bg-primary {
+    background: var(--primary-color) !important;
+}
+
+.badge.bg-success {
+    background: var(--success-color) !important;
+}
+
+.badge.bg-warning {
+    background: var(--warning-color) !important;
+}
+
+.badge.bg-danger {
+    background: var(--danger-color) !important;
+}
+
+.badge.bg-info {
+    background: var(--info-color) !important;
+}
+
+.badge.bg-secondary {
+    background: var(--gray-color) !important;
+}
 
 /* ============================================
    ALERTS
@@ -360,7 +442,7 @@ select.form-control {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     align-items: center;
     justify-content: center;
@@ -406,6 +488,7 @@ select.form-control {
         transform: translateY(-30px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -419,7 +502,7 @@ select.form-control {
     display: inline-block;
     width: 2rem;
     height: 2rem;
-    border: 3px solid rgba(0,0,0,0.1);
+    border: 3px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
     border-top-color: var(--primary-color);
     animation: spin 1s ease-in-out infinite;
@@ -432,7 +515,9 @@ select.form-control {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ============================================
@@ -471,6 +556,29 @@ select.form-control {
     border-color: var(--primary-color);
 }
 
+
+/* ============================================
+   HAMBURGER BUTTON
+   ============================================ */
+.hamburger-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: none;
+    box-shadow: var(--shadow);
+}
+
+.hamburger-btn i {
+    font-size: 18px;
+}
+
 /* ============================================
    PRINT STYLES
    ============================================ */
@@ -478,12 +586,32 @@ select.form-control {
     .no-print {
         display: none !important;
     }
-    
+
     body {
         background: white;
     }
-    
+
     .main-content {
         margin-left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+}
+
+/*  =============================================== 
+    RESPONSIVE MOBILE LAYOUT SETUP
+    =============================================== */
+@media (max-width: 768px) {
+    .sidebar {
+        left: -280px;
+        position: fixed;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .hamburger-btn {
+        display: block;
     }
 }
