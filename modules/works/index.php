@@ -14,6 +14,18 @@ $company_id = $session->getCompanyId();
 
 global $db;
 
+if (empty($company_id) || $company_id == null) {
+    $result = $db->query("SELECT company_id FROM companies WHERE company_type = 'Works' LIMIT 1");
+    $row = $result->fetch_assoc();
+    $company_id = (int)($row['company_id'] ?? 0);
+}
+
+if (empty($company_id)) {
+    $_SESSION['error'] = 'Works company not found.';
+    header('Location: ../../admin/dashboard.php');
+    exit();
+}
+
 // Get statistics
 $stats_query = "SELECT 
                 (SELECT COUNT(*) FROM works_projects WHERE company_id = ? AND status = 'In Progress') as active_projects,
@@ -102,10 +114,10 @@ $upcoming_deadlines = $stmt->get_result();
             <?php include '../../includes/top-nav.php'; ?>
 
             <!-- Module Header -->
-                        <div class="module-header">
-<button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
-    <i class="fas fa-bars"></i>
-</button>
+            <div class="department-header">
+                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Works & Construction Management</h1>
@@ -270,9 +282,8 @@ $upcoming_deadlines = $stmt->get_result();
                 <div class="tab-pane fade show active" id="projects" role="tabpanel">
                     <div class="row">
                         <?php
-                        $all_projects_query = "SELECT * FROM works_projects WHERE company_id = ? ORDER BY created_at DESC";
+                        $all_projects_query = "SELECT * FROM works_projects ORDER BY created_at DESC";
                         $stmt = $db->prepare($all_projects_query);
-                        $stmt->bind_param("i", $company_id);
                         $stmt->execute();
                         $all_projects = $stmt->get_result();
 
@@ -700,7 +711,7 @@ $upcoming_deadlines = $stmt->get_result();
                             <select class="form-control" name="project_manager">
                                 <option value="">Select Manager</option>
                                 <?php
-                                $users = $db->query("SELECT user_id, full_name FROM users WHERE company_id = $company_id AND role IN ('Manager', 'CompanyAdmin')");
+                                $users = $db->query("SELECT user_id, full_name FROM users WHERE company_id = " . (int)$company_id . " AND role IN ('Manager', 'CompanyAdmin')");
                                 while ($user = $users->fetch_assoc()):
                                 ?>
                                     <option value="<?php echo $user['user_id']; ?>"><?php echo $user['full_name']; ?></option>
@@ -909,7 +920,7 @@ $upcoming_deadlines = $stmt->get_result();
                             <select class="form-control" name="project_id" required>
                                 <option value="">Select Project</option>
                                 <?php
-                                $projects = $db->query("SELECT project_id, project_name FROM works_projects WHERE company_id = $company_id AND status = 'In Progress'");
+                                $projects = $db->query("SELECT project_id, project_name FROM works_projects WHERE company_id = " . (int)$company_id . " AND status = 'In Progress'");
                                 while ($proj = $projects->fetch_assoc()):
                                 ?>
                                     <option value="<?php echo $proj['project_id']; ?>"><?php echo $proj['project_name']; ?></option>

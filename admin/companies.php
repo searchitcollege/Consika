@@ -228,156 +228,158 @@ if (isset($_GET['edit'])) {
 </head>
 <body>
     <div class="wrapper">
-        <!-- Include sidebar -->
-        <?php include '../includes/sidebar.php'; ?>
-        
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Top Navigation -->
-            <?php include '../includes/top-nav.php'; ?>
+        <div class="container-fluid p-0">
+            <!-- Include sidebar -->
+            <?php include '../includes/sidebar.php'; ?>
             
-            <!-- Page Header -->
-            <div class="page-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h4 class="mb-1">Company Management</h4>
-                    <p class="text-muted mb-0">Manage your companies and their settings</p>
-                </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
-                    <i class="fas fa-plus-circle me-2"></i>Add New Company
-                </button>
-            </div>
-            
-            <!-- Alert Messages -->
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php 
-                    echo $_SESSION['success'];
-                    unset($_SESSION['success']);
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?php 
-                    echo $_SESSION['error'];
-                    unset($_SESSION['error']);
-                    ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Companies Grid -->
-            <div class="row">
-                <?php while($company = $companies->fetch_assoc()): 
-                    $type_class = strtolower(str_replace(' ', '', $company['company_type']));
-                ?>
-                <div class="col-md-6">
-                    <div class="company-card <?php echo $type_class; ?>">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <div class="company-icon <?php echo $type_class; ?>">
-                                    <?php
-                                    $icons = [
-                                        'Estate' => 'building',
-                                        'Procurement' => 'truck',
-                                        'Works' => 'tools',
-                                        'Block Factory' => 'cubes'
-                                    ];
-                                    echo '<i class="fas fa-' . $icons[$company['company_type']] . '"></i>';
-                                    ?>
-                                </div>
-                                <h5 class="mb-1"><?php echo htmlspecialchars($company['company_name']); ?></h5>
-                                <p class="text-muted mb-2">
-                                    <span class="type-badge bg-<?php 
-                                        echo $company['company_type'] == 'Estate' ? 'primary' : 
-                                            ($company['company_type'] == 'Procurement' ? 'info' : 
-                                            ($company['company_type'] == 'Works' ? 'danger' : 'success')); 
-                                    ?> text-white">
-                                        <?php echo $company['company_type']; ?>
-                                    </span>
-                                    <?php if ($company['status'] != 'Active'): ?>
-                                        <span class="badge bg-secondary ms-2"><?php echo $company['status']; ?></span>
-                                    <?php endif; ?>
-                                </p>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm" data-bs-toggle="dropdown">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="?edit=<?php echo $company['company_id']; ?>">
-                                        <i class="fas fa-edit me-2"></i>Edit
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="view-company.php?id=<?php echo $company['company_id']; ?>">
-                                        <i class="fas fa-eye me-2"></i>View Details
-                                    </a></li>
-                                    <li><a class="dropdown-item" href="users.php?company=<?php echo $company['company_id']; ?>">
-                                        <i class="fas fa-users me-2"></i>Manage Users
-                                    </a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteCompany(<?php echo $company['company_id']; ?>, '<?php echo htmlspecialchars($company['company_name']); ?>')">
-                                        <i class="fas fa-trash me-2"></i>Delete
-                                    </a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <p class="text-muted small mb-3">
-                            <i class="fas fa-map-marker-alt me-1"></i> <?php echo $company['address'] ?: 'No address'; ?>
-                        </p>
-                        
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <div class="stats-badge">
-                                    <span class="number"><?php echo $company['user_count']; ?></span>
-                                    <span class="label">Users</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stats-badge">
-                                    <span class="number"><?php echo $company['active_users']; ?></span>
-                                    <span class="label">Active</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="stats-badge">
-                                    <span class="number"><?php echo date('Y', strtotime($company['established_date'] ?: $company['created_at'])); ?></span>
-                                    <span class="label">Est.</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <small class="text-muted d-block">Registration</small>
-                                <span><?php echo $company['registration_number'] ?: 'N/A'; ?></span>
-                            </div>
-                            <div class="col-6">
-                                <small class="text-muted d-block">Tax Number</small>
-                                <span><?php echo $company['tax_number'] ?: 'N/A'; ?></span>
-                            </div>
-                        </div>
-                        
-                        <?php if ($company['phone'] || $company['email']): ?>
-                        <hr>
-                        <div class="row g-2">
-                            <?php if ($company['phone']): ?>
-                            <div class="col-6">
-                                <i class="fas fa-phone me-1 text-muted"></i> <?php echo $company['phone']; ?>
-                            </div>
-                            <?php endif; ?>
-                            <?php if ($company['email']): ?>
-                            <div class="col-6">
-                                <i class="fas fa-envelope me-1 text-muted"></i> <?php echo $company['email']; ?>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                        <?php endif; ?>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Top Navigation -->
+                <?php include '../includes/top-nav.php'; ?>
+                
+                <!-- Page Header -->
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">Company Management</h4>
+                        <p class="text-muted mb-0">Manage your companies and their settings</p>
                     </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompanyModal">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Company
+                    </button>
                 </div>
-                <?php endwhile; ?>
+                
+                <!-- Alert Messages -->
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?php 
+                        echo $_SESSION['success'];
+                        unset($_SESSION['success']);
+                        ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?php 
+                        echo $_SESSION['error'];
+                        unset($_SESSION['error']);
+                        ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
+                
+                <!-- Companies Grid -->
+                <div class="row">
+                    <?php while($company = $companies->fetch_assoc()): 
+                        $type_class = strtolower(str_replace(' ', '', $company['company_type']));
+                    ?>
+                    <div class="col-md-6">
+                        <div class="company-card <?php echo $type_class; ?>">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="company-icon <?php echo $type_class; ?>">
+                                        <?php
+                                        $icons = [
+                                            'Estate' => 'building',
+                                            'Procurement' => 'truck',
+                                            'Works' => 'tools',
+                                            'Block Factory' => 'cubes'
+                                        ];
+                                        echo '<i class="fas fa-' . $icons[$company['company_type']] . '"></i>';
+                                        ?>
+                                    </div>
+                                    <h5 class="mb-1"><?php echo htmlspecialchars($company['company_name']); ?></h5>
+                                    <p class="text-muted mb-2">
+                                        <span class="type-badge bg-<?php 
+                                            echo $company['company_type'] == 'Estate' ? 'primary' : 
+                                                ($company['company_type'] == 'Procurement' ? 'info' : 
+                                                ($company['company_type'] == 'Works' ? 'danger' : 'success')); 
+                                        ?> text-white">
+                                            <?php echo $company['company_type']; ?>
+                                        </span>
+                                        <?php if ($company['status'] != 'Active'): ?>
+                                            <span class="badge bg-secondary ms-2"><?php echo $company['status']; ?></span>
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="?edit=<?php echo $company['company_id']; ?>">
+                                            <i class="fas fa-edit me-2"></i>Edit
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="view-company.php?id=<?php echo $company['company_id']; ?>">
+                                            <i class="fas fa-eye me-2"></i>View Details
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="users.php?company=<?php echo $company['company_id']; ?>">
+                                            <i class="fas fa-users me-2"></i>Manage Users
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteCompany(<?php echo $company['company_id']; ?>, '<?php echo htmlspecialchars($company['company_name']); ?>')">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-map-marker-alt me-1"></i> <?php echo $company['address'] ?: 'No address'; ?>
+                            </p>
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-4">
+                                    <div class="stats-badge">
+                                        <span class="number"><?php echo $company['user_count']; ?></span>
+                                        <span class="label">Users</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stats-badge">
+                                        <span class="number"><?php echo $company['active_users']; ?></span>
+                                        <span class="label">Active</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stats-badge">
+                                        <span class="number"><?php echo date('Y', strtotime($company['established_date'] ?: $company['created_at'])); ?></span>
+                                        <span class="label">Est.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Registration</small>
+                                    <span><?php echo $company['registration_number'] ?: 'N/A'; ?></span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Tax Number</small>
+                                    <span><?php echo $company['tax_number'] ?: 'N/A'; ?></span>
+                                </div>
+                            </div>
+                            
+                            <?php if ($company['phone'] || $company['email']): ?>
+                            <hr>
+                            <div class="row g-2">
+                                <?php if ($company['phone']): ?>
+                                <div class="col-6">
+                                    <i class="fas fa-phone me-1 text-muted"></i> <?php echo $company['phone']; ?>
+                                </div>
+                                <?php endif; ?>
+                                <?php if ($company['email']): ?>
+                                <div class="col-6">
+                                    <i class="fas fa-envelope me-1 text-muted"></i> <?php echo $company['email']; ?>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endwhile; ?>
+                </div>
             </div>
         </div>
     </div>

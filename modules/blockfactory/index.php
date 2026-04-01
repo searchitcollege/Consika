@@ -14,6 +14,18 @@ $company_id = $session->getCompanyId();
 
 global $db;
 
+if (empty($company_id) || $company_id == null) {
+    $result = $db->query("SELECT company_id FROM companies WHERE company_type = 'Block Factory' LIMIT 1");
+    $row = $result->fetch_assoc();
+    $company_id = (int)($row['company_id'] ?? 0);
+}
+
+if (empty($company_id)) {
+    $_SESSION['error'] = 'Block Factory company not found.';
+    header('Location: ../../admin/dashboard.php');
+    exit();
+}
+
 // Get statistics
 $stats_query = "SELECT 
                 (SELECT COUNT(*) FROM blockfactory_products WHERE company_id = ? AND status = 'Active') as total_products,
@@ -22,7 +34,7 @@ $stats_query = "SELECT
                 (SELECT COALESCE(SUM(produced_quantity), 0) FROM blockfactory_production WHERE production_date = CURDATE()) as today_blocks,
                 (SELECT COALESCE(SUM(total_amount), 0) FROM blockfactory_sales WHERE sale_date = CURDATE()) as today_sales,
                 (SELECT COUNT(*) FROM blockfactory_sales WHERE delivery_status = 'Pending') as pending_deliveries,
-                (SELECT COALESCE(SUM(current_stock), 0) FROM blockfactory_raw_materials WHERE current_stock <= minimum_stock) as low_materials";
+                (SELECT COALESCE(SUM(stock_quantity), 0) FROM blockfactory_raw_materials WHERE stock_quantity <= minimum_stock) as low_materials";
 $stmt = $db->prepare($stats_query);
 $stmt->bind_param("ii", $company_id, $company_id);
 $stmt->execute();
@@ -52,8 +64,8 @@ $recent_sales = $stmt->get_result();
 
 // Get low stock raw materials
 $low_materials_query = "SELECT * FROM blockfactory_raw_materials 
-                       WHERE current_stock <= minimum_stock 
-                       ORDER BY (current_stock - minimum_stock) ASC";
+                       WHERE stock_quantity <= minimum_stock 
+                       ORDER BY (stock_quantity - minimum_stock) ASC";
 $low_materials = $db->query($low_materials_query);
 
 // Get pending deliveries
@@ -1005,7 +1017,7 @@ $deliveries = $db->query($deliveries_query);
                                 <select class="form-control" name="product_id" required>
                                     <option value="">Select Product</option>
                                     <?php
-                                    $products = $db->query("SELECT product_id, product_name FROM blockfactory_products WHERE company_id = $company_id AND status = 'Active'");
+                                    $products = $db->query("SELECT product_id, product_name FROM blockfactory_products WHERE status = 'Active'");
                                     while ($prod = $products->fetch_assoc()):
                                     ?>
                                         <option value="<?php echo $prod['product_id']; ?>"><?php echo $prod['product_name']; ?></option>
@@ -1121,7 +1133,7 @@ $deliveries = $db->query($deliveries_query);
                                 <select class="form-control" name="product_id" id="productSelect" required>
                                     <option value="">Select Product</option>
                                     <?php
-                                    $products = $db->query("SELECT product_id, product_name, price_per_unit, current_stock FROM blockfactory_products WHERE company_id = $company_id AND status = 'Active'");
+                                    $products = $db->query("SELECT product_id, product_name, price_per_unit, current_stock FROM blockfactory_products WHERE status = 'Active'");
                                     while ($prod = $products->fetch_assoc()):
                                     ?>
                                         <option value="<?php echo $prod['product_id']; ?>"

@@ -14,6 +14,18 @@ $company_id = $session->getCompanyId();
 
 global $db;
 
+if (empty($company_id) || $company_id == null) {
+    $result = $db->query("SELECT company_id FROM companies WHERE company_type = 'Estate' LIMIT 1");
+    $row = $result->fetch_assoc();
+    $company_id = (int)($row['company_id'] ?? 0);
+}
+
+if (empty($company_id)) {
+    $_SESSION['error'] = 'Estate company not found.';
+    header('Location: ../../admin/dashboard.php');
+    exit();
+}
+
 // Get properties
 $properties_query = "SELECT p.*, 
                     (SELECT COUNT(*) FROM estate_tenants WHERE property_id = p.property_id AND status = 'Active') as active_tenants,
@@ -661,10 +673,10 @@ $stats = $stmt->get_result()->fetch_assoc();
                                     <?php
                                     $stats_query = "SELECT 
                                                     COUNT(*) as total,
-                                                    SUM(CASE WHEN priority = 'Emergency' THEN 1 ELSE 0 END) as emergency,
-                                                    SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-                                                    SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
-                                                    AVG(CASE WHEN status = 'Completed' THEN DATEDIFF(completion_date, request_date) ELSE NULL END) as avg_completion_days
+                                                    SUM(CASE WHEN m.priority = 'Emergency' THEN 1 ELSE 0 END) as emergency,
+                                                    SUM(CASE WHEN m.status = 'Pending' THEN 1 ELSE 0 END) as pending,
+                                                    SUM(CASE WHEN m.status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+                                                    AVG(CASE WHEN m.status = 'Completed' THEN DATEDIFF(m.completion_date, m.request_date) ELSE NULL END) as avg_completion_days
                                                     FROM estate_maintenance m
                                                     JOIN estate_properties p ON m.property_id = p.property_id
                                                     WHERE p.company_id = ?";
@@ -688,7 +700,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span>Avg. Completion</span>
-                                            <span class="badge bg-info"><?php echo round($maintenance_stats['avg_completion_days']); ?> days</span>
+                                            <span class="badge bg-info"><?php echo round($maintenance_stats['avg_completion_days'] ?? 0, 1); ?> days</span>
                                         </div>
                                     </div>
                                 </div>

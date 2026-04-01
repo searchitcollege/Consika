@@ -335,9 +335,14 @@ $page_title = 'Sales';
                             <h4 class="mb-1">Sales Management</h4>
                             <p class="text-muted mb-0">Record and track sales transactions</p>
                         </div>
+                        <div>
+                        <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSaleModal">
                             <i class="fas fa-plus-circle me-2"></i>New Sale
                         </button>
+                        </div>
                     </div>
                     
                     <!-- Alert Messages -->
@@ -721,6 +726,8 @@ $page_title = 'Sales';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../../assets/js/modules.js"></script>
+    <script src="../../assets/js/main.js"></script>
     
     <script>
         $(document).ready(function() {

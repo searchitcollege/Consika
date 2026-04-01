@@ -67,25 +67,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
             
             <!-- Department Links for Admin -->
             <li class="nav-item">
-                <a href="<?php echo baseUrl('modules/estate/dashboard.php'); ?>" class="nav-link">
+                <a href="<?php echo baseUrl('modules/estate/index.php'); ?>" class="nav-link">
                     <i class="fas fa-building"></i>
                     <span>Estate</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo baseUrl('modules/procurement/dashboard.php'); ?>" class="nav-link">
+                <a href="<?php echo baseUrl('modules/procurement/index.php'); ?>" class="nav-link">
                     <i class="fas fa-truck"></i>
                     <span>Procurement</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo baseUrl('modules/works/dashboard.php'); ?>" class="nav-link">
+                <a href="<?php echo baseUrl('modules/works/index.php'); ?>" class="nav-link">
                     <i class="fas fa-tools"></i>
                     <span>Works</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo baseUrl('modules/blockfactory/dashboard.php'); ?>" class="nav-link">
+                <a href="<?php echo baseUrl('modules/blockfactory/index.php'); ?>" class="nav-link">
                     <i class="fas fa-cubes"></i>
                     <span>Block Factory</span>
                 </a>

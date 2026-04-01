@@ -14,6 +14,18 @@ $company_id = $session->getCompanyId();
 
 global $db;
 
+if (empty($company_id) || $company_id == null) {
+    $result = $db->query("SELECT company_id FROM companies WHERE company_type = 'Procurement' LIMIT 1");
+    $row = $result->fetch_assoc();
+    $company_id = (int)($row['company_id'] ?? 0);
+}
+
+if (empty($company_id)) {
+    $_SESSION['error'] = 'Procurement company not found.';
+    header('Location: ../../admin/dashboard.php');
+    exit();
+}
+
 // Handle purchase order creation
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'create_po') {
     $supplier_id = $db->escapeString($_POST['supplier_id']);
@@ -145,10 +157,10 @@ $pending_deliveries = $stmt->get_result();
             <?php include '../../includes/top-nav.php'; ?>
 
             <!-- Module Header -->
-                        <div class="module-header">
-<button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
-    <i class="fas fa-bars"></i>
-</button>
+            <div class="module-header">
+                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Procurement Management</h1>
@@ -501,7 +513,7 @@ $pending_deliveries = $stmt->get_result();
                                     <tbody>
                                         <?php
                                         $suppliers_query = "SELECT * FROM procurement_suppliers 
-                                                           WHERE company_id = ? 
+                                                           WHERE company_id = ?
                                                            ORDER BY supplier_name ASC";
                                         $stmt = $db->prepare($suppliers_query);
                                         $stmt->bind_param("i", $company_id);
@@ -691,7 +703,7 @@ $pending_deliveries = $stmt->get_result();
                                 <select class="form-control select2" name="supplier_id" required>
                                     <option value="">Select Supplier</option>
                                     <?php
-                                    $suppliers = $db->query("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE company_id = $company_id AND status = 'Active'");
+                                    $suppliers = $db->query("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE company_id = " . (int)$company_id . " AND status = 'Active'");
                                     while ($sup = $suppliers->fetch_assoc()):
                                     ?>
                                         <option value="<?php echo $sup['supplier_id']; ?>"><?php echo $sup['supplier_name']; ?></option>

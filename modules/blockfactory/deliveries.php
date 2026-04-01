@@ -387,9 +387,14 @@ $page_title = 'Deliveries';
                             <h4 class="mb-1">Delivery Management</h4>
                             <p class="text-muted mb-0">Schedule and track deliveries</p>
                         </div>
+                        <div>
+                        <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
                             <i class="fas fa-truck me-2"></i>Schedule New Delivery
                         </button>
+                        </div>
                     </div>
                     
                     <!-- Alert Messages -->
@@ -729,6 +734,8 @@ $page_title = 'Deliveries';
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
     
     <script>
         $(document).ready(function() {

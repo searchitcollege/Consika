@@ -99,14 +99,14 @@
 }
 
 .quick-action-btn:hover {
-    border-color: #4cc9f0;
+    border-color: #f72585;
     background: #f8f9fa;
     transform: translateY(-3px);
 }
 
 .quick-action-btn i {
     font-size: 28px;
-    color: #4cc9f0;
+    color: #f72585;
     margin-bottom: 10px;
 }
 

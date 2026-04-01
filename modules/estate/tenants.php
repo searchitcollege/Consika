@@ -203,9 +203,14 @@ $page_title = 'Tenants';
                         <h4 class="mb-1">Tenants Management</h4>
                         <p class="text-muted mb-0">Manage all tenants and leases</p>
                     </div>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantModal">
-                        <i class="fas fa-user-plus me-2"></i>Add New Tenant
-                    </button>
+                <div>
+                                            <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                            <i class="fas fa-user-plus me-2"></i>Add New Tenant
+                        </button>
+                </div>
                 </div>
                 
                 <!-- Alert Messages -->
@@ -521,6 +526,8 @@ $page_title = 'Tenants';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
     
     <script>
         $(document).ready(function() {

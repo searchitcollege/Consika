@@ -85,6 +85,7 @@ $page_title = 'Estate Dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,18 +102,21 @@ $page_title = 'Estate Dashboard';
             border-radius: 15px;
             margin-bottom: 30px;
         }
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             transition: transform 0.3s;
         }
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
+
         .stat-icon {
             width: 50px;
             height: 50px;
@@ -125,12 +129,14 @@ $page_title = 'Estate Dashboard';
             font-size: 24px;
             margin-bottom: 15px;
         }
+
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 25px;
         }
+
         .quick-action-btn {
             background: white;
             border: 2px dashed #dee2e6;
@@ -140,6 +146,7 @@ $page_title = 'Estate Dashboard';
             cursor: pointer;
             transition: all 0.3s;
         }
+
         .quick-action-btn:hover {
             border-color: #4361ee;
             background: #f8f9fa;
@@ -147,11 +154,12 @@ $page_title = 'Estate Dashboard';
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Simple Sidebar -->
-            <div class="col-md-2 bg-dark text-white p-0 vh-100">
+            <div class="sidebar col-md-2 bg-dark text-white p-0 vh-100">
                 <div class="p-3">
                     <h4>Estate Management</h4>
                     <hr>
@@ -180,14 +188,17 @@ $page_title = 'Estate Dashboard';
                     </ul>
                 </div>
             </div>
-            
+
             <!-- Main Content -->
             <div class="col-md-10 p-4">
                 <div class="department-header">
                     <h2>Estate Dashboard</h2>
                     <p>Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                    <button id="sidebarToggle" class="btn btn-dark d-md-none m-2 ">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
-                
+
                 <!-- Stats Row -->
                 <div class="row">
                     <div class="col-md-3">
@@ -227,7 +238,7 @@ $page_title = 'Estate Dashboard';
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Second Stats Row -->
                 <div class="row mt-3">
                     <div class="col-md-6">
@@ -253,17 +264,17 @@ $page_title = 'Estate Dashboard';
                             <div class="card-body">
                                 <ul class="list-unstyled">
                                     <?php foreach ($recent_activities as $activity): ?>
-                                    <li class="mb-2">
-                                        <small class="text-muted"><?php echo timeAgo($activity['created_at']); ?></small>
-                                        <p class="mb-0"><?php echo htmlspecialchars($activity['description']); ?></p>
-                                    </li>
+                                        <li class="mb-2">
+                                            <small class="text-muted"><?php echo timeAgo($activity['created_at']); ?></small>
+                                            <p class="mb-0"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                        </li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Quick Actions -->
                 <div class="quick-actions mt-4">
                     <div class="quick-action-btn" onclick="window.location.href='add-property.php'">
@@ -286,8 +297,11 @@ $page_title = 'Estate Dashboard';
             </div>
         </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/modules.js"></script>
 </body>
+
 </html>
