@@ -352,10 +352,8 @@ $recent_deliveries = $stmt->get_result();
                                 $all_pos_query = "SELECT po.*, s.supplier_name 
                                                          FROM procurement_purchase_orders po
                                                          JOIN procurement_suppliers s ON po.supplier_id = s.supplier_id
-                                                         WHERE s.company_id = ?
                                                          ORDER BY po.created_at DESC";
                                 $stmt = $db->prepare($all_pos_query);
-                                $stmt->bind_param("i", $company_id);
                                 $stmt->execute();
                                 $all_pos = $stmt->get_result();
                                 while ($po = $all_pos->fetch_assoc()):
@@ -416,10 +414,13 @@ $recent_deliveries = $stmt->get_result();
                                 <select class="form-control select2" name="supplier_id" required>
                                     <option value="">Select Supplier</option>
                                     <?php
-                                    $suppliers = $db->query("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE company_id = $company_id AND status = 'Active'");
+                                    $sup_stmt = $db->prepare("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE status = 'Active'");
+                                    $sup_stmt->execute();
+                                    $suppliers = $sup_stmt->get_result();
                                     while ($sup = $suppliers->fetch_assoc()):
                                     ?>
-                                        <option value="<?php echo $sup['supplier_id']; ?>"><?php echo $sup['supplier_name']; ?></option>
+                                        <option value="<?php echo $sup['supplier_id']; ?>"><?php echo htmlspecialchars($sup['supplier_name']); ?>
+                                        </option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>

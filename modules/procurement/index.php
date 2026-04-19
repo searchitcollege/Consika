@@ -1,5 +1,9 @@
 <?php
+require_once '../../includes/config.php';
+require_once '../../includes/db_connection.php';
+require_once '../../includes/functions.php';
 require_once '../../includes/session.php';
+
 $session->requireLogin();
 
 // Check permission
@@ -26,52 +30,546 @@ if (empty($company_id)) {
     exit();
 }
 
-// Handle purchase order creation
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'create_po') {
-    $supplier_id = $db->escapeString($_POST['supplier_id']);
-    $order_date = $db->escapeString($_POST['order_date']);
-    $expected_delivery = $db->escapeString($_POST['expected_delivery']);
-    $items = $_POST['items']; // This should be an array of items with product_id, quantity, unit_price
 
-    // Validate inputs
-    if (empty($supplier_id) || empty($order_date) || empty($items) || !is_array($items)) {
-        $_SESSION['error'] = 'Please fill in all required fields and add at least one item.';
+// Handle purchase orders createion 
+// PO draft until everything is approved and ready, then redirect to edit page to add items and finalize the order
+// Handle purchase order creation
+
+// ============================================================
+// CREATE PURCHASE ORDER
+// ============================================================
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    ($_POST['action'] ?? '') === 'add' &&
+    ($_POST['form']   ?? '') === 'po'
+) {
+
+    $supplier_id       = (int)($_POST['supplier_id']       ?? 0);
+    $order_date        = trim($_POST['order_date']         ?? '');
+    $expected_delivery = trim($_POST['expected_delivery']  ?? '') ?: null;
+    $notes             = trim($_POST['notes']              ?? '') ?: null;
+    $items             = $_POST['items'] ?? [];
+    $created_by        = (int)$current_user['user_id'];
+
+    if (!$supplier_id || empty($order_date) || empty($items)) {
+        $_SESSION['error'] = 'Please fill required fields and add at least one item.';
         header('Location: index.php');
         exit();
     }
 
-    // Calculate total amount
-    $total_amount = 0;
+    // ── Validate supplier belongs to this company ────────────────────────────
+    $sup_check = $db->prepare("SELECT supplier_id FROM procurement_suppliers WHERE supplier_id = ? AND company_id = ?");
+    $sup_check->bind_param("ii", $supplier_id, $company_id);
+    $sup_check->execute();
+    $sup_check->store_result();
+
+    if ($sup_check->num_rows === 0) {
+        $_SESSION['error'] = 'Invalid supplier selected.';
+        header('Location: index.php');
+        exit();
+    }
+    $sup_check->close();
+
+    // ── Calculate totals ─────────────────────────────────────────────────────
+    $subtotal = 0;
+    $valid_items = [];
+
     foreach ($items as $item) {
-        if (isset($item['product_id'], $item['quantity'], $item['unit_price'])) {
-            $total_amount += $item['quantity'] * $item['unit_price'];
-        }
+        if (empty($item['product_id'])) continue;
+
+        $quantity = (int)($item['quantity']   ?? 0);
+        $price    = (float)($item['unit_price'] ?? 0);
+        $discount = (float)($item['discount']   ?? 0);
+
+        if ($quantity <= 0 || $price <= 0) continue;
+
+        $line_total  = ($quantity * $price) - $discount;
+        $subtotal   += $line_total;
+
+        $valid_items[] = [
+            'product_id' => (int)$item['product_id'],
+            'quantity'   => $quantity,
+            'price'      => $price,
+            'discount'   => $discount,
+            'line_total' => $line_total,
+        ];
     }
 
-    // Insert purchase order
-    $sql = "INSERT INTO procurement_purchase_orders (company_id, supplier_id, order_date, expected_delivery, total_amount, delivery_status, payment_status) 
-            VALUES (?, ?, ?, ?, ?, 'Pending', 'Unpaid')";
-    $stmt = $db->prepare($sql);
-    $stmt->bind_param("iissd", $company_id, $supplier_id, $order_date, $expected_delivery, $total_amount);
+    if (empty($valid_items)) {
+        $_SESSION['error'] = 'Please add at least one valid item.';
+        header('Location: index.php');
+        exit();
+    }
+
+    $tax_amount   = $subtotal * 0.16;
+    $total_amount = $subtotal + $tax_amount;
+
+    // ── Generate unique PO number ─────────────────────────────────────────────
+    $po_number = 'PO-' . date('Y') . '-' . rand(1000, 9999);
+
+    $po_check = $db->prepare("SELECT po_id FROM procurement_purchase_orders WHERE po_number = ?");
+    $po_check->bind_param("s", $po_number);
+    $po_check->execute();
+    $po_check->store_result();
+    if ($po_check->num_rows > 0) {
+        $po_number = 'PO-' . date('Y') . '-' . rand(1000, 9999) . rand(0, 9);
+    }
+    $po_check->close();
+
+    $delivery_status = 'Pending';
+    $payment_status  = 'Unpaid';
+    $approval_status = 'Pending';
+
+    // ── Insert PO header ──────────────────────────────────────────────────────
+    $stmt = $db->prepare("
+        INSERT INTO procurement_purchase_orders
+            (po_number, supplier_id, order_date, expected_delivery, notes,
+             delivery_status, payment_status, total_amount, approval_status, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->bind_param(
+        "sisssssdsi",
+        $po_number,
+        $supplier_id,
+        $order_date,
+        $expected_delivery,
+        $notes,
+        $delivery_status,
+        $payment_status,
+        $total_amount,
+        $approval_status,
+        $created_by
+    );
+
+    if (!$stmt->execute()) {
+        $_SESSION['error'] = 'Failed to create purchase order.';
+        header('Location: index.php');
+        exit();
+    }
+    $stmt->close();
+
+    // ── Retrieve new po_id ────────────────────────────────────────────────────
+    $id_result = $db->query("SELECT LAST_INSERT_ID() AS new_id");
+    $po_id     = (int)$id_result->fetch_assoc()['new_id'];
+
+    // ── Insert PO items ───────────────────────────────────────────────────────
+    foreach ($valid_items as $item) {
+        $stmt_item = $db->prepare("
+            INSERT INTO procurement_po_items
+                (po_id, product_id, quantity, unit_price, discount, total_price)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmt_item->bind_param(
+            "iiiddd",
+            $po_id,
+            $item['product_id'],
+            $item['quantity'],
+            $item['price'],
+            $item['discount'],
+            $item['line_total']
+        );
+        $stmt_item->execute();
+        $stmt_item->close();
+    }
+
+    // ── Activity log ──────────────────────────────────────────────────────────
+    $log_desc = "Created purchase order {$po_number} for supplier ID {$supplier_id}";
+    $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+    $log = $db->prepare("
+        INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
+        VALUES (?, 'Create PO', ?, ?, 'procurement', ?)
+    ");
+    $log->bind_param("issi", $created_by, $log_desc, $log_ip, $po_id);
+    $log->execute();
+    $log->close();
+
+    $_SESSION['success'] = "Purchase Order {$po_number} created successfully.";
+    header('Location: index.php');
+    exit();
+}
+
+
+// ============================================================
+// ADD SUPPLIER
+// ============================================================
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    ($_POST['action'] ?? '') === 'add' &&
+    ($_POST['form']   ?? '') === 'supplier'
+) {
+
+    $supplier_code  = trim($_POST['supplier_code']  ?? '');
+    $supplier_name  = trim($_POST['supplier_name']  ?? '');
+    $contact_person = trim($_POST['contact_person'] ?? '') ?: null;
+    $phone          = trim($_POST['phone']          ?? '');
+    $email          = trim($_POST['email']          ?? '') ?: null;
+    $website        = trim($_POST['website']        ?? '') ?: null;
+    $address        = trim($_POST['address']        ?? '') ?: null;
+    $category       = trim($_POST['category']       ?? '') ?: null;
+    $tax_number     = trim($_POST['tax_number']     ?? '') ?: null;
+    $payment_terms  = trim($_POST['payment_terms']  ?? '') ?: null;
+    $credit_limit   = isset($_POST['credit_limit']) && $_POST['credit_limit'] !== '' ? (float)$_POST['credit_limit'] : null;
+    $created_by     = (int)$current_user['user_id'];
+
+    if (empty($supplier_code) || empty($supplier_name) || empty($phone)) {
+        $_SESSION['error'] = 'Supplier code, name, and phone are required.';
+        header('Location: index.php');
+        exit();
+    }
+
+    if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = 'Invalid email address.';
+        header('Location: index.php');
+        exit();
+    }
+
+    // Duplicate code check
+    $dup = $db->prepare("SELECT supplier_id FROM procurement_suppliers WHERE supplier_code = ?");
+    $dup->bind_param("s", $supplier_code);
+    $dup->execute();
+    $dup->store_result();
+    if ($dup->num_rows > 0) {
+        $_SESSION['error'] = "Supplier code '{$supplier_code}' already exists.";
+        header('Location: index.php');
+        exit();
+    }
+    $dup->close();
+
+    $stmt = $db->prepare("
+        INSERT INTO procurement_suppliers
+            (company_id, supplier_code, supplier_name, contact_person, phone,
+             email, website, address, category, tax_number, payment_terms, credit_limit, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->bind_param(
+        "issssssssssdi",
+        $company_id,
+        $supplier_code,
+        $supplier_name,
+        $contact_person,
+        $phone,
+        $email,
+        $website,
+        $address,
+        $category,
+        $tax_number,
+        $payment_terms,
+        $credit_limit,
+        $created_by
+    );
 
     if ($stmt->execute()) {
-        $po_id = $stmt->insert_id;
+        $stmt->close();
 
-        // Insert purchase order items
-        foreach ($items as $item) {
-            if (isset($item['product_id'], $item['quantity'], $item['unit_price'])) {
-                $sql_item = "INSERT INTO procurement_po_items (po_id, product_id, quantity, unit_price) 
-                             VALUES (?, ?, ?, ?)";
-                $stmt_item = $db->prepare($sql_item);
-                $stmt_item->bind_param("iiid", $po_id, $item['product_id'], $item['quantity'], $item['unit_price']);
-                $stmt_item->execute();
-            }
-        }
+        $id_result   = $db->query("SELECT LAST_INSERT_ID() AS new_id");
+        $supplier_id = (int)$id_result->fetch_assoc()['new_id'];
 
-        $_SESSION['success'] = 'Purchase order created successfully.';
+        $log_desc = "Added supplier: {$supplier_name} ({$supplier_code})";
+        $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+        $log = $db->prepare("
+            INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
+            VALUES (?, 'Add Supplier', ?, ?, 'procurement', ?)
+        ");
+        $log->bind_param("issi", $created_by, $log_desc, $log_ip, $supplier_id);
+        $log->execute();
+        $log->close();
+
+        $_SESSION['success'] = "Supplier '{$supplier_name}' added successfully.";
     } else {
-        $_SESSION['error'] = 'Failed to create purchase order. Please try again.';
+        $_SESSION['error'] = 'Error adding supplier. Please try again.';
     }
+
+    header('Location: index.php');
+    exit();
+}
+
+
+// ============================================================
+// PRODUCT ACTIONS (add / edit / delete / reduce_stock)
+// ============================================================
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    ($_POST['form'] ?? '') === 'product' &&
+    isset($_POST['action'])
+) {
+
+    $created_by = (int)$current_user['user_id'];
+
+    switch ($_POST['action']) {
+
+        // ── ADD PRODUCT ───────────────────────────────────────────────────────
+        case 'add':
+            $product_code  = trim($_POST['product_code']  ?? '');
+            $product_name  = trim($_POST['product_name']  ?? '');
+            $category      = trim($_POST['category']      ?? '') ?: null;
+            $sub_category  = trim($_POST['sub_category']  ?? '') ?: null;
+            $description   = trim($_POST['description']   ?? '') ?: null;
+            $unit          = trim($_POST['unit']          ?? '');
+            $minimum_stock = (int)($_POST['minimum_stock'] ?? 0);
+            $maximum_stock = (int)($_POST['maximum_stock'] ?? 1000);
+            $current_stock = (int)($_POST['current_stock'] ?? 0);
+            $reorder_level = (int)($_POST['reorder_level'] ?? 10);
+            $unit_price    = (float)($_POST['unit_price']   ?? 0);
+            $selling_price = isset($_POST['selling_price']) && $_POST['selling_price'] !== '' ? (float)$_POST['selling_price'] : null;
+            $tax_rate      = isset($_POST['tax_rate'])      && $_POST['tax_rate']      !== '' ? (float)$_POST['tax_rate']      : 16.00;
+            $location      = trim($_POST['location']  ?? '') ?: null;
+            $barcode       = trim($_POST['barcode']   ?? '') ?: null;
+            $status        = trim($_POST['status']    ?? 'Active');
+
+            if (empty($product_code) || empty($product_name) || empty($unit) || $unit_price <= 0) {
+                $_SESSION['error'] = 'Product code, name, unit, and unit price are required.';
+                break;
+            }
+
+            $dup = $db->prepare("SELECT product_id FROM procurement_products WHERE product_code = ?");
+            $dup->bind_param("s", $product_code);
+            $dup->execute();
+            $dup->store_result();
+            if ($dup->num_rows > 0) {
+                $_SESSION['error'] = "Product code '{$product_code}' already exists.";
+                $dup->close();
+                break;
+            }
+            $dup->close();
+
+            $stmt = $db->prepare("
+                INSERT INTO procurement_products
+                    (product_code, product_name, category, sub_category, description, unit,
+                     minimum_stock, maximum_stock, current_stock, reorder_level,
+                     unit_price, selling_price, tax_rate, location, barcode, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->bind_param(
+                "ssssssiiiidddsss",
+                $product_code,
+                $product_name,
+                $category,
+                $sub_category,
+                $description,
+                $unit,
+                $minimum_stock,
+                $maximum_stock,
+                $current_stock,
+                $reorder_level,
+                $unit_price,
+                $selling_price,
+                $tax_rate,
+                $location,
+                $barcode,
+                $status
+            );
+
+            if ($stmt->execute()) {
+                $stmt->close();
+
+                $id_result  = $db->query("SELECT LAST_INSERT_ID() AS new_id");
+                $product_id = (int)$id_result->fetch_assoc()['new_id'];
+
+                $log_desc = "Added product: {$product_name} ({$product_code})";
+                $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+                $log = $db->prepare("
+                    INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
+                    VALUES (?, 'Add Product', ?, ?, 'procurement', ?)
+                ");
+                $log->bind_param("issi", $created_by, $log_desc, $log_ip, $product_id);
+                $log->execute();
+                $log->close();
+
+                $_SESSION['success'] = "Product '{$product_name}' added successfully.";
+            } else {
+                $_SESSION['error'] = 'Error adding product. Please try again.';
+            }
+            break;
+
+        // ── EDIT PRODUCT ──────────────────────────────────────────────────────
+        case 'edit':
+            $product_id    = (int)($_POST['product_id']   ?? 0);
+            $product_code  = trim($_POST['product_code']  ?? '');
+            $product_name  = trim($_POST['product_name']  ?? '');
+            $category      = trim($_POST['category']      ?? '') ?: null;
+            $sub_category  = trim($_POST['sub_category']  ?? '') ?: null;
+            $description   = trim($_POST['description']   ?? '') ?: null;
+            $unit          = trim($_POST['unit']          ?? '');
+            $minimum_stock = (int)($_POST['minimum_stock'] ?? 0);
+            $maximum_stock = (int)($_POST['maximum_stock'] ?? 1000);
+            $unit_price    = (float)($_POST['unit_price']   ?? 0);
+            $selling_price = isset($_POST['selling_price']) && $_POST['selling_price'] !== '' ? (float)$_POST['selling_price'] : null;
+            $status        = trim($_POST['status'] ?? 'Active');
+
+            if (!$product_id || empty($product_code) || empty($product_name) || empty($unit)) {
+                $_SESSION['error'] = 'Product ID, code, name, and unit are required.';
+                break;
+            }
+
+            $stmt = $db->prepare("
+                UPDATE procurement_products SET
+                    product_code  = ?,
+                    product_name  = ?,
+                    category      = ?,
+                    sub_category  = ?,
+                    description   = ?,
+                    unit          = ?,
+                    minimum_stock = ?,
+                    maximum_stock = ?,
+                    unit_price    = ?,
+                    selling_price = ?,
+                    status        = ?
+                WHERE product_id = ?
+            ");
+            $stmt->bind_param(
+                "ssssssiiddsi",
+                $product_code,
+                $product_name,
+                $category,
+                $sub_category,
+                $description,
+                $unit,
+                $minimum_stock,
+                $maximum_stock,
+                $unit_price,
+                $selling_price,
+                $status,
+                $product_id
+            );
+
+            if ($stmt->execute()) {
+                $log_desc = "Updated product ID {$product_id}: {$product_name}";
+                $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+                $log = $db->prepare("
+                    INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
+                    VALUES (?, 'Edit Product', ?, ?, 'procurement', ?)
+                ");
+                $log->bind_param("issi", $created_by, $log_desc, $log_ip, $product_id);
+                $log->execute();
+                $log->close();
+
+                $_SESSION['success'] = 'Product updated successfully.';
+            } else {
+                $_SESSION['error'] = 'Error updating product. Please try again.';
+            }
+            $stmt->close();
+            break;
+
+        // ── DELETE PRODUCT ────────────────────────────────────────────────────
+        case 'delete':
+            $product_id = (int)($_POST['product_id'] ?? 0);
+
+            if (!$product_id) {
+                $_SESSION['error'] = 'Invalid product ID.';
+                break;
+            }
+
+            // Check for inventory history before deleting
+            $check = $db->prepare("SELECT COUNT(*) AS cnt FROM procurement_inventory WHERE product_id = ?");
+            $check->bind_param("i", $product_id);
+            $check->execute();
+            $count = (int)$check->get_result()->fetch_assoc()['cnt'];
+            $check->close();
+
+            if ($count > 0) {
+                $_SESSION['error'] = 'Cannot delete product with inventory history. Deactivate it instead.';
+                break;
+            }
+
+            // Also block if used in any PO items
+            $po_check = $db->prepare("SELECT COUNT(*) AS cnt FROM procurement_po_items WHERE product_id = ?");
+            $po_check->bind_param("i", $product_id);
+            $po_check->execute();
+            $po_count = (int)$po_check->get_result()->fetch_assoc()['cnt'];
+            $po_check->close();
+
+            if ($po_count > 0) {
+                $_SESSION['error'] = 'Cannot delete product that is referenced in purchase orders.';
+                break;
+            }
+
+            $stmt = $db->prepare("DELETE FROM procurement_products WHERE product_id = ?");
+            $stmt->bind_param("i", $product_id);
+
+            if ($stmt->execute()) {
+                $log_desc = "Deleted product ID {$product_id}";
+                $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
+
+                $log = $db->prepare("
+                    INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
+                    VALUES (?, 'Delete Product', ?, ?, 'procurement', ?)
+                ");
+                $log->bind_param("issi", $created_by, $log_desc, $log_ip, $product_id);
+                $log->execute();
+                $log->close();
+
+                $_SESSION['success'] = 'Product deleted successfully.';
+            } else {
+                $_SESSION['error'] = 'Error deleting product.';
+            }
+            $stmt->close();
+            break;
+
+        // ── REDUCE STOCK ──────────────────────────────────────────────────────
+        case 'reduce_stock':
+            $product_id = (int)($_POST['product_id'] ?? 0);
+            $quantity   = (float)($_POST['quantity']   ?? 0);
+
+            if (!$product_id || $quantity <= 0) {
+                http_response_code(400);
+                echo 'Invalid product or quantity.';
+                exit();
+            }
+
+            $check = $db->prepare("SELECT current_stock, product_name FROM procurement_products WHERE product_id = ?");
+            $check->bind_param("i", $product_id);
+            $check->execute();
+            $product = $check->get_result()->fetch_assoc();
+            $check->close();
+
+            if (!$product) {
+                http_response_code(404);
+                echo 'Product not found.';
+                exit();
+            }
+
+            $current_stock = (float)$product['current_stock'];
+
+            if ($quantity > $current_stock) {
+                http_response_code(400);
+                echo 'Cannot reduce more than available stock.';
+                exit();
+            }
+
+            $new_balance = $current_stock - $quantity;
+
+            $update = $db->prepare("
+                UPDATE procurement_products
+                SET current_stock = current_stock - ?
+                WHERE product_id = ?
+            ");
+            $update->bind_param("di", $quantity, $product_id);
+
+            if (!$update->execute()) {
+                http_response_code(500);
+                echo 'Failed to update stock.';
+                exit();
+            }
+            $update->close();
+
+            // Log inventory movement with full required columns
+            $movement = $db->prepare("
+                INSERT INTO procurement_inventory
+                    (product_id, transaction_type, quantity, previous_balance, new_balance, transaction_date, created_by)
+                VALUES (?, 'Sale', ?, ?, ?, NOW(), ?)
+            ");
+            $movement->bind_param("idddi", $product_id, $quantity, $current_stock, $new_balance, $created_by);
+            $movement->execute();
+            $movement->close();
+
+            echo 'Stock reduced successfully.';
+            exit();
+    }
+
     header('Location: index.php');
     exit();
 }
@@ -266,11 +764,6 @@ $pending_deliveries = $stmt->get_result();
                         <i class="fas fa-box me-2"></i>Products
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory" type="button" role="tab">
-                        <i class="fas fa-warehouse me-2"></i>Inventory
-                    </button>
-                </li>
             </ul>
 
             <!-- Tab Content -->
@@ -435,13 +928,10 @@ $pending_deliveries = $stmt->get_result();
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $all_pos_query = "SELECT po.*, s.supplier_name 
-                                                         FROM procurement_purchase_orders po
-                                                         JOIN procurement_suppliers s ON po.supplier_id = s.supplier_id
-                                                         WHERE s.company_id = ?
-                                                         ORDER BY po.created_at DESC";
+                                        $all_pos_query = "SELECT po.*, s.supplier_name FROM procurement_purchase_orders po 
+                                                            JOIN procurement_suppliers s ON po.supplier_id = s.supplier_id 
+                                                            ORDER BY po.order_date ";
                                         $stmt = $db->prepare($all_pos_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_pos = $stmt->get_result();
                                         while ($po = $all_pos->fetch_assoc()):
@@ -467,7 +957,7 @@ $pending_deliveries = $stmt->get_result();
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-info" onclick="viewPO(<?php echo $po['po_id']; ?>)">
+                                                    <button class="btn btn-sm btn-info" onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $po['po_id']; ?>,'Purchsase Order')">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                     <?php if ($po['delivery_status'] != 'Completed'): ?>
@@ -513,10 +1003,8 @@ $pending_deliveries = $stmt->get_result();
                                     <tbody>
                                         <?php
                                         $suppliers_query = "SELECT * FROM procurement_suppliers 
-                                                           WHERE company_id = ?
                                                            ORDER BY supplier_name ASC";
                                         $stmt = $db->prepare($suppliers_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $suppliers = $stmt->get_result();
                                         while ($supplier = $suppliers->fetch_assoc()):
@@ -623,65 +1111,6 @@ $pending_deliveries = $stmt->get_result();
                         </div>
                     </div>
                 </div>
-
-                <!-- Inventory Tab -->
-                <div class="tab-pane fade" id="inventory" role="tabpanel">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Inventory Transactions</h5>
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#adjustStockModal">
-                                <i class="fas fa-balance-scale me-2"></i>Adjust Stock
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="inventoryTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Product</th>
-                                            <th>Type</th>
-                                            <th>Quantity</th>
-                                            <th>Previous Balance</th>
-                                            <th>New Balance</th>
-                                            <th>Reference</th>
-                                            <th>Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $inventory_query = "SELECT i.*, p.product_name 
-                                                           FROM procurement_inventory i
-                                                           JOIN procurement_products p ON i.product_id = p.product_id
-                                                           ORDER BY i.transaction_date DESC LIMIT 100";
-                                        $inventory = $db->query($inventory_query);
-                                        while ($trans = $inventory->fetch_assoc()):
-                                        ?>
-                                            <tr>
-                                                <td><?php echo format_datetime($trans['transaction_date']); ?></td>
-                                                <td><?php echo htmlspecialchars($trans['product_name']); ?></td>
-                                                <td>
-                                                    <span class="badge bg-<?php
-                                                                            echo $trans['transaction_type'] == 'Purchase' ? 'success' : ($trans['transaction_type'] == 'Sale' ? 'primary' : ($trans['transaction_type'] == 'Adjustment' ? 'warning' : 'info'));
-                                                                            ?>">
-                                                        <?php echo $trans['transaction_type']; ?>
-                                                    </span>
-                                                </td>
-                                                <td class="<?php echo $trans['quantity'] > 0 ? 'text-success' : 'text-danger'; ?>">
-                                                    <?php echo $trans['quantity'] > 0 ? '+' . $trans['quantity'] : $trans['quantity']; ?>
-                                                </td>
-                                                <td><?php echo $trans['previous_balance']; ?></td>
-                                                <td><?php echo $trans['new_balance']; ?></td>
-                                                <td><?php echo $trans['reference_type'] . ': ' . $trans['reference_id']; ?></td>
-                                                <td><small><?php echo $trans['notes']; ?></small></td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -694,8 +1123,9 @@ $pending_deliveries = $stmt->get_result();
                     <h5 class="modal-title">Create Purchase Order</h5>
                     <button type="button" class="btn-close"></button>
                 </div>
-                <form action="process/create-po.php" method="POST" id="poForm">
+                <form action="index.php" method="POST" id="poForm">
                     <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="form" value="po">
                     <div class="modal-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -703,8 +1133,8 @@ $pending_deliveries = $stmt->get_result();
                                 <select class="form-control select2" name="supplier_id" required>
                                     <option value="">Select Supplier</option>
                                     <?php
-                                    $suppliers = $db->query("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE company_id = " . (int)$company_id . " AND status = 'Active'");
-                                    while ($sup = $suppliers->fetch_assoc()):
+                                    $supplierss = $db->query("SELECT supplier_id, supplier_name FROM procurement_suppliers WHERE status = 'Active'");
+                                    while ($sup = $supplierss->fetch_assoc()):
                                     ?>
                                         <option value="<?php echo $sup['supplier_id']; ?>"><?php echo $sup['supplier_name']; ?></option>
                                     <?php endwhile; ?>
@@ -809,6 +1239,22 @@ $pending_deliveries = $stmt->get_result();
         </div>
     </div>
 
+    <!-- View entityb modal -->
+    <div class="modal fade" id="viewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Supplier Modal -->
     <div class="modal fade" id="addSupplierModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -817,7 +1263,9 @@ $pending_deliveries = $stmt->get_result();
                     <h5 class="modal-title">Add New Supplier</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-supplier.php" method="POST">
+                <form action="index.php" method="POST">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="form" value="supplier">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -892,7 +1340,7 @@ $pending_deliveries = $stmt->get_result();
             </div>
         </div>
     </div>
-
+    
     <!-- Add Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1">
         <div class="modal-dialog">
@@ -901,26 +1349,32 @@ $pending_deliveries = $stmt->get_result();
                     <h5 class="modal-title">Add New Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-product.php" method="POST">
+                <form id="addProductForm" action="products.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="form" value="product">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Product Code</label>
-                            <input type="text" class="form-control" name="product_code" required>
+                            <input id="product_code" type="text" class="form-control" name="product_code" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Product Name</label>
-                            <input type="text" class="form-control" name="product_name" required>
+                            <input id="product_name" type="text" class="form-control" name="product_name" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Category</label>
-                                <input type="text" class="form-control" name="category">
+                                <input id="category" type="text" class="form-control" name="category">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Sub-Category</label>
+                                <input id="sub_category" type="text" class="form-control" name="sub_category">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit</label>
-                                <select class="form-control" name="unit" required>
+                                <select id="unit" class="form-control" name="unit" required>
                                     <option value="pcs">Pieces (pcs)</option>
                                     <option value="kg">Kilograms (kg)</option>
                                     <option value="liters">Liters</option>
@@ -934,33 +1388,56 @@ $pending_deliveries = $stmt->get_result();
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Min Stock</label>
-                                <input type="number" class="form-control" name="minimum_stock" value="0">
+                                <input id="minimum_stock" type="number" class="form-control" name="minimum_stock" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Max Stock</label>
-                                <input type="number" class="form-control" name="maximum_stock" value="1000">
+                                <input id="maximum_stock" type="number" class="form-control" name="maximum_stock" value="1000">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Reorder Level</label>
-                                <input type="number" class="form-control" name="reorder_level" value="10">
+                                <input id="reorder_level" type="number" class="form-control" name="reorder_level" value="10">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit Price</label>
-                                <input type="number" step="0.01" class="form-control" name="unit_price" required>
+                                <input id="unit_price" type="number" step="0.01" class="form-control" name="unit_price" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Selling Price</label>
-                                <input type="number" step="0.01" class="form-control" name="selling_price">
+                                <input id="selling_price" type="number" step="0.01" class="form-control" name="selling_price">
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="3"></textarea>
+                            <textarea id="description" class="form-control" name="description" rows="3"></textarea>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tax Rate (%)</label>
+                            <input id="tax_rate" type="number" step="0.01" class="form-control" name="tax_rate" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input id="location" type="text" class="form-control" name="location">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Stock</label>
+                            <input type="number" class="form-control" name="current_stock" id="current_stock" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Barcode</label>
+                            <input type="text" class="form-control" name="barcode" id="barcode" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                            <small class="text-muted">Upload a product image (JPG, PNG, GIF)</small>
+                        </div>
+                        <input type="hidden" name="image_path" id="image_path" value="222222">
+                        <input type="hidden" name="status" id="status" value="Active">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -1021,6 +1498,8 @@ $pending_deliveries = $stmt->get_result();
     <script src="../../assets/js/modules.js"></script>
 
     <script>
+        let viewModalInstance;
+
         $(document).ready(function() {
             // Initialize DataTables
             $('#poTable').DataTable({
@@ -1180,6 +1659,33 @@ $pending_deliveries = $stmt->get_result();
             // Pre-select product and set quantity
         }
 
+        function showModal(title, data) {
+            let html = '<div class="container-fluid">';
+            for (const key in data) {
+                if (Array.isArray(data[key])) {
+                    // For nested arrays (like PO line items)
+                    html += `<h6 class="mt-3">${key.replace(/_/g,' ')}</h6><ul>`;
+                    data[key].forEach(item => {
+                        html += '<li>' + Object.entries(item)
+                            .map(([k, v]) => `${k}: ${v}`)
+                            .join(', ') + '</li>';
+                    });
+                    html += '</ul>';
+                } else {
+                    html += `<p><strong>${key.replace(/_/g,' ')}</strong>: ${data[key]}</p>`;
+                }
+            }
+            html += '</div>';
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.querySelector('#viewModal .modal-title').innerText = title;
+
+            if (!viewModalInstance) {
+                viewModalInstance = new bootstrap.Modal(document.getElementById('viewModal'));
+            }
+            viewModalInstance.show();
+        }
+
         function viewSupplier(id) {
             window.location.href = 'view-supplier.php?id=' + id;
         }
@@ -1194,6 +1700,17 @@ $pending_deliveries = $stmt->get_result();
 
         function editProduct(id) {
             window.location.href = 'edit-product.php?id=' + id;
+        }
+
+        function viewEntity(endpoint, id, title) {
+            fetch(`${endpoint}?id=${id}`)
+                .then(res => res.json())
+                .then(data => showModal(title, data))
+                .catch(err => alert('Error loading data: ' + err));
+        }
+
+        function viewPO(id) {
+            window.location.href = 'view-po.php?id=' + id;
         }
     </script>
 </body>

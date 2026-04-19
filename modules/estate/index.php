@@ -90,27 +90,28 @@ $stats = $stmt->get_result()->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estate Management - <?php echo APP_NAME; ?></title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    
+
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-    
+
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
-    
+
     <style>
         .module-header {
             background: linear-gradient(135deg, #4361ee, #3f37c9);
@@ -119,21 +120,21 @@ $stats = $stmt->get_result()->fetch_assoc();
             border-radius: 15px;
             margin-bottom: 30px;
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             transition: transform 0.3s;
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .stat-icon {
             width: 50px;
             height: 50px;
@@ -146,42 +147,42 @@ $stats = $stmt->get_result()->fetch_assoc();
             font-size: 24px;
             margin-bottom: 15px;
         }
-        
+
         .stat-value {
             font-size: 28px;
             font-weight: 700;
             color: #333;
             margin: 0;
         }
-        
+
         .stat-label {
             color: #666;
             font-size: 14px;
             margin: 0;
         }
-        
+
         .property-card {
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             transition: all 0.3s;
             margin-bottom: 20px;
             cursor: pointer;
         }
-        
+
         .property-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
-        
+
         .property-image {
             height: 200px;
             background-size: cover;
             background-position: center;
             position: relative;
         }
-        
+
         .property-status {
             position: absolute;
             top: 15px;
@@ -192,31 +193,31 @@ $stats = $stmt->get_result()->fetch_assoc();
             font-weight: 600;
             text-transform: uppercase;
         }
-        
+
         .property-details {
             padding: 20px;
         }
-        
+
         .property-name {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .property-address {
             color: #666;
             font-size: 14px;
             margin-bottom: 15px;
         }
-        
+
         .property-meta {
             display: flex;
             gap: 20px;
             font-size: 13px;
             color: #666;
         }
-        
+
         .quick-action-btn {
             background: white;
             border: 2px dashed #dee2e6;
@@ -227,43 +228,43 @@ $stats = $stmt->get_result()->fetch_assoc();
             transition: all 0.3s;
             margin-bottom: 20px;
         }
-        
+
         .quick-action-btn:hover {
             border-color: #4361ee;
             background: #f8f9fa;
         }
-        
+
         .quick-action-btn i {
             font-size: 32px;
             color: #4361ee;
             margin-bottom: 10px;
         }
-        
+
         .quick-action-btn span {
             display: block;
             font-weight: 600;
             color: #333;
         }
-        
+
         .priority-high {
             border-left: 4px solid #dc3545;
         }
-        
+
         .priority-medium {
             border-left: 4px solid #ffc107;
         }
-        
+
         .priority-low {
             border-left: 4px solid #28a745;
         }
-        
+
         .nav-tabs .nav-link {
             color: #666;
             font-weight: 500;
             border: none;
             padding: 10px 20px;
         }
-        
+
         .nav-tabs .nav-link.active {
             color: #4361ee;
             background: none;
@@ -271,21 +272,22 @@ $stats = $stmt->get_result()->fetch_assoc();
         }
     </style>
 </head>
+
 <body class="module-estate">
     <div class="wrapper">
         <!-- Include sidebar -->
         <?php include '../../includes/sidebar.php'; ?>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navigation -->
             <?php include '../../includes/top-nav.php'; ?>
-            
+
             <!-- Module Header -->
-                        <div class="module-header">
-<button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
-    <i class="fas fa-bars"></i>
-</button>
+            <div class="module-header">
+                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Estate Management</h1>
@@ -301,7 +303,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                     </div>
                 </div>
             </div>
-            
+
             <!-- Statistics Cards -->
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -313,7 +315,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         <p class="stat-label">Total Properties</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #4cc9f0, #4895ef);">
@@ -323,7 +325,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         <p class="stat-label">Active Tenants</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f8961e, #f3722c);">
@@ -333,7 +335,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         <p class="stat-label">Potential Monthly Rent</p>
                     </div>
                 </div>
-                
+
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-icon" style="background: linear-gradient(135deg, #f72585, #b5179e);">
@@ -344,7 +346,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                     </div>
                 </div>
             </div>
-            
+
             <!-- Tabs -->
             <ul class="nav nav-tabs mb-4" id="estateTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -376,21 +378,19 @@ $stats = $stmt->get_result()->fetch_assoc();
                     </button>
                 </li>
             </ul>
-            
+
             <!-- Tab Content -->
             <div class="tab-content" id="estateTabContent">
                 <!-- Properties Tab -->
                 <div class="tab-pane fade show active" id="properties" role="tabpanel">
                     <div class="row">
-                        <?php while($property = $properties->fetch_assoc()): ?>
+                        <?php while ($property = $properties->fetch_assoc()): ?>
                             <div class="col-md-4">
                                 <div class="property-card" onclick="window.location.href='property-details.php?id=<?php echo $property['property_id']; ?>'">
                                     <div class="property-image" style="background-image: url('<?php echo $property['images'] ? '../../uploads/estate/' . $property['images'] : '../../assets/images/default-property.jpg'; ?>')">
-                                        <span class="property-status badge bg-<?php 
-                                            echo $property['status'] == 'Available' ? 'success' : 
-                                                ($property['status'] == 'Occupied' ? 'primary' : 
-                                                ($property['status'] == 'Under Maintenance' ? 'warning' : 'secondary')); 
-                                        ?>">
+                                        <span class="property-status badge bg-<?php
+                                                                                echo $property['status'] == 'Available' ? 'success' : ($property['status'] == 'Occupied' ? 'primary' : ($property['status'] == 'Under Maintenance' ? 'warning' : 'secondary'));
+                                                                                ?>">
                                             <?php echo $property['status']; ?>
                                         </span>
                                     </div>
@@ -406,7 +406,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                         </div>
                                         <hr>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-primary fw-bold"><?php echo format_money($property['monthly_revenue']); ?>/mo</span>
+                                            <span class="text-primary fw-bold"><?php echo format_money($property['monthly_revenue']); ?>/this Month</span>
                                             <div>
                                                 <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); window.location.href='edit-property.php?id=<?php echo $property['property_id']; ?>'">
                                                     <i class="fas fa-edit"></i>
@@ -417,7 +417,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 </div>
                             </div>
                         <?php endwhile; ?>
-                        
+
                         <!-- Quick Add Property Card -->
                         <div class="col-md-4">
                             <div class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
@@ -428,7 +428,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Tenants Tab -->
                 <div class="tab-pane fade" id="tenants" role="tabpanel">
                     <div class="card">
@@ -453,59 +453,56 @@ $stats = $stmt->get_result()->fetch_assoc();
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $tenants_query = "SELECT t.*, p.property_name 
                                                          FROM estate_tenants t
                                                          JOIN estate_properties p ON t.property_id = p.property_id
-                                                         WHERE p.company_id = ?
                                                          ORDER BY t.created_at DESC";
                                         $stmt = $db->prepare($tenants_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_tenants = $stmt->get_result();
-                                        while($tenant = $all_tenants->fetch_assoc()): 
+                                        while ($tenant = $all_tenants->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle bg-primary text-white me-2">
-                                                        <?php echo get_avatar_letter($tenant['full_name']); ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle bg-primary text-white me-2">
+                                                            <?php echo get_avatar_letter($tenant['full_name']); ?>
+                                                        </div>
+                                                        <div>
+                                                            <strong><?php echo htmlspecialchars($tenant['full_name']); ?></strong>
+                                                            <br>
+                                                            <small class="text-muted"><?php echo $tenant['tenant_code']; ?></small>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <strong><?php echo htmlspecialchars($tenant['full_name']); ?></strong>
-                                                        <br>
-                                                        <small class="text-muted"><?php echo $tenant['tenant_code']; ?></small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($tenant['property_name']); ?></td>
-                                            <td><?php echo $tenant['phone']; ?></td>
-                                            <td>
-                                                <?php echo format_date($tenant['lease_start_date']); ?> - 
-                                                <?php echo format_date($tenant['lease_end_date']); ?>
-                                            </td>
-                                            <td><?php echo format_money($tenant['monthly_rent']); ?></td>
-                                            <td>
-                                                <?php 
-                                                $status_class = $tenant['status'] == 'Active' ? 'success' : 
-                                                               ($tenant['status'] == 'Notice' ? 'warning' : 'secondary');
-                                                ?>
-                                                <span class="badge bg-<?php echo $status_class; ?>">
-                                                    <?php echo $tenant['status']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="window.location.href='tenant-details.php?id=<?php echo $tenant['tenant_id']; ?>'">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-primary" onclick="window.location.href='edit-tenant.php?id=<?php echo $tenant['tenant_id']; ?>'">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-success" onclick="recordPayment(<?php echo $tenant['tenant_id']; ?>, '<?php echo $tenant['full_name']; ?>', <?php echo $tenant['monthly_rent']; ?>)">
-                                                    <i class="fas fa-money-bill"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                                </td>
+                                                <td><?php echo htmlspecialchars($tenant['property_name']); ?></td>
+                                                <td><?php echo $tenant['phone']; ?></td>
+                                                <td>
+                                                    <?php echo format_date($tenant['lease_start_date']); ?> -
+                                                    <?php echo format_date($tenant['lease_end_date']); ?>
+                                                </td>
+                                                <td><?php echo format_money($tenant['monthly_rent']); ?></td>
+                                                <td>
+                                                    <?php
+                                                    $status_class = $tenant['status'] == 'Active' ? 'success' : ($tenant['status'] == 'Notice' ? 'warning' : 'secondary');
+                                                    ?>
+                                                    <span class="badge bg-<?php echo $status_class; ?>">
+                                                        <?php echo $tenant['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="window.location.href='tenant-details.php?id=<?php echo $tenant['tenant_id']; ?>'">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary" onclick="window.location.href='edit-tenant.php?id=<?php echo $tenant['tenant_id']; ?>'">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success" onclick="recordPayment(<?php echo $tenant['tenant_id']; ?>, '<?php echo $tenant['full_name']; ?>', <?php echo $tenant['monthly_rent']; ?>)">
+                                                        <i class="fas fa-money-bill"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -513,7 +510,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Payments Tab -->
                 <div class="tab-pane fade" id="payments" role="tabpanel">
                     <div class="card">
@@ -540,41 +537,39 @@ $stats = $stmt->get_result()->fetch_assoc();
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
+                                        <?php
                                         $payments_query = "SELECT p.*, t.full_name as tenant_name, pr.property_name 
                                                           FROM estate_payments p
                                                           JOIN estate_tenants t ON p.tenant_id = t.tenant_id
                                                           JOIN estate_properties pr ON p.property_id = pr.property_id
-                                                          WHERE pr.company_id = ?
                                                           ORDER BY p.payment_date DESC LIMIT 50";
                                         $stmt = $db->prepare($payments_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $payments = $stmt->get_result();
-                                        while($payment = $payments->fetch_assoc()): 
+                                        while ($payment = $payments->fetch_assoc()):
                                         ?>
-                                        <tr>
-                                            <td><strong><?php echo $payment['receipt_number']; ?></strong></td>
-                                            <td><?php echo htmlspecialchars($payment['tenant_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($payment['property_name']); ?></td>
-                                            <td><?php echo format_date($payment['payment_date']); ?></td>
-                                            <td>
-                                                <?php echo format_date($payment['payment_period_start'], 'd/m'); ?> - 
-                                                <?php echo format_date($payment['payment_period_end'], 'd/m/y'); ?>
-                                            </td>
-                                            <td><strong><?php echo format_money($payment['amount']); ?></strong></td>
-                                            <td>
-                                                <span class="badge bg-info"><?php echo $payment['payment_method']; ?></span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-success"><?php echo $payment['status']; ?></span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info" onclick="window.open('receipt.php?id=<?php echo $payment['payment_id']; ?>', '_blank')">
-                                                    <i class="fas fa-print"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td><strong><?php echo $payment['receipt_number']; ?></strong></td>
+                                                <td><?php echo htmlspecialchars($payment['tenant_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($payment['property_name']); ?></td>
+                                                <td><?php echo format_date($payment['payment_date']); ?></td>
+                                                <td>
+                                                    <?php echo format_date($payment['payment_period_start'], 'd/m'); ?> -
+                                                    <?php echo format_date($payment['payment_period_end'], 'd/m/y'); ?>
+                                                </td>
+                                                <td><strong><?php echo format_money($payment['amount']); ?></strong></td>
+                                                <td>
+                                                    <span class="badge bg-info"><?php echo $payment['payment_method']; ?></span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-success"><?php echo $payment['status']; ?></span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-info" onclick="window.open('receipt.php?id=<?php echo $payment['payment_id']; ?>', '_blank')">
+                                                        <i class="fas fa-print"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                 </table>
@@ -582,7 +577,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Maintenance Tab -->
                 <div class="tab-pane fade" id="maintenance" role="tabpanel">
                     <div class="row">
@@ -596,12 +591,11 @@ $stats = $stmt->get_result()->fetch_assoc();
                                     </button>
                                 </div>
                                 <div class="card-body">
-                                    <?php 
+                                    <?php
                                     $maintenance_query = "SELECT m.*, p.property_name, t.full_name as tenant_name
                                                          FROM estate_maintenance m
                                                          LEFT JOIN estate_properties p ON m.property_id = p.property_id
                                                          LEFT JOIN estate_tenants t ON m.tenant_id = t.tenant_id
-                                                         WHERE p.company_id = ?
                                                          ORDER BY 
                                                          CASE m.priority 
                                                              WHEN 'Emergency' THEN 1
@@ -610,59 +604,54 @@ $stats = $stmt->get_result()->fetch_assoc();
                                                              WHEN 'Low' THEN 4
                                                          END, m.request_date DESC";
                                     $stmt = $db->prepare($maintenance_query);
-                                    $stmt->bind_param("i", $company_id);
                                     $stmt->execute();
                                     $maintenance_requests = $stmt->get_result();
-                                    
+
                                     if ($maintenance_requests->num_rows > 0):
-                                        while($request = $maintenance_requests->fetch_assoc()): 
-                                            $priority_class = $request['priority'] == 'Emergency' ? 'danger' : 
-                                                              ($request['priority'] == 'High' ? 'warning' : 
-                                                              ($request['priority'] == 'Medium' ? 'info' : 'secondary'));
+                                        while ($request = $maintenance_requests->fetch_assoc()):
+                                            $priority_class = $request['priority'] == 'Emergency' ? 'danger' : ($request['priority'] == 'High' ? 'warning' : ($request['priority'] == 'Medium' ? 'info' : 'secondary'));
                                     ?>
-                                        <div class="maintenance-item <?php echo 'priority-' . strtolower($request['priority']); ?> p-3 mb-2 border rounded">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <span class="badge bg-<?php echo $priority_class; ?> mb-2"><?php echo $request['priority']; ?></span>
-                                                    <h6 class="mb-1"><?php echo htmlspecialchars($request['description']); ?></h6>
-                                                    <p class="mb-2 text-muted small">
-                                                        <i class="fas fa-building me-1"></i> <?php echo $request['property_name']; ?>
-                                                        <?php if ($request['tenant_name']): ?>
-                                                            | <i class="fas fa-user me-1"></i> <?php echo $request['tenant_name']; ?>
+                                            <div class="maintenance-item <?php echo 'priority-' . strtolower($request['priority']); ?> p-3 mb-2 border rounded">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <span class="badge bg-<?php echo $priority_class; ?> mb-2"><?php echo $request['priority']; ?></span>
+                                                        <h6 class="mb-1"><?php echo htmlspecialchars($request['description']); ?></h6>
+                                                        <p class="mb-2 text-muted small">
+                                                            <i class="fas fa-building me-1"></i> <?php echo $request['property_name']; ?>
+                                                            <?php if ($request['tenant_name']): ?>
+                                                                | <i class="fas fa-user me-1"></i> <?php echo $request['tenant_name']; ?>
+                                                            <?php endif; ?>
+                                                            | <i class="fas fa-clock me-1"></i> <?php echo timeAgo($request['request_date']); ?>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <?php if ($request['status'] == 'Pending'): ?>
+                                                            <button class="btn btn-sm btn-success" onclick="assignMaintenance(<?php echo $request['maintenance_id']; ?>)">
+                                                                <i class="fas fa-check"></i> Assign
+                                                            </button>
+                                                        <?php elseif ($request['status'] == 'In Progress'): ?>
+                                                            <button class="btn btn-sm btn-primary" onclick="completeMaintenance(<?php echo $request['maintenance_id']; ?>)">
+                                                                <i class="fas fa-check-circle"></i> Complete
+                                                            </button>
                                                         <?php endif; ?>
-                                                        | <i class="fas fa-clock me-1"></i> <?php echo timeAgo($request['request_date']); ?>
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <?php if ($request['status'] == 'Pending'): ?>
-                                                        <button class="btn btn-sm btn-success" onclick="assignMaintenance(<?php echo $request['maintenance_id']; ?>)">
-                                                            <i class="fas fa-check"></i> Assign
-                                                        </button>
-                                                    <?php elseif ($request['status'] == 'In Progress'): ?>
-                                                        <button class="btn btn-sm btn-primary" onclick="completeMaintenance(<?php echo $request['maintenance_id']; ?>)">
-                                                            <i class="fas fa-check-circle"></i> Complete
-                                                        </button>
-                                                    <?php endif; ?>
-                                                    <span class="badge bg-<?php 
-                                                        echo $request['status'] == 'Completed' ? 'success' : 
-                                                             ($request['status'] == 'In Progress' ? 'primary' : 
-                                                             ($request['status'] == 'Pending' ? 'warning' : 'secondary')); 
-                                                    ?> ms-2">
-                                                        <?php echo $request['status']; ?>
-                                                    </span>
+                                                        <span class="badge bg-<?php
+                                                                                echo $request['status'] == 'Completed' ? 'success' : ($request['status'] == 'In Progress' ? 'primary' : ($request['status'] == 'Pending' ? 'warning' : 'secondary'));
+                                                                                ?> ms-2">
+                                                            <?php echo $request['status']; ?>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    <?php 
+                                        <?php
                                         endwhile;
                                     else:
-                                    ?>
+                                        ?>
                                         <p class="text-muted text-center py-4">No maintenance requests found</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Maintenance Stats -->
                         <div class="col-md-4">
                             <div class="card mb-3">
@@ -705,13 +694,13 @@ $stats = $stmt->get_result()->fetch_assoc();
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="mb-0">Upcoming Lease Expiries</h5>
                                 </div>
                                 <div class="card-body">
-                                    <?php 
+                                    <?php
                                     $expiring_query = "SELECT t.full_name, p.property_name, t.lease_end_date,
                                                        DATEDIFF(t.lease_end_date, CURRENT_DATE()) as days_left
                                                        FROM estate_tenants t
@@ -725,24 +714,24 @@ $stats = $stmt->get_result()->fetch_assoc();
                                     $stmt->bind_param("i", $company_id);
                                     $stmt->execute();
                                     $expiring = $stmt->get_result();
-                                    
+
                                     if ($expiring->num_rows > 0):
-                                        while($lease = $expiring->fetch_assoc()):
+                                        while ($lease = $expiring->fetch_assoc()):
                                     ?>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <div>
-                                                <strong><?php echo htmlspecialchars($lease['full_name']); ?></strong>
-                                                <br>
-                                                <small class="text-muted"><?php echo $lease['property_name']; ?></small>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <strong><?php echo htmlspecialchars($lease['full_name']); ?></strong>
+                                                    <br>
+                                                    <small class="text-muted"><?php echo $lease['property_name']; ?></small>
+                                                </div>
+                                                <span class="badge bg-<?php echo $lease['days_left'] <= 7 ? 'danger' : 'warning'; ?>">
+                                                    <?php echo $lease['days_left']; ?> days
+                                                </span>
                                             </div>
-                                            <span class="badge bg-<?php echo $lease['days_left'] <= 7 ? 'danger' : 'warning'; ?>">
-                                                <?php echo $lease['days_left']; ?> days
-                                            </span>
-                                        </div>
-                                    <?php 
+                                        <?php
                                         endwhile;
                                     else:
-                                    ?>
+                                        ?>
                                         <p class="text-muted text-center">No leases expiring soon</p>
                                     <?php endif; ?>
                                 </div>
@@ -750,7 +739,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Reports Tab -->
                 <div class="tab-pane fade" id="reports" role="tabpanel">
                     <div class="row">
@@ -795,7 +784,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             </div>
         </div>
     </div>
-    
+
     <!-- Add Property Modal -->
     <div class="modal fade" id="addPropertyModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -804,7 +793,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                     <h5 class="modal-title">Add New Property</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-property.php" method="POST" enctype="multipart/form-data">
+                <form action="../../api/add-property.php" method="POST" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -816,7 +805,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="text" class="form-control" name="property_name" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Property Type</label>
@@ -836,12 +825,12 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Address</label>
                             <textarea class="form-control" name="address" rows="2" required></textarea>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">City</label>
@@ -856,7 +845,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="number" class="form-control" name="units" value="1">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Purchase Price</label>
@@ -867,12 +856,12 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="number" step="0.01" class="form-control" name="current_value">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Property Images</label>
                             <input type="file" class="form-control" name="images[]" multiple accept="image/*">
@@ -887,7 +876,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             </div>
         </div>
     </div>
-    
+
     <!-- Add Tenant Modal -->
     <div class="modal fade" id="addTenantModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -896,24 +885,23 @@ $stats = $stmt->get_result()->fetch_assoc();
                     <h5 class="modal-title">Add New Tenant</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-tenant.php" method="POST">
+                <form action="../../api/add-tenant.php" method="POST">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Property</label>
                                 <select class="form-control select2" name="property_id" required>
                                     <option value="">Select Property</option>
-                                    <?php 
-                                    $prop_query = "SELECT property_id, property_name, address FROM estate_properties WHERE company_id = ? AND status = 'Available'";
+                                    <?php
+                                    $prop_query = "SELECT property_id, property_name, address FROM estate_properties WHERE status = 'Available'";
                                     $stmt = $db->prepare($prop_query);
-                                    $stmt->bind_param("i", $company_id);
                                     $stmt->execute();
                                     $available_props = $stmt->get_result();
-                                    while($prop = $available_props->fetch_assoc()):
+                                    while ($prop = $available_props->fetch_assoc()):
                                     ?>
-                                    <option value="<?php echo $prop['property_id']; ?>">
-                                        <?php echo $prop['property_name']; ?> - <?php echo $prop['address']; ?>
-                                    </option>
+                                        <option value="<?php echo $prop['property_id']; ?>">
+                                            <?php echo $prop['property_name']; ?> - <?php echo $prop['address']; ?>
+                                        </option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>
@@ -922,7 +910,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="text" class="form-control" name="unit_number">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Full Name</label>
@@ -933,7 +921,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="text" class="form-control" name="id_number" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone</label>
@@ -944,7 +932,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="email" class="form-control" name="email">
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Lease Start Date</label>
@@ -955,7 +943,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="date" class="form-control" name="lease_end_date" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monthly Rent</label>
@@ -966,7 +954,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <input type="number" step="0.01" class="form-control" name="deposit_amount" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Emergency Contact Name</label>
@@ -986,7 +974,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             </div>
         </div>
     </div>
-    
+
     <!-- Add Maintenance Modal -->
     <div class="modal fade" id="addMaintenanceModal" tabindex="-1">
         <div class="modal-dialog">
@@ -995,43 +983,48 @@ $stats = $stmt->get_result()->fetch_assoc();
                     <h5 class="modal-title">New Maintenance Request</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-maintenance.php" method="POST">
+                <form action="../../api/add-maintenance.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Property</label>
                             <select class="form-control" name="property_id" required>
                                 <option value="">Select Property</option>
-                                <?php 
-                                $prop_query = "SELECT property_id, property_name FROM estate_properties WHERE company_id = ?";
+                                <?php
+                                $prop_query = "SELECT property_id, property_name FROM estate_properties";
                                 $stmt = $db->prepare($prop_query);
-                                $stmt->bind_param("i", $company_id);
                                 $stmt->execute();
                                 $props = $stmt->get_result();
-                                while($prop = $props->fetch_assoc()):
+                                while ($prop = $props->fetch_assoc()):
                                 ?>
-                                <option value="<?php echo $prop['property_id']; ?>">
-                                    <?php echo $prop['property_name']; ?>
-                                </option>
+                                    <option value="<?php echo $prop['property_id']; ?>">
+                                        <?php echo $prop['property_name']; ?>
+                                    </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Tenant (Optional)</label>
                             <select class="form-control" name="tenant_id">
                                 <option value="">Not Reported by Tenant</option>
-                                <?php 
+                                <?php
                                 $tenant_query = "SELECT tenant_id, full_name FROM estate_tenants WHERE status = 'Active'";
                                 $tenants = $db->query($tenant_query);
-                                while($tenant = $tenants->fetch_assoc()):
+                                while ($tenant = $tenants->fetch_assoc()):
                                 ?>
-                                <option value="<?php echo $tenant['tenant_id']; ?>">
-                                    <?php echo $tenant['full_name']; ?>
-                                </option>
+                                    <option value="<?php echo $tenant['tenant_id']; ?>">
+                                        <?php echo $tenant['full_name']; ?>
+                                    </option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label class="form-label">Request Date</label>
+                            <input type="date" class="form-control" name="request_date"
+                                value="<?php echo date('Y-m-d'); ?>" required>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Category</label>
                             <select class="form-control" name="category" required>
@@ -1044,7 +1037,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Priority</label>
                             <select class="form-control" name="priority" required>
@@ -1054,7 +1047,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <option value="Emergency">Emergency</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="3" required></textarea>
@@ -1068,7 +1061,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             </div>
         </div>
     </div>
-    
+
     <!-- Record Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1077,25 +1070,64 @@ $stats = $stmt->get_result()->fetch_assoc();
                     <h5 class="modal-title">Record Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/record-payment.php" method="POST" id="paymentForm">
+
+                <form action="../../api/record-payment.php" method="POST">
                     <div class="modal-body">
-                        <input type="hidden" name="tenant_id" id="payment_tenant_id">
-                        
                         <div class="mb-3">
                             <label class="form-label">Tenant</label>
-                            <input type="text" class="form-control" id="payment_tenant_name" readonly>
+                            <select class="form-control" name="tenant_id" id="payment_tenant_id" required>
+                                <option value="">-- Select Tenant --</option>
+                                <?php
+                                // Fetch tenants
+                                $tenants = "SELECT tenant_id, full_name, property_id FROM estate_tenants WHERE status='Active'";
+                                $stmt = $db->prepare($tenants);
+                                $stmt->execute();
+                                $tenants_result = $stmt->get_result();
+                                while ($row = $tenants_result->fetch_assoc()):
+                                ?>
+                                    <option value="<?php echo $row['tenant_id']; ?>">
+                                        <?php echo $row['full_name']; ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label class="form-label">Property</label>
+                            <select class="form-control" name="property_id" id="payment_property_id" required>
+                                <option value="">-- Select Property --</option>
+                                <?php
+                                // Fetch properties
+                                $properties = "SELECT property_id, property_name FROM estate_properties WHERE status='Occupied' OR status='Available'";
+                                $stmt = $db->prepare($properties);
+                                $stmt->execute();
+                                $properties_result = $stmt->get_result();
+                                while ($row = $properties_result->fetch_assoc()):
+                                ?>
+                                    <option value="<?php echo $row['property_id']; ?>">
+                                        <?php echo $row['property_name']; ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+
+                        <!-- <div class="mb-3">
+                            <label class="form-label">Tenant</label>
+                            <input type="text" class="form-control" id="payment_tenant_name" readonly>
+                        </div> -->
+
                         <div class="mb-3">
                             <label class="form-label">Payment Date</label>
-                            <input type="date" class="form-control" name="payment_date" value="<?php echo date('Y-m-d'); ?>" required>
+                            <input type="date" class="form-control" name="payment_date"
+                                value="<?php echo date('Y-m-d'); ?>" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Amount</label>
-                            <input type="number" step="0.01" class="form-control" name="amount" id="payment_amount" required>
+                            <input type="number" step="0.01" class="form-control"
+                                name="amount" id="payment_amount" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Payment Method</label>
                             <select class="form-control" name="payment_method" required>
@@ -1106,28 +1138,32 @@ $stats = $stmt->get_result()->fetch_assoc();
                                 <option value="Credit Card">Credit Card</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label class="form-label">Transaction Reference (Optional)</label>
+                            <label class="form-label">Transaction Reference</label>
                             <input type="text" class="form-control" name="transaction_reference">
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Period Start</label>
-                                <input type="date" class="form-control" name="period_start" required>
+                                <input type="date" class="form-control"
+                                    name="payment_period_start" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Period End</label>
-                                <input type="date" class="form-control" name="period_end" required>
+                                <input type="date" class="form-control"
+                                    name="payment_period_end" required>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label class="form-label">Notes (Optional)</label>
+                            <label class="form-label">Notes</label>
                             <textarea class="form-control" name="notes" rows="2"></textarea>
                         </div>
+
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-success">Record Payment</button>
@@ -1136,7 +1172,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             </div>
         </div>
     </div>
-    
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1145,88 +1181,110 @@ $stats = $stmt->get_result()->fetch_assoc();
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/modules.js"></script>
-    
+
     <script>
         $(document).ready(function() {
+            $('#paymentModal').on('show.bs.modal', function(event) {
+                const button = $(event.relatedTarget);
+
+                $('#payment_tenant_id').val(button.data('tenant-id'));
+                $('#payment_property_id').val(button.data('property-id'));
+                $('#payment_tenant_name').val(button.data('tenant-name'));
+            });
+            document.getElementById('payment_tenant_id').addEventListener('change', function() {
+                let selected = this.options[this.selectedIndex];
+                let propertyId = selected.getAttribute('data-property');
+
+                if (propertyId) {
+                    document.getElementById('payment_property_id').value = propertyId;
+                }
+            });
             // Initialize DataTables
             $('#tenantsTable').DataTable({
                 pageLength: 25,
-                order: [[0, 'asc']]
+                order: [
+                    [0, 'asc']
+                ]
             });
-            
+
             $('#paymentsTable').DataTable({
                 pageLength: 25,
-                order: [[3, 'desc']]
+                order: [
+                    [3, 'desc']
+                ]
             });
-            
+
             // Initialize Select2
             $('.select2').select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $('#addTenantModal')
             });
-            
+
             // Calculate lease dates
             $('#lease_start_date, #lease_end_date').change(function() {
                 let start = new Date($('#lease_start_date').val());
                 let end = new Date($('#lease_end_date').val());
-                
+
                 if (start && end) {
                     let diffTime = Math.abs(end - start);
                     let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     let diffMonths = Math.round(diffDays / 30);
-                    
+
                     if (diffMonths > 0) {
                         $('#lease_duration').val(diffMonths + ' months');
                     }
                 }
             });
         });
-        
+
         function recordPayment(tenantId, tenantName, monthlyRent) {
             $('#payment_tenant_id').val(tenantId);
             $('#payment_tenant_name').val(tenantName);
             $('#payment_amount').val(monthlyRent);
-            
+
             // Set default period to current month
             let today = new Date();
             let firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
             let lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            
+
             $('input[name="period_start"]').val(firstDay.toISOString().split('T')[0]);
             $('input[name="period_end"]').val(lastDay.toISOString().split('T')[0]);
-            
+
             $('#paymentModal').modal('show');
         }
-        
+
         function assignMaintenance(maintenanceId) {
             let contractor = prompt('Enter contractor name:');
+            let phone = prompt('Enter contractor phone number:');
             if (contractor) {
-                $.post('process/assign-maintenance.php', {
+                $.post('../../api/assign-maintenance.php', {
                     id: maintenanceId,
-                    contractor: contractor
+                    contractor: contractor,
+                    phone: phone
                 }, function() {
                     location.reload();
                 });
             }
         }
-        
+
         function completeMaintenance(maintenanceId) {
             if (confirm('Mark this maintenance as complete?')) {
-                $.post('process/complete-maintenance.php', {
+                $.post('../../api/complete-maintenance.php', {
                     id: maintenanceId
                 }, function() {
                     location.reload();
                 });
             }
         }
-        
+
         function generateReport(type) {
             window.location.href = '../../reports/generate.php?type=' + type + '&company=estate';
         }
-        
+
         function exportTenants() {
             window.location.href = '../../reports/export.php?type=tenants&format=csv';
         }
     </script>
 </body>
+
 </html>

@@ -54,7 +54,6 @@ $reports_stmt = $db->prepare("
     LEFT  JOIN users     u ON u.user_id     = dr.submitted_by
     WHERE p.company_id = ?
     ORDER BY dr.report_date DESC, dr.created_at DESC
-    LIMIT 50
 ");
 $reports_stmt->bind_param('i', $company_id);
 $reports_stmt->execute();

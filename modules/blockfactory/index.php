@@ -28,15 +28,14 @@ if (empty($company_id)) {
 
 // Get statistics
 $stats_query = "SELECT 
-                (SELECT COUNT(*) FROM blockfactory_products WHERE company_id = ? AND status = 'Active') as total_products,
-                (SELECT COALESCE(SUM(current_stock), 0) FROM blockfactory_products WHERE company_id = ?) as total_blocks,
+                (SELECT COUNT(*) FROM blockfactory_products WHERE status = 'Active') as total_products,
+                (SELECT COALESCE(SUM(current_stock), 0) FROM blockfactory_products) as total_blocks,
                 (SELECT COUNT(*) FROM blockfactory_production WHERE production_date = CURDATE()) as today_production,
                 (SELECT COALESCE(SUM(produced_quantity), 0) FROM blockfactory_production WHERE production_date = CURDATE()) as today_blocks,
                 (SELECT COALESCE(SUM(total_amount), 0) FROM blockfactory_sales WHERE sale_date = CURDATE()) as today_sales,
                 (SELECT COUNT(*) FROM blockfactory_sales WHERE delivery_status = 'Pending') as pending_deliveries,
                 (SELECT COALESCE(SUM(stock_quantity), 0) FROM blockfactory_raw_materials WHERE stock_quantity <= minimum_stock) as low_materials";
 $stmt = $db->prepare($stats_query);
-$stmt->bind_param("ii", $company_id, $company_id);
 $stmt->execute();
 $stats = $stmt->get_result()->fetch_assoc();
 
@@ -44,10 +43,9 @@ $stats = $stmt->get_result()->fetch_assoc();
 $production_query = "SELECT p.*, pr.product_name 
                      FROM blockfactory_production p
                      JOIN blockfactory_products pr ON p.product_id = pr.product_id
-                     WHERE pr.company_id = ?
                      ORDER BY p.production_date DESC LIMIT 10";
 $stmt = $db->prepare($production_query);
-$stmt->bind_param("i", $company_id);
+// $stmt->bind_param("i", $company_id);
 $stmt->execute();
 $recent_production = $stmt->get_result();
 
@@ -55,10 +53,9 @@ $recent_production = $stmt->get_result();
 $sales_query = "SELECT s.*, pr.product_name 
                 FROM blockfactory_sales s
                 JOIN blockfactory_products pr ON s.product_id = pr.product_id
-                WHERE pr.company_id = ?
                 ORDER BY s.sale_date DESC LIMIT 10";
 $stmt = $db->prepare($sales_query);
-$stmt->bind_param("i", $company_id);
+// $stmt->bind_param("i", $company_id);
 $stmt->execute();
 $recent_sales = $stmt->get_result();
 
@@ -600,10 +597,8 @@ $deliveries = $db->query($deliveries_query);
                                         $all_production_query = "SELECT p.*, pr.product_name 
                                                                 FROM blockfactory_production p
                                                                 JOIN blockfactory_products pr ON p.product_id = pr.product_id
-                                                                WHERE pr.company_id = ?
                                                                 ORDER BY p.production_date DESC";
                                         $stmt = $db->prepare($all_production_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_production = $stmt->get_result();
                                         while ($prod = $all_production->fetch_assoc()):
@@ -667,9 +662,8 @@ $deliveries = $db->query($deliveries_query);
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $products_query = "SELECT * FROM blockfactory_products WHERE company_id = ? ORDER BY product_name ASC";
+                                        $products_query = "SELECT * FROM blockfactory_products ORDER BY product_name ASC";
                                         $stmt = $db->prepare($products_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $products = $stmt->get_result();
                                         while ($product = $products->fetch_assoc()):
@@ -739,10 +733,8 @@ $deliveries = $db->query($deliveries_query);
                                                            FROM blockfactory_sales s
                                                            JOIN blockfactory_products pr ON s.product_id = pr.product_id
                                                            LEFT JOIN blockfactory_customers c ON s.customer_id = c.customer_id
-                                                           WHERE pr.company_id = ?
                                                            ORDER BY s.sale_date DESC";
                                         $stmt = $db->prepare($all_sales_query);
-                                        $stmt->bind_param("i", $company_id);
                                         $stmt->execute();
                                         $all_sales = $stmt->get_result();
                                         while ($sale = $all_sales->fetch_assoc()):
@@ -891,9 +883,9 @@ $deliveries = $db->query($deliveries_query);
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <span class="stock-indicator stock-<?php
-                                                                                            echo $material['current_stock'] <= $material['minimum_stock'] ? 'critical' : ($material['current_stock'] <= $material['reorder_level'] ? 'low' : 'good');
+                                                                                            echo $material['stock_quantity'] <= $material['minimum_stock'] ? 'critical' : ($material['stock_quantity'] <= $material['reorder_level'] ? 'low' : 'good');
                                                                                             ?>"></span>
-                                                        <?php echo $material['current_stock']; ?>
+                                                        <?php echo $material['stock_quantity']; ?>
                                                     </div>
                                                 </td>
                                                 <td><?php echo $material['unit']; ?></td>
@@ -1009,7 +1001,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">Record Production Batch</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-production.php" method="POST">
+                <form action="../../api/add-production.php" method="POST">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -1102,7 +1094,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">New Sale</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-sale.php" method="POST" id="saleForm">
+                <form action="../../api/add-sale.php" method="POST" id="saleForm">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -1115,7 +1107,6 @@ $deliveries = $db->query($deliveries_query);
                                     ?>
                                         <option value="<?php echo $cust['customer_id']; ?>"><?php echo $cust['customer_name']; ?></option>
                                     <?php endwhile; ?>
-                                    <option value="new">+ Add New Customer</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3" id="newCustomerFields" style="display: none;">
@@ -1209,7 +1200,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">Add New Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-product.php" method="POST">
+                <form action="../../api/add-goods.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Product Code</label>
@@ -1297,7 +1288,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">Add New Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-customer.php" method="POST">
+                <form action="../../api/add-customer.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Customer Code</label>
@@ -1369,7 +1360,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">Add Raw Material</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-material.php" method="POST">
+                <form action="../../api/add-raw-materials.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Material Code</label>
@@ -1452,7 +1443,7 @@ $deliveries = $db->query($deliveries_query);
                     <h5 class="modal-title">Schedule Delivery</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/add-delivery.php" method="POST">
+                <form action="../../api/add-delivery.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Select Sale</label>
