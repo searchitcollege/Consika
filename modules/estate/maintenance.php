@@ -179,7 +179,7 @@ $page_title = 'Maintenance';
         }
         .stats-card.emergency { border-left-color: #dc3545; }
         .stats-card.pending { border-left-color: #ffc107; }
-        .stats-card.progress { border-left-color: #17a2b8; }
+        .stats-card.progress { border-left-color: #17a2b8;  display: block; height: fit-content; font-size: 1rem;}
         .stats-card.completed { border-left-color: #28a745; }
         
         .priority-badge {

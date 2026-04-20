@@ -121,7 +121,7 @@ $deliveries_query = "SELECT d.*, s.invoice_number, c.customer_name, pr.product_n
                      FROM blockfactory_deliveries d
                      JOIN blockfactory_sales s ON d.sale_id = s.sale_id
                      JOIN blockfactory_products pr ON s.product_id = pr.product_id
-                     JOIN blockfactory_customers c ON s.customer_id = c.customer_id
+                     LEFT JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                      WHERE d.status != 'Delivered'
                      ORDER BY d.delivery_date ASC LIMIT 10";
 $pending_deliveries = $db->query($deliveries_query);
@@ -573,22 +573,22 @@ $page_title = 'Block Factory Dashboard';
                     
                     <!-- Quick Actions -->
                     <div class="quick-actions mt-4">
-                        <div class="quick-action-btn" onclick="window.location.href='record-production.php'">
+                        <div class="quick-action-btn" onclick="window.location.href='./production.php'">
                             <i class="fas fa-plus-circle"></i>
                             <span>Record Production</span>
                             <small class="text-muted d-block">New batch</small>
                         </div>
-                        <div class="quick-action-btn" onclick="window.location.href='add-sale.php'">
+                        <div class="quick-action-btn" onclick="window.location.href='./sales.php'">
                             <i class="fas fa-shopping-cart"></i>
                             <span>New Sale</span>
                             <small class="text-muted d-block">Record sale</small>
                         </div>
-                        <div class="quick-action-btn" onclick="window.location.href='add-product.php'">
+                        <div class="quick-action-btn" onclick="window.location.href='./production.php'">
                             <i class="fas fa-cube"></i>
                             <span>Add Product</span>
                             <small class="text-muted d-block">New product type</small>
                         </div>
-                        <div class="quick-action-btn" onclick="window.location.href='schedule-delivery.php'">
+                        <div class="quick-action-btn" onclick="window.location.href='./deliveries.php'">
                             <i class="fas fa-truck"></i>
                             <span>Schedule Delivery</span>
                             <small class="text-muted d-block">Arrange transport</small>

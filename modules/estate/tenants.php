@@ -11,9 +11,9 @@ $company_id = $session->getCompanyId();
 $role = $session->getRole();
 
 // Ensure only Estate users can access
-if ($current_user['company_type'] != 'Estate' && $role != 'SuperAdmin') {
+if ($current_user['company_type'] != 'Estate' ) {
     $_SESSION['error'] = 'Access denied. Estate department only.';
-    header('Location: ../../login.php');
+    header('Location: ../../api/logout.php');
     exit();
 }
 
@@ -207,9 +207,9 @@ $page_title = 'Tenants';
                                             <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+                        <!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantModal">
                             <i class="fas fa-user-plus me-2"></i>Add New Tenant
-                        </button>
+                        </button> -->
                 </div>
                 </div>
                 
@@ -321,7 +321,7 @@ $page_title = 'Tenants';
                                             <button class="btn btn-sm btn-info" onclick="viewTenant(<?php echo $tenant['tenant_id']; ?>)" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-primary" onclick="editTenant(<?php echo $tenant['tenant_id']; ?>)" title="Edit">
+                                            <!-- <button class="btn btn-sm btn-primary" onclick="editTenant(<?php echo $tenant['tenant_id']; ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn btn-sm btn-success" onclick="recordPayment(<?php echo $tenant['tenant_id']; ?>)" title="Record Payment">
@@ -330,7 +330,7 @@ $page_title = 'Tenants';
                                             <?php if ($tenant['status'] == 'Active'): ?>
                                             <button class="btn btn-sm btn-warning" onclick="terminateTenant(<?php echo $tenant['tenant_id']; ?>, '<?php echo $tenant['full_name']; ?>')" title="Terminate">
                                                 <i class="fas fa-ban"></i>
-                                            </button>
+                                            </button> -->
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -537,7 +537,7 @@ $page_title = 'Tenants';
         });
         
         function viewTenant(id) {
-            window.location.href = 'tenant-details.php?id=' + id;
+            window.location.href = '../../api/tenant-details.php?id=' + id;
         }
         
         function editTenant(id) {

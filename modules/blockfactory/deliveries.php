@@ -580,9 +580,9 @@ $page_title = 'Deliveries';
                                             </button>
                                         <?php endif; ?>
                                         
-                                        <button class="btn btn-sm btn-primary" onclick="printDeliveryNote(<?php echo $delivery['delivery_id']; ?>)" title="Print Delivery Note">
+                                        <!-- <button class="btn btn-sm btn-primary" onclick="printDeliveryNote(<?php echo $delivery['delivery_id']; ?>)" title="Print Delivery Note">
                                             <i class="fas fa-print"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                             </div>
@@ -755,7 +755,7 @@ $page_title = 'Deliveries';
         });
         
         function viewDelivery(id) {
-            window.location.href = 'delivery-details.php?id=' + id;
+            window.location.href = '../../api/view-delivery.php?id=' + id;
         }
         
         function updateStatus(id, status) {
@@ -772,6 +772,7 @@ $page_title = 'Deliveries';
             $('#status_confirm').removeClass('btn-primary btn-success btn-danger').addClass(btnClass);
             
             $('#statusModal').modal('show');
+            // TODO
         }
         
         function printDeliveryNote(id) {

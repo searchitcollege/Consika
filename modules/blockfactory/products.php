@@ -375,9 +375,9 @@ $page_title = 'Products';
                                                     <button class="btn btn-sm btn-primary" onclick="editProduct(<?php echo $product['product_id']; ?>)" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-success" onclick="adjustStock(<?php echo $product['product_id']; ?>)" title="Adjust Stock">
+                                                    <!-- <button class="btn btn-sm btn-success" onclick="adjustStock(<?php echo $product['product_id']; ?>)" title="Adjust Stock">
                                                         <i class="fas fa-balance-scale"></i>
-                                                    </button>
+                                                    </button> -->
                                                     <?php if ($role == 'SuperAdmin'): ?>
                                                     <button class="btn btn-sm btn-danger" onclick="deleteProduct(<?php echo $product['product_id']; ?>, '<?php echo $product['product_name']; ?>')" title="Delete">
                                                         <i class="fas fa-trash"></i>
@@ -689,32 +689,15 @@ $page_title = 'Products';
         });
         
         function viewProduct(id) {
-            window.location.href = 'product-details.php?id=' + id;
+            window.location.href = '../../api/view-good.php?id=' + id;
         }
         
         function editProduct(id) {
-            $.get('ajax/get-product.php', {id: id}, function(data) {
-                $('#edit_product_id').val(data.product_id);
-                $('#edit_product_code').val(data.product_code);
-                $('#edit_product_name').val(data.product_name);
-                $('#edit_product_type').val(data.product_type);
-                $('#edit_dimensions').val(data.dimensions);
-                $('#edit_weight_kg').val(data.weight_kg);
-                $('#edit_strength_mpa').val(data.strength_mpa);
-                $('#edit_current_stock').val(data.current_stock);
-                $('#edit_price').val(data.price_per_unit);
-                $('#edit_cost').val(data.cost_per_unit);
-                $('#edit_min_stock').val(data.minimum_stock);
-                $('#edit_max_stock').val(data.maximum_stock);
-                $('#edit_reorder').val(data.reorder_level);
-                $('#edit_description').val(data.description);
-                $('#edit_status').val(data.status);
-                $('#editProductModal').modal('show');
-            }, 'json');
+            window.location.href = '../../api/edit-good.php?id=' + id;
         }
         
         function adjustStock(id) {
-            $.get('ajax/get-product.php', {id: id}, function(data) {
+            $.get('../../api/get-product.php', {id: id}, function(data) {
                 $('#adjust_product_id').val(data.product_id);
                 $('#adjust_product_name').val(data.product_name);
                 $('#adjust_current_stock').val(data.current_stock);

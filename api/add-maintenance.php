@@ -41,27 +41,42 @@ $description           = trim($_POST['description']            ?? '');
 $created_by           = (int)$current_user['user_id'];
 
 // ── Validation ───────────────────────────────────────────────────────────────
-if (!$tenant_id || !$property_id || empty($request_date) || empty($priority) 
-    || empty($issue_category)) {
-    $_SESSION['error'] = 'Please fill in all required payment fields.';
-    header('Location: ../admin/dashboard.php');
+$allowed_categories = ['Plumbing','Electrical','Structural','Appliance','Pest Control','Cleaning','Other'];
+$allowed_priorities = ['Low','Medium','High','Emergency'];
+
+if (!$property_id || empty($request_date) || empty($issue_category) || empty($priority) || empty($description)) {
+    $_SESSION['error'] = 'Please fill in all required fields.';
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
-// ── Insert payment ───────────────────────────────────────────────────────────
+if (!in_array($issue_category, $allowed_categories)) {
+    $_SESSION['error'] = 'Invalid category selected.';
+    header('Location: ../modules/estate/index.php');
+    exit();
+}
+
+if (!in_array($priority, $allowed_priorities)) {
+    $_SESSION['error'] = 'Invalid priority selected.';
+    header('Location: ../modules/estate/index.php');
+    exit();
+}
+
+// tenant_id is optional — treat 0 as NULL
+$tenant_id_val = $tenant_id > 0 ? $tenant_id : null;
+$request_date_val = !empty($request_date) ? $request_date : date('Y-m-d H:i:s');
+
 $stmt = $db->prepare("
     INSERT INTO estate_maintenance
-        (tenant_id, property_id, request_date, issue_category,
-         priority, description, created_by)
+        (property_id, tenant_id, request_date, issue_category, priority, description, created_by, status)
     VALUES
-        (?, ?, ?, ?, ?, ?, ?)
+        (?, ?, ?, ?, ?, ?, ?, 'Pending')
 ");
-
 $stmt->bind_param(
-    "iissss",
-    $tenant_id,
+    "iissssi",
     $property_id,
-    $request_date,
+    $tenant_id_val,
+    $request_date_val,
     $issue_category,
     $priority,
     $description,
@@ -70,29 +85,26 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to record maintenance request. Please try again.';
-    header('Location: ../admin/dashboard.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
-
 $stmt->close();
 
-// ── Retrieve new payment_id ──────────────────────────────────────────────────
-$id_result  = $db->query("SELECT LAST_INSERT_ID() AS new_id");
-$payment_id = (int)$id_result->fetch_assoc()['new_id'];
+$id_result      = $db->query("SELECT LAST_INSERT_ID() AS new_id");
+$maintenance_id = (int)$id_result->fetch_assoc()['new_id'];
 
-// ── Activity log ─────────────────────────────────────────────────────────────
-$log_desc = "Recorded maintenance: {$description} ON: {$request_date}) for tenant: {$tenant_id} in {$property_id} ";
+// Activity log
+$log_desc = "New maintenance request: {$issue_category} ({$priority}) for property ID {$property_id}";
 $log_ip   = $_SERVER['REMOTE_ADDR'] ?? '';
-$module   = 'estate';
 
 $log = $db->prepare("
     INSERT INTO activity_log (user_id, action, description, ip_address, module, reference_id)
-    VALUES (?, 'Record Maintenance', ?, ?, ?, ?)
+    VALUES (?, 'Add Maintenance', ?, ?, 'estate', ?)
 ");
-$log->bind_param("isssi", $recorded_by, $log_desc, $log_ip, $module, $payment_id);
+$log->bind_param("issi", $created_by, $log_desc, $log_ip, $maintenance_id);
 $log->execute();
 $log->close();
 
-$_SESSION['success'] = "Payment recorded successfully. Receipt No: {$receipt_number}";
+$_SESSION['success'] = 'Maintenance request submitted successfully.';
 header('Location: ../modules/estate/index.php');
 exit();

@@ -33,88 +33,86 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'add':
-                $username = $db->escapeString($_POST['username']);
-                $email = $db->escapeString($_POST['email']);
-                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $full_name = $db->escapeString($_POST['full_name']);
-                $phone = $db->escapeString($_POST['phone']);
-                $role = $db->escapeString($_POST['role']);
-                $company_id = $is_super_admin ? ($_POST['company_id'] ?: null) : $session->getCompanyId();
-                $status = $db->escapeString($_POST['status']);
-                
-                // Check if username or email exists
+                $username   = trim($_POST['username']   ?? '');
+                $email      = trim($_POST['email']      ?? '');
+                $password   = password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT);
+                $full_name  = trim($_POST['full_name']  ?? '');
+                $phone      = trim($_POST['phone']      ?? '');
+                $role       = trim($_POST['role']       ?? 'Staff');
+                $company_id = $is_super_admin
+                    ? (($_POST['company_id'] ?? '') !== '' ? (int)$_POST['company_id'] : null)
+                    : $session->getCompanyId();
+                $status = trim($_POST['status'] ?? 'Active');
+
+                // Check duplicate username or email
                 $check = $db->prepare("SELECT user_id FROM users WHERE username = ? OR email = ?");
-                if ($check) {
-                    $check->bind_param("ss", $username, $email);
-                    $check->execute();
-                    if ($check->get_result()->num_rows > 0) {
-                        $_SESSION['error'] = 'Username or email already exists';
-                    } else {
-                        $sql = "INSERT INTO users (username, password, email, full_name, phone, role, company_id, status) 
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                        $stmt = $db->prepare($sql);
-                        if ($stmt) {
-                            $stmt->bind_param("ssssssis", $username, $password, $email, $full_name, $phone, $role, $company_id, $status);
-                            
-                            if ($stmt->execute()) {
-                                $_SESSION['success'] = 'User added successfully';
-                                
-                                // Log activity
-                                if (function_exists('log_activity')) {
-                                    log_activity($current_user['user_id'], 'Add User', "Added user: $username");
-                                }
-                            } else {
-                                $_SESSION['error'] = 'Error adding user: ' . $db->error();
-                            }
-                            $stmt->close();
-                        } else {
-                            $_SESSION['error'] = 'Error preparing statement';
-                        }
-                    }
+                $check->bind_param("ss", $username, $email);
+                $check->execute();
+                $check->store_result();
+
+                if ($check->num_rows > 0) {
+                    $_SESSION['error'] = 'Username or email already exists';
+                } else {
                     $check->close();
-                }
-                break;
-                
-            case 'edit':
-                $user_id = intval($_POST['user_id']);
-                $email = $db->escapeString($_POST['email']);
-                $full_name = $db->escapeString($_POST['full_name']);
-                $phone = $db->escapeString($_POST['phone']);
-                $role = $db->escapeString($_POST['role']);
-                $status = $db->escapeString($_POST['status']);
-                
-                $sql = "UPDATE users SET email = ?, full_name = ?, phone = ?, role = ?, status = ? WHERE user_id = ?";
-                $stmt = $db->prepare($sql);
-                if ($stmt) {
-                    $stmt->bind_param("sssssi", $email, $full_name, $phone, $role, $status, $user_id);
-                    
+                    $stmt = $db->prepare("
+                        INSERT INTO users (username, password, email, full_name, phone, role, company_id, status)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ");
+                    $stmt->bind_param(
+                        "ssssssiss",
+                        $username,
+                        $password,
+                        $email,
+                        $full_name,
+                        $phone,
+                        $role,
+                        $company_id,
+                        $status
+                    );
                     if ($stmt->execute()) {
-                        // If password is provided, update it
-                        if (!empty($_POST['new_password'])) {
-                            $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-                            $pwd_sql = "UPDATE users SET password = ? WHERE user_id = ?";
-                            $pwd_stmt = $db->prepare($pwd_sql);
-                            if ($pwd_stmt) {
-                                $pwd_stmt->bind_param("si", $new_password, $user_id);
-                                $pwd_stmt->execute();
-                                $pwd_stmt->close();
-                            }
-                        }
-                        
-                        $_SESSION['success'] = 'User updated successfully';
-                        if (function_exists('log_activity')) {
-                            log_activity($current_user['user_id'], 'Edit User', "Edited user ID: $user_id");
-                        }
+                        $stmt->close();
+                        log_activity($current_user['user_id'], 'Add User', "Added user: $username");
+                        $_SESSION['success'] = 'User added successfully';
                     } else {
-                        $_SESSION['error'] = 'Error updating user: ' . $db->error();
+                        $_SESSION['error'] = 'Error adding user';
                     }
-                    $stmt->close();
                 }
                 break;
-                
+
+            case 'edit':
+                $user_id   = (int)($_POST['user_id'] ?? 0);
+                $email     = trim($_POST['email']     ?? '');
+                $full_name = trim($_POST['full_name'] ?? '');
+                $phone     = trim($_POST['phone']     ?? '');
+                $role      = trim($_POST['role']      ?? 'Staff');
+                $status    = trim($_POST['status']    ?? 'Active');
+
+                $stmt = $db->prepare("
+                    UPDATE users SET email = ?, full_name = ?, phone = ?, role = ?, status = ?
+                    WHERE user_id = ?
+                ");
+                $stmt->bind_param("sssssi", $email, $full_name, $phone, $role, $status, $user_id);
+
+                if ($stmt->execute()) {
+                    $stmt->close();
+
+                    if (!empty($_POST['new_password'])) {
+                        $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+                        $pwd = $db->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+                        $pwd->bind_param("si", $new_password, $user_id);
+                        $pwd->execute();
+                        $pwd->close();
+                    }
+
+                    log_activity($current_user['user_id'], 'Edit User', "Edited user ID: $user_id");
+                    $_SESSION['success'] = 'User updated successfully';
+                } else {
+                    $_SESSION['error'] = 'Error updating user';
+                }
+                break;
             case 'delete':
                 $user_id = intval($_POST['user_id']);
-                
+
                 // Don't allow deleting own account
                 if ($user_id == $current_user['user_id']) {
                     $_SESSION['error'] = 'You cannot delete your own account';
@@ -123,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt = $db->prepare($sql);
                     if ($stmt) {
                         $stmt->bind_param("i", $user_id);
-                        
+
                         if ($stmt->execute()) {
                             $_SESSION['success'] = 'User deleted successfully';
                             if (function_exists('log_activity')) {
@@ -136,13 +134,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }
                 break;
-                
+
             case 'update_permissions':
                 $user_id = intval($_POST['user_id']);
-                
+
                 // Delete existing permissions
                 $db->query("DELETE FROM user_permissions WHERE user_id = $user_id");
-                
+
                 // Insert new permissions
                 if (isset($_POST['modules']) && is_array($_POST['modules'])) {
                     $success_count = 0;
@@ -152,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $can_edit = isset($perms['edit']) ? 1 : 0;
                         $can_delete = isset($perms['delete']) ? 1 : 0;
                         $can_approve = isset($perms['approve']) ? 1 : 0;
-                        
+
                         $sql = "INSERT INTO user_permissions (user_id, module_name, can_view, can_create, can_edit, can_delete, can_approve) 
                                 VALUES (?, ?, ?, ?, ?, ?, ?)";
                         $stmt = $db->prepare($sql);
@@ -164,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $stmt->close();
                         }
                     }
-                    
+
                     if ($success_count > 0) {
                         $_SESSION['success'] = 'Permissions updated successfully';
                         if (function_exists('log_activity')) {
@@ -176,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 break;
         }
-        
+
         header('Location: users.php');
         exit();
     }
@@ -217,7 +215,7 @@ if (isset($_GET['edit'])) {
         $edit_user = $stmt->get_result()->fetch_assoc();
         $stmt->close();
     }
-    
+
     // Get user permissions
     $perms_query = "SELECT * FROM user_permissions WHERE user_id = ?";
     $stmt = $db->prepare($perms_query);
@@ -237,23 +235,24 @@ $page_title = 'User Management';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - <?php echo defined('APP_NAME') ? APP_NAME : 'Company Management'; ?></title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-    
+
     <!-- Custom CSS -->
     <link href="../assets/css/style.css" rel="stylesheet">
-    
+
     <style>
         :root {
             --primary-color: #4361ee;
@@ -264,24 +263,24 @@ $page_title = 'User Management';
             --dark-color: #1e1e2f;
             --light-color: #f8f9fa;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             background-color: #f4f7fc;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .wrapper {
             display: flex;
         }
-        
+
         /* Sidebar - already in sidebar.php */
-        
+
         /* Main Content */
         .main-content {
             flex: 1;
@@ -289,15 +288,15 @@ $page_title = 'User Management';
             padding: 20px;
             transition: all 0.3s;
         }
-        
+
         .page-header {
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 25px;
         }
-        
+
         .role-badge {
             padding: 5px 12px;
             border-radius: 20px;
@@ -306,12 +305,23 @@ $page_title = 'User Management';
             color: white;
             display: inline-block;
         }
-        
-        .role-superadmin { background: #dc3545; }
-        .role-companyadmin { background: #fd7e14; }
-        .role-manager { background: #0d6efd; }
-        .role-staff { background: #6c757d; }
-        
+
+        .role-superadmin {
+            background: #dc3545;
+        }
+
+        .role-companyadmin {
+            background: #fd7e14;
+        }
+
+        .role-manager {
+            background: #0d6efd;
+        }
+
+        .role-staff {
+            background: #6c757d;
+        }
+
         .status-badge {
             padding: 5px 12px;
             border-radius: 20px;
@@ -319,17 +329,17 @@ $page_title = 'User Management';
             font-weight: 600;
             display: inline-block;
         }
-        
+
         .status-active {
             background: #d4edda;
             color: #155724;
         }
-        
+
         .status-inactive {
             background: #f8d7da;
             color: #721c24;
         }
-        
+
         .user-avatar {
             width: 40px;
             height: 40px;
@@ -342,11 +352,11 @@ $page_title = 'User Management';
             font-weight: 600;
             font-size: 16px;
         }
-        
+
         .modal-xl {
             max-width: 90%;
         }
-        
+
         .permission-group {
             border: 1px solid #dee2e6;
             border-radius: 8px;
@@ -354,80 +364,82 @@ $page_title = 'User Management';
             margin-bottom: 15px;
             background: #f8f9fa;
         }
-        
+
         .permission-group h6 {
             margin-bottom: 10px;
             color: #495057;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 5px;
         }
-        
+
         .permission-checkboxes {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
-        
+
         .permission-checkboxes .form-check {
             min-width: 80px;
         }
-        
+
         .badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
         }
-        
+
         .alert {
             padding: 15px 20px;
             border-radius: 10px;
             margin-bottom: 20px;
         }
-        
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
+
         .table th {
             background-color: #f8f9fa;
             font-weight: 600;
         }
-        
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
             margin: 0 2px;
         }
-        
+
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
             }
+
             .modal-xl {
                 max-width: 95%;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="wrapper">
         <!-- Include sidebar -->
         <?php include dirname(__DIR__) . '/includes/sidebar.php'; ?>
-        
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Top Navigation -->
             <?php include dirname(__DIR__) . '/includes/top-nav.php'; ?>
-            
+
             <!-- Page Header -->
             <div class="page-header d-flex justify-content-between align-items-center">
                 <div>
@@ -438,30 +450,30 @@ $page_title = 'User Management';
                     <i class="fas fa-plus-circle me-2"></i>Add New User
                 </button>
             </div>
-            
+
             <!-- Alert Messages -->
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle me-2"></i>
-                    <?php 
+                    <?php
                     echo $_SESSION['success'];
                     unset($_SESSION['success']);
                     ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    <?php 
+                    <?php
                     echo $_SESSION['error'];
                     unset($_SESSION['error']);
                     ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
-            
+
             <!-- Users Table -->
             <div class="card">
                 <div class="card-body">
@@ -474,7 +486,7 @@ $page_title = 'User Management';
                                     <th>Email</th>
                                     <th>Phone</th>
                                     <?php if ($is_super_admin): ?>
-                                    <th>Company</th>
+                                        <th>Company</th>
                                     <?php endif; ?>
                                     <th>Role</th>
                                     <th>Last Login</th>
@@ -484,60 +496,60 @@ $page_title = 'User Management';
                             </thead>
                             <tbody>
                                 <?php if ($users && $users->num_rows > 0): ?>
-                                    <?php while($user = $users->fetch_assoc()): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="user-avatar me-2">
-                                                    <?php echo getAvatarLetter($user['full_name'] ?? 'U'); ?>
+                                    <?php while ($user = $users->fetch_assoc()): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="user-avatar me-2">
+                                                        <?php echo getAvatarLetter($user['full_name'] ?? 'U'); ?>
+                                                    </div>
+                                                    <div>
+                                                        <strong><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></strong>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <strong><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></strong>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($user['username'] ?? ''); ?></td>
-                                        <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
-                                        <td><?php echo htmlspecialchars($user['phone'] ?? ''); ?></td>
-                                        <?php if ($is_super_admin): ?>
-                                        <td><?php echo htmlspecialchars($user['company_name'] ?? 'All Companies'); ?></td>
-                                        <?php endif; ?>
-                                        <td>
-                                            <span class="role-badge role-<?php echo strtolower($user['role'] ?? 'staff'); ?>">
-                                                <?php echo $user['role'] ?? 'Staff'; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                            if (!empty($user['last_login'])) {
-                                                echo formatDateTime($user['last_login']);
-                                            } else {
-                                                echo '<span class="text-muted">Never</span>';
-                                            }
-                                            ?>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge status-<?php echo strtolower($user['status'] ?? 'inactive'); ?>">
-                                                <?php echo $user['status'] ?? 'Inactive'; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-info" onclick="viewUser(<?php echo $user['user_id']; ?>)" title="View">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-primary" onclick="editUser(<?php echo $user['user_id']; ?>)" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-warning" onclick="managePermissions(<?php echo $user['user_id']; ?>)" title="Permissions">
-                                                <i class="fas fa-key"></i>
-                                            </button>
-                                            <?php if ($user['user_id'] != $current_user['user_id']): ?>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteUser(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? ''); ?>')" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($user['username'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($user['phone'] ?? ''); ?></td>
+                                            <?php if ($is_super_admin): ?>
+                                                <td><?php echo htmlspecialchars($user['company_name'] ?? 'All Companies'); ?></td>
                                             <?php endif; ?>
-                                        </td>
-                                    </tr>
+                                            <td>
+                                                <span class="role-badge role-<?php echo strtolower($user['role'] ?? 'staff'); ?>">
+                                                    <?php echo $user['role'] ?? 'Staff'; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                if (!empty($user['last_login'])) {
+                                                    echo formatDateTime($user['last_login']);
+                                                } else {
+                                                    echo '<span class="text-muted">Never</span>';
+                                                }
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-<?php echo strtolower($user['status'] ?? 'inactive'); ?>">
+                                                    <?php echo $user['status'] ?? 'Inactive'; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="viewUser(<?php echo $user['user_id']; ?>)" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-primary" onclick="editUser(<?php echo $user['user_id']; ?>)" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-warning" onclick="managePermissions(<?php echo $user['user_id']; ?>)" title="Permissions">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                                <?php if ($user['user_id'] != $current_user['user_id']): ?>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteUser(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars($user['username'] ?? ''); ?>')" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <tr>
@@ -554,7 +566,7 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- Add User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -576,7 +588,7 @@ $page_title = 'User Management';
                                 <input type="email" class="form-control" name="email" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Password</label>
@@ -588,7 +600,7 @@ $page_title = 'User Management';
                                 <input type="text" class="form-control" name="full_name" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone</label>
@@ -600,28 +612,28 @@ $page_title = 'User Management';
                                     <option value="Staff">Staff</option>
                                     <option value="Manager">Manager</option>
                                     <?php if ($is_super_admin): ?>
-                                    <option value="CompanyAdmin">Company Admin</option>
-                                    <option value="SuperAdmin">Super Admin</option>
+                                        <option value="CompanyAdmin">Company Admin</option>
+                                        <option value="SuperAdmin">Super Admin</option>
                                     <?php endif; ?>
                                 </select>
                             </div>
                         </div>
-                        
+
                         <?php if ($is_super_admin && $companies && $companies->num_rows > 0): ?>
-                        <div class="mb-3">
-                            <label class="form-label">Company</label>
-                            <select class="form-control" name="company_id">
-                                <option value="">All Companies (Super Admin)</option>
-                                <?php while($company = $companies->fetch_assoc()): ?>
-                                <option value="<?php echo $company['company_id']; ?>"><?php echo htmlspecialchars($company['company_name']); ?></option>
-                                <?php endwhile; ?>
-                                <?php // Reset pointer for potential later use
-                                if ($companies) $companies->data_seek(0);
-                                ?>
-                            </select>
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Company</label>
+                                <select class="form-control" name="company_id">
+                                    <option value="">All Companies (Super Admin)</option>
+                                    <?php while ($company = $companies->fetch_assoc()): ?>
+                                        <option value="<?php echo $company['company_id']; ?>"><?php echo htmlspecialchars($company['company_name']); ?></option>
+                                    <?php endwhile; ?>
+                                    <?php // Reset pointer for potential later use
+                                    if ($companies) $companies->data_seek(0);
+                                    ?>
+                                </select>
+                            </div>
                         <?php endif; ?>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <select class="form-control" name="status">
@@ -638,7 +650,7 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- Edit User Modal -->
     <div class="modal fade" id="editUserModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -662,7 +674,7 @@ $page_title = 'User Management';
                                 <input type="email" class="form-control" name="email" id="edit_email" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">New Password</label>
@@ -674,7 +686,7 @@ $page_title = 'User Management';
                                 <input type="text" class="form-control" name="full_name" id="edit_fullname" required>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone</label>
@@ -686,13 +698,13 @@ $page_title = 'User Management';
                                     <option value="Staff">Staff</option>
                                     <option value="Manager">Manager</option>
                                     <?php if ($is_super_admin): ?>
-                                    <option value="CompanyAdmin">Company Admin</option>
-                                    <option value="SuperAdmin">Super Admin</option>
+                                        <option value="CompanyAdmin">Company Admin</option>
+                                        <option value="SuperAdmin">Super Admin</option>
                                     <?php endif; ?>
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Status</label>
                             <select class="form-control" name="status" id="edit_status">
@@ -709,7 +721,7 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- Permissions Modal -->
     <div class="modal fade" id="permissionsModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -723,7 +735,7 @@ $page_title = 'User Management';
                     <input type="hidden" name="user_id" id="perm_user_id">
                     <div class="modal-body">
                         <p class="text-muted mb-3">Configure module access for this user. Company Admins and Super Admins automatically have full access.</p>
-                        
+
                         <div class="row">
                             <!-- Estate Module -->
                             <div class="col-md-6">
@@ -753,7 +765,7 @@ $page_title = 'User Management';
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Procurement Module -->
                             <div class="col-md-6">
                                 <div class="permission-group">
@@ -782,7 +794,7 @@ $page_title = 'User Management';
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Works Module -->
                             <div class="col-md-6">
                                 <div class="permission-group">
@@ -811,7 +823,7 @@ $page_title = 'User Management';
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Block Factory Module -->
                             <div class="col-md-6">
                                 <div class="permission-group">
@@ -840,7 +852,7 @@ $page_title = 'User Management';
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Reports Module -->
                             <div class="col-md-6">
                                 <div class="permission-group">
@@ -861,28 +873,28 @@ $page_title = 'User Management';
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Admin Module (Super Admin only) -->
                             <?php if ($is_super_admin): ?>
-                            <div class="col-md-6">
-                                <div class="permission-group">
-                                    <h6><i class="fas fa-cog me-2"></i>Admin</h6>
-                                    <div class="permission-checkboxes">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="modules[admin][users]" id="perm_admin_users">
-                                            <label class="form-check-label" for="perm_admin_users">Manage Users</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="modules[admin][companies]" id="perm_admin_companies">
-                                            <label class="form-check-label" for="perm_admin_companies">Manage Companies</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="modules[admin][settings]" id="perm_admin_settings">
-                                            <label class="form-check-label" for="perm_admin_settings">System Settings</label>
+                                <div class="col-md-6">
+                                    <div class="permission-group">
+                                        <h6><i class="fas fa-cog me-2"></i>Admin</h6>
+                                        <div class="permission-checkboxes">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="modules[admin][users]" id="perm_admin_users">
+                                                <label class="form-check-label" for="perm_admin_users">Manage Users</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="modules[admin][companies]" id="perm_admin_companies">
+                                                <label class="form-check-label" for="perm_admin_companies">Manage Companies</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="modules[admin][settings]" id="perm_admin_settings">
+                                                <label class="form-check-label" for="perm_admin_settings">System Settings</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -894,7 +906,7 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
@@ -918,7 +930,7 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- AJAX loader for edit user -->
     <div style="display: none;" id="ajaxLoader">
         <div class="text-center p-3">
@@ -927,19 +939,21 @@ $page_title = 'User Management';
             </div>
         </div>
     </div>
-    
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <script src="../assets/js/main.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             // Initialize DataTable
             $('#usersTable').DataTable({
-                order: [[0, 'asc']],
+                order: [
+                    [0, 'asc']
+                ],
                 language: {
                     search: "Search:",
                     lengthMenu: "Show _MENU_ entries",
@@ -955,25 +969,27 @@ $page_title = 'User Management';
                     }
                 }
             });
-            
+
             // Auto-hide alerts after 5 seconds
             setTimeout(function() {
                 $('.alert').fadeOut('slow');
             }, 5000);
         });
-        
+
         function viewUser(id) {
-            window.location.href = 'view-user.php?id=' + id;
+            window.location.href = '../api/view-user.php?id=' + id;
         }
-        
+
         function editUser(id) {
             // Show loading
             $('#editUserModal .modal-body').prepend($('#ajaxLoader').html());
-            
+
             $.ajax({
-                url: 'ajax/get-user.php',
+                url: '../api/get-user.php',
                 type: 'GET',
-                data: { id: id },
+                data: {
+                    id: id
+                },
                 dataType: 'json',
                 success: function(data) {
                     $('#edit_user_id').val(data.user_id);
@@ -984,7 +1000,7 @@ $page_title = 'User Management';
                     $('#edit_role').val(data.role);
                     $('#edit_status').val(data.status);
                     $('#edit_password').val(''); // Clear password field
-                    
+
                     $('#editUserModal').modal('show');
                 },
                 error: function(xhr, status, error) {
@@ -996,22 +1012,24 @@ $page_title = 'User Management';
                 }
             });
         }
-        
+
         function managePermissions(id) {
             $('#perm_user_id').val(id);
-            
+
             // Show loading
             $('#permissionsModal .modal-body').prepend($('#ajaxLoader').html());
-            
+
             $.ajax({
-                url: 'ajax/get-user-permissions.php',
+                url: '../api/get-user-permissions.php',
                 type: 'GET',
-                data: { id: id },
+                data: {
+                    id: id
+                },
                 dataType: 'json',
                 success: function(data) {
                     // Reset all checkboxes
                     $('.permission-checkboxes input[type="checkbox"]').prop('checked', false);
-                    
+
                     // Set checked based on existing permissions
                     if (data) {
                         $.each(data, function(module, perms) {
@@ -1022,7 +1040,7 @@ $page_title = 'User Management';
                             });
                         });
                     }
-                    
+
                     $('#permissionsModal').modal('show');
                 },
                 error: function(xhr, status, error) {
@@ -1034,7 +1052,7 @@ $page_title = 'User Management';
                 }
             });
         }
-        
+
         function deleteUser(id, username) {
             $('#deleteUserId').val(id);
             $('#deleteUsername').text(username);
@@ -1042,4 +1060,5 @@ $page_title = 'User Management';
         }
     </script>
 </body>
+
 </html>

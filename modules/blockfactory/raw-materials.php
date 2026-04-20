@@ -501,9 +501,9 @@ $page_title = 'Raw Materials';
                                                     <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $material['material_id']; ?>)" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-success" onclick="adjustStock(<?php echo $material['material_id']; ?>)" title="Adjust Stock">
+                                                    <!-- <button class="btn btn-sm btn-success" onclick="adjustStock(<?php echo $material['material_id']; ?>)" title="Adjust Stock">
                                                         <i class="fas fa-balance-scale"></i>
-                                                    </button>
+                                                    </button> -->
                                                     <button class="btn btn-sm btn-warning" onclick="orderMaterial(<?php echo $material['material_id']; ?>)" title="Order">
                                                         <i class="fas fa-shopping-cart"></i>
                                                     </button>
@@ -819,27 +819,11 @@ $page_title = 'Raw Materials';
         });
         
         function viewMaterial(id) {
-            window.location.href = 'material-details.php?id=' + id;
+            window.location.href = '../../api/view-material.php?id=' + id;
         }
         
         function editMaterial(id) {
-            $.get('ajax/get-material.php', {id: id}, function(data) {
-                $('#edit_material_id').val(data.material_id);
-                $('#edit_material_code').val(data.material_code);
-                $('#edit_material_name').val(data.material_name);
-                $('#edit_material_type').val(data.material_type);
-                $('#edit_supplier').val(data.supplier);
-                $('#edit_unit').val(data.unit);
-                $('#edit_stock_quantity').val(data.stock_quantity);
-                $('#edit_minimum_stock').val(data.minimum_stock);
-                $('#edit_maximum_stock').val(data.maximum_stock);
-                $('#edit_reorder_level').val(data.reorder_level);
-                $('#edit_unit_cost').val(data.unit_cost);
-                $('#edit_location').val(data.location);
-                $('#edit_status').val(data.status);
-                $('#edit_notes').val(data.notes);
-                $('#editMaterialModal').modal('show');
-            }, 'json');
+            window.location.href = '../../api/edit-material.php?id=' + id;
         }
         
         function adjustStock(id) {
@@ -853,6 +837,7 @@ $page_title = 'Raw Materials';
         
         function orderMaterial(id) {
             window.location.href = '../procurement/create-po.php?material=' + id + '&source=blockfactory';
+            // TODO
         }
         
         function deleteMaterial(id, name) {

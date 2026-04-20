@@ -69,7 +69,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <li class="nav-item">
                 <a href="<?php echo baseUrl('modules/estate/index.php'); ?>" class="nav-link">
                     <i class="fas fa-building"></i>
-                    <span>Estate</span>
+                    <span>Accounts</span>
                 </a>
             </li>
             <li class="nav-item">

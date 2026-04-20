@@ -114,7 +114,7 @@ $stmt->bind_param(
     $daily_rate,
     $monthly_salary,
     $emergency_contact,
-    $emergency_phone,
+    $emergency_phone
 );
 
 if (!$stmt->execute()) {

@@ -957,7 +957,7 @@ $pending_deliveries = $stmt->get_result();
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-info" onclick="viewEntity('../../api/get_purchase_order.php',<?php echo $po['po_id']; ?>,'Purchsase Order')">
+                                                    <button class="btn btn-sm btn-info" onclick="viewPO(<?php echo $po['po_id']; ?>)">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                     <?php if ($po['delivery_status'] != 'Completed'): ?>
@@ -1456,7 +1456,7 @@ $pending_deliveries = $stmt->get_result();
                     <h5 class="modal-title">Receive Stock</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/receive-stock.php" method="POST">
+                <form action="../../api/recieve-stock.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Purchase Order</label>
@@ -1637,7 +1637,7 @@ $pending_deliveries = $stmt->get_result();
             $('select[name="po_id"]').change(function() {
                 let poId = $(this).val();
                 if (poId) {
-                    $.get('ajax/get-po-items.php', {
+                    $.get('../../api/get-po-items.php', {
                         po_id: poId
                     }, function(data) {
                         $('#poItemsList').html(data);
@@ -1645,14 +1645,6 @@ $pending_deliveries = $stmt->get_result();
                 }
             });
         });
-
-        function viewPO(id) {
-            window.location.href = 'view-po.php?id=' + id;
-        }
-
-        function receivePO(id) {
-            window.location.href = 'receive-po.php?id=' + id;
-        }
 
         function reorderProduct(id) {
             $('#createPOModal').modal('show');
@@ -1687,19 +1679,19 @@ $pending_deliveries = $stmt->get_result();
         }
 
         function viewSupplier(id) {
-            window.location.href = 'view-supplier.php?id=' + id;
+            window.location.href = '../../api/view-supplier.php?id=' + id;
         }
 
         function editSupplier(id) {
-            window.location.href = 'edit-supplier.php?id=' + id;
+            window.location.href = '../../api/edit-supplier.php?id=' + id;
         }
 
         function viewProduct(id) {
-            window.location.href = 'view-product.php?id=' + id;
+            window.location.href = '../../api/view-product.php?id=' + id;
         }
 
         function editProduct(id) {
-            window.location.href = 'edit-product.php?id=' + id;
+            window.location.href = '../../api/edit-product.php?id=' + id;
         }
 
         function viewEntity(endpoint, id, title) {
@@ -1710,7 +1702,7 @@ $pending_deliveries = $stmt->get_result();
         }
 
         function viewPO(id) {
-            window.location.href = 'view-po.php?id=' + id;
+            window.location.href = '../../api/view-po.php?id=' + id;
         }
     </script>
 </body>

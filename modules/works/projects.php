@@ -314,7 +314,7 @@ $upcoming_deadlines = $stmt->get_result();
                     <h5 class="modal-title">Start New Project</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/new-project.php" method="POST">
+                <form action="../../api/new-project.php" method="POST">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">

@@ -70,7 +70,7 @@ $deliveries_query = "SELECT d.*, s.invoice_number, c.customer_name, pr.product_n
                      FROM blockfactory_deliveries d
                      JOIN blockfactory_sales s ON d.sale_id = s.sale_id
                      JOIN blockfactory_products pr ON s.product_id = pr.product_id
-                     JOIN blockfactory_customers c ON s.customer_id = c.customer_id
+                     LEFT JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                      WHERE d.status != 'Delivered'
                      ORDER BY d.delivery_date ASC LIMIT 10";
 $deliveries = $db->query($deliveries_query);
@@ -950,7 +950,7 @@ $deliveries = $db->query($deliveries_query);
                                                                 FROM blockfactory_deliveries d
                                                                 JOIN blockfactory_sales s ON d.sale_id = s.sale_id
                                                                 JOIN blockfactory_products pr ON s.product_id = pr.product_id
-                                                                JOIN blockfactory_customers c ON s.customer_id = c.customer_id
+                                                                LEFT JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                                                                 ORDER BY d.delivery_date DESC";
                                         $all_deliveries = $db->query($all_deliveries_query);
                                         while ($delivery = $all_deliveries->fetch_assoc()):
@@ -1452,7 +1452,7 @@ $deliveries = $db->query($deliveries_query);
                                 <?php
                                 $pending_sales = $db->query("SELECT s.sale_id, s.invoice_number, c.customer_name, s.delivery_address
                                                             FROM blockfactory_sales s
-                                                            JOIN blockfactory_customers c ON s.customer_id = c.customer_id
+                                                            LEFT JOIN blockfactory_customers c ON s.customer_id = c.customer_id
                                                             WHERE s.delivery_status != 'Delivered'");
                                 while ($sale = $pending_sales->fetch_assoc()):
                                 ?>
@@ -1598,27 +1598,27 @@ $deliveries = $db->query($deliveries_query);
         });
 
         function viewBatch(id) {
-            window.location.href = 'view-batch.php?id=' + id;
+            window.location.href = '../../api/view-batch.php?id=' + id;
         }
 
         function recordQuality(id) {
-            window.location.href = 'quality-check.php?id=' + id;
+            window.location.href = '../../api/quality-check.php?id=' + id;
         }
 
         function viewProduct(id) {
-            window.location.href = 'view-product.php?id=' + id;
+            window.location.href = '../../api/view-good.php?id=' + id;
         }
 
         function editProduct(id) {
-            window.location.href = 'edit-product.php?id=' + id;
+            window.location.href = '../../api/edit-good.php?id=' + id;
         }
 
         function viewSale(id) {
-            window.location.href = 'view-sale.php?id=' + id;
+            window.location.href = '../../api/view-sale.php?id=' + id;
         }
 
         function printInvoice(id) {
-            window.open('print-invoice.php?id=' + id, '_blank');
+            window.open('../../api/print-invoice.php?id=' + id, '_blank');
         }
 
         function scheduleDelivery(saleId) {
@@ -1627,11 +1627,11 @@ $deliveries = $db->query($deliveries_query);
         }
 
         function viewCustomer(id) {
-            window.location.href = 'view-customer.php?id=' + id;
+            window.location.href = '../../api/view-customer.php?id=' + id;
         }
 
         function editCustomer(id) {
-            window.location.href = 'edit-customer.php?id=' + id;
+            window.location.href = '../../api/edit-customer.php?id=' + id;
         }
 
         function newSale(customerId) {
@@ -1640,15 +1640,15 @@ $deliveries = $db->query($deliveries_query);
         }
 
         function viewMaterial(id) {
-            window.location.href = 'view-material.php?id=' + id;
+            window.location.href = '../../api/view-material.php?id=' + id;
         }
 
         function editMaterial(id) {
-            window.location.href = 'edit-material.php?id=' + id;
+            window.location.href = '../../api/edit-material.php?id=' + id;
         }
 
         function receiveMaterial(id) {
-            window.location.href = 'receive-material.php?id=' + id;
+            window.location.href = '../../api/receive-material.php?id=' + id;
         }
 
         function orderMaterial(id) {
@@ -1656,12 +1656,12 @@ $deliveries = $db->query($deliveries_query);
         }
 
         function viewDelivery(id) {
-            window.location.href = 'view-delivery.php?id=' + id;
+            window.location.href = '../../api/view-delivery.php?id=' + id;
         }
 
         function markDelivered(id) {
             if (confirm('Mark this delivery as delivered?')) {
-                $.post('ajax/mark-delivered.php', {
+                $.post('../../api/mark-delivered.php', {
                     id: id
                 }, function() {
                     location.reload();

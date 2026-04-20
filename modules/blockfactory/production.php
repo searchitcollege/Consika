@@ -670,22 +670,11 @@ $page_title = 'Production';
         });
         
         function viewBatch(id) {
-            window.location.href = 'production-details.php?id=' + id;
+            window.location.href = '../../api/view-batch.php?id=' + id;
         }
         
         function editBatch(id) {
-            $.get('ajax/get-production.php', {id: id}, function(data) {
-                $('#edit_production_id').val(data.production_id);
-                $('#edit_batch_number').val(data.batch_number);
-                $('#edit_product_name').val(data.product_name);
-                $('#edit_production_date').val(data.production_date);
-                $('#edit_shift').val(data.shift);
-                $('#edit_produced_quantity').val(data.produced_quantity);
-                $('#edit_good_quantity').val(data.good_quantity);
-                $('#edit_defective_quantity').val(data.defective_quantity);
-                $('#edit_notes').val(data.notes);
-                $('#editProductionModal').modal('show');
-            }, 'json');
+            window.location.href = '../../api/edit-good.php?id=' + id;            
         }
         
         function deleteBatch(id, batchNumber) {

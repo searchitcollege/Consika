@@ -413,7 +413,7 @@ $page_title = 'Suppliers';
         });
 
         function editSupplier(id) {
-            window.location.href = 'edit-supplier.php?id=' + id;
+            window.location.href = '../../api/edit-supplier.php?id=' + id;
         }
     </script>
 </body>

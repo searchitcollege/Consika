@@ -1034,7 +1034,7 @@ $reports = $reports_stmt->get_result();
                     <h5 class="modal-title">Start New Project</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="process/new-project.php" method="POST">
+                <form action="../../api/new-project.php" method="POST">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -1971,7 +1971,7 @@ $reports = $reports_stmt->get_result();
             $('select[name="po_id"]').change(function() {
                 let poId = $(this).val();
                 if (poId) {
-                    $.get('ajax/get-po-items.php', {
+                    $.get('../../api/get-po-items.php', {
                         po_id: poId
                     }, function(data) {
                         $('#poItemsList').html(data);
@@ -1989,7 +1989,7 @@ $reports = $reports_stmt->get_result();
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            events: 'ajax/get-project-events.php',
+            events: '../../api/get-project-events.php',
             eventClick: function(info) {
                 window.location.href = 'view-project.php?id=' + info.event.id;
             }
@@ -2594,11 +2594,11 @@ $reports = $reports_stmt->get_result();
         }
 
         function viewEmployee(id) {
-            window.location.href = 'view-employee.php?id=' + id;
+            window.location.href = '../../api/view-employee.php?id=' + id;
         }
 
         function editEmployee(id) {
-            window.location.href = 'edit-employee.php?id=' + id;
+            window.location.href = '../../api/edit-employee.php?id=' + id;
         }
 
         function assignToProject(employeeId) {
@@ -2608,15 +2608,15 @@ $reports = $reports_stmt->get_result();
         }
 
         function viewMaterial(id) {
-            window.location.href = 'view-material.php?id=' + id;
+            window.location.href = '../../api/view-product.php?id=' + id;
         }
 
         function editMaterial(id) {
-            window.location.href = 'edit-material.php?id=' + id;
+            window.location.href = '../../api/edit-product.php?id=' + id;
         }
 
         function issueMaterial(id) {
-            window.location.href = 'issue-material.php?id=' + id;
+            window.location.href = '../../api/issue-material.php?id=' + id;
         }
 
         function orderMaterial(id) {

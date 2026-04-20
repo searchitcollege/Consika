@@ -11,9 +11,9 @@ $company_id = $session->getCompanyId();
 $role = $session->getRole();
 
 // Ensure only Estate users can access
-if ($current_user['company_type'] != 'Estate' && $role != 'SuperAdmin') {
+if ($current_user['company_type'] != 'Estate') {
     $_SESSION['error'] = 'Access denied. Estate department only.';
-    header('Location: ../../login.php');
+    header('Location: ../../api/logout.php');
     exit();
 }
 
@@ -158,37 +158,10 @@ $page_title = 'Estate Dashboard';
 <body>
     <div class="container-fluid">
         <div class="row">
-            <!-- Simple Sidebar -->
-            <div class="sidebar col-md-2 bg-dark text-white p-0 vh-100">
-                <div class="p-3">
-                    <h4>Estate Management</h4>
-                    <hr>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a href="dashboard.php" class="nav-link text-white active">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="properties.php" class="nav-link text-white">Properties</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="tenants.php" class="nav-link text-white">Tenants</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="payments.php" class="nav-link text-white">Payments</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="maintenance.php" class="nav-link text-white">Maintenance</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="reports.php" class="nav-link text-white">Reports</a>
-                        </li>
-                        <li class="nav-item mt-5">
-                            <a href="../../api/logout.php" class="nav-link text-white">Logout</a>
-                        </li>
-                    </ul>
-                </div>
+             <!-- Sidebar -->
+            <div class="col-md-2 p-0">
+                <?php include dirname(__DIR__, 2) . '/includes/sidebar.php'; ?>
             </div>
-
             <!-- Main Content -->
             <div class="col-md-10 p-4">
                 <div class="department-header">
@@ -276,8 +249,8 @@ $page_title = 'Estate Dashboard';
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="quick-actions mt-4">
-                    <div class="quick-action-btn" onclick="window.location.href='add-property.php'">
+                <!-- <div class="quick-actions mt-4">
+                    <div class="quick-action-btn" onclick="window.location.href='./prop.php'">
                         <i class="fas fa-plus-circle"></i>
                         <span>Add Property</span>
                     </div>
@@ -293,7 +266,7 @@ $page_title = 'Estate Dashboard';
                         <i class="fas fa-tools"></i>
                         <span>Maintenance Request</span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

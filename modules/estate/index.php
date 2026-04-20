@@ -94,7 +94,7 @@ $stats = $stmt->get_result()->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estate Management - <?php echo APP_NAME; ?></title>
+    <title>Accounts Management - <?php echo APP_NAME; ?></title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -290,7 +290,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                 </button>
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h1 class="h3 mb-2">Estate Management</h1>
+                        <h1 class="h3 mb-2">Accounts Management</h1>
                         <p class="mb-0 opacity-75">Manage properties, tenants, and maintenance requests</p>
                     </div>
                     <div class="col-md-4 text-end">
@@ -386,7 +386,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                     <div class="row">
                         <?php while ($property = $properties->fetch_assoc()): ?>
                             <div class="col-md-4">
-                                <div class="property-card" onclick="window.location.href='property-details.php?id=<?php echo $property['property_id']; ?>'">
+                                <div class="property-card" onclick="window.location.href='../../api/property-details.php?id=<?php echo $property['property_id']; ?>'">
                                     <div class="property-image" style="background-image: url('<?php echo $property['images'] ? '../../uploads/estate/' . $property['images'] : '../../assets/images/default-property.jpg'; ?>')">
                                         <span class="property-status badge bg-<?php
                                                                                 echo $property['status'] == 'Available' ? 'success' : ($property['status'] == 'Occupied' ? 'primary' : ($property['status'] == 'Under Maintenance' ? 'warning' : 'secondary'));
@@ -408,7 +408,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span class="text-primary fw-bold"><?php echo format_money($property['monthly_revenue']); ?>/this Month</span>
                                             <div>
-                                                <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); window.location.href='edit-property.php?id=<?php echo $property['property_id']; ?>'">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); window.location.href='../../api/edit-property.php?id=<?php echo $property['property_id']; ?>'">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                             </div>
@@ -492,10 +492,10 @@ $stats = $stmt->get_result()->fetch_assoc();
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-info" onclick="window.location.href='tenant-details.php?id=<?php echo $tenant['tenant_id']; ?>'">
+                                                    <button class="btn btn-sm btn-info" onclick="window.location.href='../../api/tenant-details.php?id=<?php echo $tenant['tenant_id']; ?>'">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-primary" onclick="window.location.href='edit-tenant.php?id=<?php echo $tenant['tenant_id']; ?>'">
+                                                    <button class="btn btn-sm btn-primary" onclick="window.location.href='../../api/edit-tenant.php?id=<?php echo $tenant['tenant_id']; ?>'">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button class="btn btn-sm btn-success" onclick="recordPayment(<?php echo $tenant['tenant_id']; ?>, '<?php echo $tenant['full_name']; ?>', <?php echo $tenant['monthly_rent']; ?>)">
@@ -565,7 +565,7 @@ $stats = $stmt->get_result()->fetch_assoc();
                                                     <span class="badge bg-success"><?php echo $payment['status']; ?></span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-info" onclick="window.open('receipt.php?id=<?php echo $payment['payment_id']; ?>', '_blank')">
+                                                    <button class="btn btn-sm btn-info" onclick="window.open('../../api/receipt.php?id=<?php echo $payment['payment_id']; ?>', '_blank')">
                                                         <i class="fas fa-print"></i>
                                                     </button>
                                                 </td>

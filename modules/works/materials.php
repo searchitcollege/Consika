@@ -776,7 +776,7 @@ $stats = $stmt->get_result()->fetch_assoc();
             $('select[name="po_id"]').change(function() {
                 let poId = $(this).val();
                 if (poId) {
-                    $.get('ajax/get-po-items.php', {
+                    $.get('../../api/get-po-items.php', {
                         po_id: poId
                     }, function(data) {
                         $('#poItemsList').html(data);

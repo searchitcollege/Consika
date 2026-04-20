@@ -131,5 +131,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Delivery {$delivery_note} scheduled successfully for {$delivery_date}.";
-header('Location: ./index.php');
+header('Location: ../modules/blockfactory/index.php');
 exit();

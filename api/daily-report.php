@@ -2,6 +2,12 @@
 require_once '../includes/config.php';
 require_once '../includes/db_connection.php';
 require_once '../includes/functions.php';
+require_once '../includes/session.php';
+
+$session->requireLogin();
+
+$current_user = currentUser();
+$user_id      = (int)$current_user['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -172,13 +178,18 @@ foreach ($materials as $mat) {
 
     // TODO: Update the daily reports ncolumn materials_used and link to work_projects_materials 
     // usage_id whilst also updating the used_by with user_id
-    $upd_stmt = $db->prepare("
+    // Link usage IDs back to the report
+    if (!empty($usage_ids)) {
+        $usage_json = json_encode($usage_ids);
+        $upd_stmt = $db->prepare("
         UPDATE works_daily_reports
-        SET    materials_used = ?
-        WHERE  report_id      = ?
+        SET materials_used = ?
+        WHERE report_id = ?
     ");
-    $upd_stmt->bind_param('ii', $usage_ids, $report_id);
-    $upd_stmt->execute();
+        $upd_stmt->bind_param("si", $usage_json, $report_id);
+        $upd_stmt->execute();
+        $upd_stmt->close();
+    }
 }
 
 echo json_encode([

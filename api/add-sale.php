@@ -168,7 +168,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to record sale. Please try again.';
-    header('Location: ./index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $stmt->close();
@@ -176,15 +176,15 @@ $stmt->close();
 $id_result = $db->query("SELECT LAST_INSERT_ID() AS new_id");
 $sale_id   = (int)$id_result->fetch_assoc()['new_id'];
 
-// ── Reduce product stock ──────────────────────────────────────────────────────
-$stock_update = $db->prepare("
-    UPDATE blockfactory_products
-    SET current_stock = current_stock - ?
-    WHERE product_id = ?
-");
-$stock_update->bind_param("ii", $quantity, $product_id);
-$stock_update->execute();
-$stock_update->close();
+// // ── Reduce product stock ──────────────────────────────────────────────────────
+// $stock_update = $db->prepare("
+//     UPDATE blockfactory_products
+//     SET current_stock = current_stock - ?
+//     WHERE product_id = ?
+// ");
+// $stock_update->bind_param("ii", $quantity, $product_id);
+// $stock_update->execute();
+// $stock_update->close();
 
 // ── Activity log ─────────────────────────────────────────────────────────────
 $log_desc = "Recorded sale {$invoice_number}: {$quantity} units of {$product['product_name']} to {$customer_name}. Total: {$total_amount}";
@@ -199,5 +199,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Sale {$invoice_number} recorded successfully.";
-header('Location: ./index.php');
+header('Location: ../modules/blockfactory/index.php');
 exit();

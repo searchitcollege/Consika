@@ -11,9 +11,9 @@ $company_id = $session->getCompanyId();
 $role = $session->getRole();
 
 // Ensure only Estate users can access
-if ($current_user['company_type'] != 'Estate' && $role != 'SuperAdmin') {
+if ($current_user['company_type'] != 'Estate') {
     $_SESSION['error'] = 'Access denied. Estate department only.';
-    header('Location: ../../login.php');
+    header('Location: ../../api/logout.php');
     exit();
 }
 
@@ -187,9 +187,9 @@ $page_title = 'Properties';
                         <button id="sidebarToggle" class="btn btn-dark d-md-none m-2 align-self-end">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
+                        <!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
                             <i class="fas fa-plus-circle me-2"></i>Add New Property
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -247,16 +247,16 @@ $page_title = 'Properties';
                                             <button class="btn btn-sm btn-info btn-action" onclick="viewProperty(<?php echo $prop['property_id']; ?>)" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-primary btn-action" onclick="editProperty(<?php echo $prop['property_id']; ?>)" title="Edit">
+                                            <!-- <button class="btn btn-sm btn-primary btn-action" onclick="editProperty(<?php echo $prop['property_id']; ?>)" title="Edit">
                                                 <i class="fas fa-edit"></i>
-                                            </button>
+                                            </button> -->
                                             <button class="btn btn-sm btn-success btn-action" onclick="viewTenants(<?php echo $prop['property_id']; ?>)" title="Tenants">
                                                 <i class="fas fa-users"></i>
                                             </button>
                                             <?php if ($prop['active_tenants'] == 0): ?>
-                                            <button class="btn btn-sm btn-danger btn-action" onclick="deleteProperty(<?php echo $prop['property_id']; ?>, '<?php echo $prop['property_name']; ?>')" title="Delete">
+                                            <!-- <button class="btn btn-sm btn-danger btn-action" onclick="deleteProperty(<?php echo $prop['property_id']; ?>, '<?php echo $prop['property_name']; ?>')" title="Delete">
                                                 <i class="fas fa-trash"></i>
-                                            </button>
+                                            </button> -->
                                             <?php endif; ?>
                                         </td>
                                     </tr>
@@ -464,7 +464,7 @@ $page_title = 'Properties';
         });
         
         function viewProperty(id) {
-            window.location.href = 'property-details.php?id=' + id;
+            window.location.href = '../../api/property-details.php?id=' + id;
         }
         
         function editProperty(id) {

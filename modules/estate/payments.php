@@ -11,9 +11,9 @@ $company_id = $session->getCompanyId();
 $role = $session->getRole();
 
 // Ensure only Estate users can access
-if ($current_user['company_type'] != 'Estate' && $role != 'SuperAdmin') {
+if ($current_user['company_type'] != 'Estate') {
     $_SESSION['error'] = 'Access denied. Estate department only.';
-    header('Location: ../../login.php');
+    header('Location: ../../api/logout.php');
     exit();
 }
 
@@ -213,9 +213,9 @@ $page_title = 'Payments';
                         <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                        <!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
                             <i class="fas fa-plus-circle me-2"></i>Record New Payment
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -545,7 +545,7 @@ $page_title = 'Payments';
         });
         
         function printReceipt(id) {
-            window.open('print-receipt.php?id=' + id, '_blank', 'width=800,height=600');
+            window.open('../../api/receipt.php?id=' + id, '_blank', 'width=800,height=600');
         }
         
         function deletePayment(id, receipt) {
