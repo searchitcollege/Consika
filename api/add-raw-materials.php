@@ -79,11 +79,11 @@ $stmt = $db->prepare("
     INSERT INTO blockfactory_raw_materials
         (material_code, material_name, material_type, supplier, unit,
          stock_quantity, minimum_stock, maximum_stock, reorder_level,
-         unit_cost, status)
+         unit_cost, status, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?,
-         ?, ?)
+         ?, ?, 'Pending')
 ");
 $stmt->bind_param(
     "sssssddddds",

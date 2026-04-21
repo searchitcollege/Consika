@@ -59,7 +59,7 @@ if (!$mat) { header('Location: index.php'); exit(); }
         <?php include '../includes/top-nav.php'; ?>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4>Edit Material — <?php echo htmlspecialchars($mat['product_name']); ?></h4>
-            <a href="view-material.php?id=<?php echo $product_id; ?>" class="btn btn-secondary btn-sm">
+            <a href="view-product.php?id=<?php echo $product_id; ?>" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i>Back
             </a>
         </div>

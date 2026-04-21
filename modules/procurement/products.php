@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $image_path = $db->escapeString($_POST['image_path']);
                 $status = $db->escapeString($_POST['status']);
                 $sql = "INSERT INTO procurement_products 
-                        (product_code, product_name, category, sub_category, description, unit, minimum_stock, maximum_stock, current_stock, reorder_level, unit_price, selling_price, tax_rate, location, barcode, image_path, status)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        (product_code, product_name, category, sub_category, description, unit, minimum_stock, maximum_stock, current_stock, reorder_level, unit_price, selling_price, tax_rate, location, barcode, image_path, status, admin_approvals)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param(
                     "ssssssiiiidddssss",

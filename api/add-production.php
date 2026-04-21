@@ -99,13 +99,13 @@ $stmt = $db->prepare("
          machine_used, planned_quantity, produced_quantity, good_quantity,
          defective_quantity, defect_rate,
          cement_used, sand_used, aggregate_used, water_used,
-         notes, created_by)
+         notes, created_by, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?,
          ?, ?,
          ?, ?, ?, ?,
-         ?, ?)
+         ?, ?, 'Pending')
 ");
 $stmt->bind_param(
     "sissssiiiidddddss",

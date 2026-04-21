@@ -24,7 +24,7 @@ define('DB_NAME', 'group_companies_db');
 // ============================================
 define('APP_NAME', 'Consika Companies Management System');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost:8000');
+define('APP_URL', 'http://192.168.100.111:8000');
 define('APP_ROOT', dirname(dirname(__FILE__)));
 
 // ============================================
@@ -42,7 +42,7 @@ date_default_timezone_set('Africa/Accra'); // Changed from Nairobi to Accra
 // ============================================
 // ERROR REPORTING
 // ============================================
-if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1') {
+if ($_SERVER['SERVER_NAME'] == '192.168.100.111' || $_SERVER['SERVER_ADDR'] == '192.168.100.111') {
     // Development
     error_reporting(E_ALL);
     ini_set('display_errors', 1);

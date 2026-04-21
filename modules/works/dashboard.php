@@ -117,15 +117,8 @@ $page_title = 'Works Dashboard';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="../../assets/css/style.css" rel="stylesheet">
+    <link href="../../assets/css/works/style.css" rel="stylesheet">
     <style>
-        .department-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(247, 37, 133, 0.3);
-        }
 
         .stat-card {
             background: white;
@@ -280,60 +273,7 @@ $page_title = 'Works Dashboard';
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar -->
-            <div class="col-auto">
-                <div class="sidebar p-3">
-                    <div class="text-center mb-4">
-                        <h4>Works & Construction</h4>
-                        <p class="small text-muted">Project Management</p>
-                    </div>
-
-                    <div class="user-info text-center mb-4 p-3 bg-white bg-opacity-10 rounded">
-                        <div class="avatar mx-auto mb-2" style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                            <?php echo getAvatarLetter($current_user['full_name']); ?>
-                        </div>
-                        <strong><?php echo htmlspecialchars($current_user['full_name']); ?></strong>
-                        <p class="small text-muted"><?php echo $current_user['company_name'] ?? 'Works Dept'; ?></p>
-                    </div>
-
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a href="dashboard.php" class="nav-link active">
-                                <i class="fas fa-home me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="projects.php" class="nav-link">
-                                <i class="fas fa-hard-hat me-2"></i>Projects
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="employees.php" class="nav-link">
-                                <i class="fas fa-users me-2"></i>Employees
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="materials.php" class="nav-link">
-                                <i class="fas fa-box me-2"></i>Materials
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="daily-reports.php" class="nav-link">
-                                <i class="fas fa-clipboard-list me-2"></i>Daily Reports
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="reports.php" class="nav-link">
-                                <i class="fas fa-chart-bar me-2"></i>Reports
-                            </a>
-                        </li>
-                        <li class="nav-item mt-5">
-                            <a href="../../api/logout.php" class="nav-link text-danger">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <?php include '../../includes/sidebar.php'; ?>
 
             <!-- Main Content -->
             <div class="col">

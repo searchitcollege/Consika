@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $priority = $db->escapeString($_POST['priority']);
                 $description = $db->escapeString($_POST['description']);
                 
-                $sql = "INSERT INTO estate_maintenance (property_id, tenant_id, issue_category, priority, description, status, created_by) 
-                        VALUES (?, ?, ?, ?, ?, 'Pending', ?)";
+                $sql = "INSERT INTO estate_maintenance (property_id, tenant_id, issue_category, priority, description, status, created_by, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, 'Pending', ?, 'Pending')";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("iisssi", $property_id, $tenant_id, $category, $priority, $description, $current_user['user_id']);
                 
@@ -147,7 +147,7 @@ $stmt->execute();
 $stats = $stmt->get_result()->fetch_assoc();
 
 // Get properties for dropdown
-$properties = $db->query("SELECT property_id, property_name FROM estate_properties WHERE company_id = $company_id ORDER BY property_name");
+$properties = $db->query("SELECT property_id, property_name FROM estate_properties ORDER BY property_name");
 
 $page_title = 'Maintenance';
 ?>

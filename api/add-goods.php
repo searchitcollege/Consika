@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('blockfactory', 'create')) {
     $_SESSION['error'] = 'You do not have permission to add products.';
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
@@ -46,13 +46,13 @@ $allowed_types = ['Solid Block', 'Hollow Block', 'Interlocking Block', 'Paving B
 if (empty($product_code) || empty($product_name) || empty($product_type) ||
     empty($dimensions) || $price_per_unit <= 0) {
     $_SESSION['error'] = 'Product code, name, type, dimensions, and price are required.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
 if (!in_array($product_type, $allowed_types)) {
     $_SESSION['error'] = 'Invalid product type selected.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
@@ -63,7 +63,7 @@ $dup->execute();
 $dup->store_result();
 if ($dup->num_rows > 0) {
     $_SESSION['error'] = "Product code '{$product_code}' already exists.";
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $dup->close();
@@ -98,7 +98,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to add product. Please try again.';
-    header('Location: ./index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $stmt->close();
@@ -119,5 +119,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Product '{$product_name}' added successfully.";
-header('Location: ./index.php');
+header('Location: ../modules/blockfactory/index.php');
 exit();

@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $receipt_no = 'RCT-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
                 
                 $sql = "INSERT INTO estate_payments (tenant_id, property_id, amount, payment_date, payment_method, 
-                        transaction_reference, payment_period_start, payment_period_end, notes, receipt_number, recorded_by) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        transaction_reference, payment_period_start, payment_period_end, notes, receipt_number, recorded_by, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("iidsssssssi", $tenant_id, $property_id, $amount, $payment_date, $payment_method,
                                  $transaction_ref, $period_start, $period_end, $notes, $receipt_no, $current_user['user_id']);

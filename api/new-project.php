@@ -69,14 +69,14 @@ $stmt = $db->prepare("
     INSERT INTO works_projects
         (company_id, project_code, project_name, project_type, client_name,
          location, start_date, end_date, budget, contingency, total_budget,
-         description, project_manager, status, progress_percentage, actual_cost, created_by)
+         description, project_manager, status, progress_percentage, actual_cost, created_by, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?, ?,
-         ?, ?, 'Planning', 0.00, 0.00, ?)
+         ?, ?, 'Planning', 0.00, 0.00, ?, 'Pending')
 ");
 $stmt->bind_param(
-    "isssssssdddssii",
+    "isssssssdddssi",
     $company_id, $project_code, $project_name, $project_type, $client_name,
     $location, $start_date, $end_date, $budget, $contingency, $total_budget,
     $description, $project_manager, $created_by

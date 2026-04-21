@@ -135,13 +135,13 @@ $stmt = $db->prepare("
          sale_date, product_id, quantity, unit_price, discount,
          subtotal, total_amount, amount_paid, balance,
          payment_method, payment_status, delivery_status,
-         delivery_address, notes, sales_person)
+         delivery_address, notes, sales_person, admin_approvals)
     VALUES
         (?, ?, ?, ?,
          ?, ?, ?, ?, ?,
          ?, ?, ?, ?,
          ?, ?, ?,
-         ?, ?, ?)
+         ?, ?, ?, 'Pending')
 ");
 $stmt->bind_param(
     "sisssiiddddddsssssi",

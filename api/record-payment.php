@@ -49,25 +49,25 @@ $allowed_methods = ['Cash', 'Bank Transfer', 'Cheque', 'Mobile Money', 'Credit C
 if (!$tenant_id || !$property_id || empty($payment_date) || $amount <= 0 ||
     empty($payment_method) || empty($period_start) || empty($period_end)) {
     $_SESSION['error'] = 'Please fill in all required payment fields.';
-    header('Location: ../admin/dashboard.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if (!in_array($payment_method, $allowed_methods)) {
     $_SESSION['error'] = 'Invalid payment method selected.';
-    header('Location: ../admin/dashboard.php');
+    header('Location../modules/estate/index.php');
     exit();
 }
 
 if (!strtotime($payment_date)) {
     $_SESSION['error'] = 'Invalid payment date.';
-    header('Location: ../admin/dashboard.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if (!strtotime($period_start) || !strtotime($period_end) || strtotime($period_end) < strtotime($period_start)) {
     $_SESSION['error'] = 'Invalid payment period dates.';
-    header('Location: ../admin/dashboard.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -88,7 +88,7 @@ $owner_check->close();
 
 if (!$tenant_data) {
     $_SESSION['error'] = 'Invalid tenant or property selection.';
-    header('Location: ../admin/dashboard.php');
+    header('Location:../modules/estate/index.php');
     exit();
 }
 
@@ -130,13 +130,13 @@ $stmt = $db->prepare("
          payment_method, transaction_reference,
          payment_period_start, payment_period_end,
          late_fee, total_amount, receipt_number,
-         notes, recorded_by, status)
+         notes, recorded_by, status, admin_approvals)
     VALUES
         (?, ?, ?, ?,
          ?, ?,
          ?, ?,
          ?, ?, ?,
-         ?, ?, ?)
+         ?, ?, ?, 'Pending')
 ");
 
 $stmt->bind_param(
@@ -159,7 +159,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to record payment. Please try again.';
-    header('Location: ../admin/dashboard.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -183,5 +183,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Payment recorded successfully. Receipt No: {$receipt_number}";
-header('Location: ../admin/dashboard.php');
+header('Location: ../modules/estate/index.php');
 exit();

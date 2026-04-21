@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('works', 'create')) {
     $_SESSION['error'] = 'You do not have permission to add employees.';
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 
@@ -44,25 +44,25 @@ $allowed_contracts = ['Permanent', 'Contract', 'Temporary', 'Casual'];
 if (empty($employee_code) || empty($full_name) || empty($phone) ||
     empty($position) || empty($hire_date)) {
     $_SESSION['error'] = 'Employee code, name, phone, position, and hire date are required.';
-    header('Location: ../index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 
 if (!in_array($contract_type, $allowed_contracts)) {
     $_SESSION['error'] = 'Invalid contract type selected.';
-    header('Location: ../index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 
 if (!strtotime($hire_date)) {
     $_SESSION['error'] = 'Invalid hire date.';
-    header('Location: ../index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 
 if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['error'] = 'Invalid email address.';
-    header('Location: ../index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 
@@ -74,7 +74,7 @@ $dup->store_result();
 
 if ($dup->num_rows > 0) {
     $_SESSION['error'] = "Employee code '{$employee_code}' already exists.";
-    header('Location: ../index.php');
+    header('Location: .../modules/works/index.php');
     exit();
 }
 $dup->close();
@@ -86,13 +86,13 @@ $stmt = $db->prepare("
          email, address, position, department, specialization,
          qualification, hire_date, contract_type,
          hourly_rate, daily_rate, monthly_salary,
-         emergency_contact, emergency_phone, status)
+         emergency_contact, emergency_phone, status, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?,
          ?, ?, ?,
          ?, ?, ?,
-         ?, ?, 'Active')
+         ?, ?, 'Active', 'Pending')
 ");
 
 $stmt->bind_param(
@@ -119,7 +119,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to add employee. Please try again.';
-    header('Location: ./index.php');
+    header('Location: ../modules/works/index.php');
     exit();
 }
 $stmt->close();
@@ -141,5 +141,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Employee '{$full_name}' ({$employee_code}) added successfully.";
-header('Location: ./index.php');
+header('Location: ../modules/works/index.php');
 exit();

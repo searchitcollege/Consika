@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE customer_id = ?
     ");
     $stmt->bind_param(
-        "ssssssssdss i",
+        "ssssssssdssi",
         $customer_name, $contact_person, $phone, $email,
         $address, $city, $customer_type, $tax_number,
         $credit_limit, $status, $notes,

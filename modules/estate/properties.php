@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $description = $db->escapeString($_POST['description']);
                 
                 $sql = "INSERT INTO estate_properties (company_id, property_code, property_name, property_type, 
-                        address, city, total_area, units, purchase_price, current_value, status, description, created_by) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        address, city, total_area, units, purchase_price, current_value, status, description, created_by, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("issssssiddssi", $company_id, $property_code, $property_name, $property_type, 
                                  $address, $city, $total_area, $units, $purchase_price, $current_value, $status, $description, $current_user['user_id']);

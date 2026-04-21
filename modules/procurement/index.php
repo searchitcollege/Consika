@@ -15,6 +15,14 @@ if (!hasPermission('procurement', 'view')) {
 
 $current_user = currentUser();
 $company_id = $session->getCompanyId();
+$role = $_SESSION['role'] ?? '';
+
+
+if ($role !== 'SuperAdmin') {
+    // $_SESSION['error'] = 'You do not have permission to create projects.';
+    header('Location: ./dashboard.php');
+    exit();
+}
 
 global $db;
 
@@ -124,8 +132,8 @@ if (
     $stmt = $db->prepare("
         INSERT INTO procurement_purchase_orders
             (po_number, supplier_id, order_date, expected_delivery, notes,
-             delivery_status, payment_status, total_amount, approval_status, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             delivery_status, payment_status, total_amount, approval_status, created_by, admin_approvals)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
     ");
     $stmt->bind_param(
         "sisssssdsi",
@@ -239,8 +247,8 @@ if (
     $stmt = $db->prepare("
         INSERT INTO procurement_suppliers
             (company_id, supplier_code, supplier_name, contact_person, phone,
-             email, website, address, category, tax_number, payment_terms, credit_limit, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             email, website, address, category, tax_number, payment_terms, credit_limit, created_by, admin_approvals)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
     ");
     $stmt->bind_param(
         "issssssssssdi",
@@ -338,8 +346,8 @@ if (
                 INSERT INTO procurement_products
                     (product_code, product_name, category, sub_category, description, unit,
                      minimum_stock, maximum_stock, current_stock, reorder_level,
-                     unit_price, selling_price, tax_rate, location, barcode, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     unit_price, selling_price, tax_rate, location, barcode, status, admin_approvals)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
             ");
             $stmt->bind_param(
                 "ssssssiiiidddsss",
@@ -656,9 +664,9 @@ $pending_deliveries = $stmt->get_result();
 
             <!-- Module Header -->
             <div class="module-header">
-                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                <!-- <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                     <i class="fas fa-bars"></i>
-                </button>
+                </button> -->
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Procurement Management</h1>
@@ -689,11 +697,11 @@ $pending_deliveries = $stmt->get_result();
                     <i class="fas fa-box"></i>
                     <span>Add Product</span>
                 </div>
-                <div class="quick-action-btn" onclick="window.location.href='inventory-check.php'">
+                <div class="quick-action-btn" onclick="window.location.href='../../api/inventory-check.php'">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Inventory Check</span>
                 </div>
-                <div class="quick-action-btn" onclick="window.location.href='supplier-performance.php'">
+                <div class="quick-action-btn" onclick="window.location.href='../../api/supplier-performance.php'">
                     <i class="fas fa-chart-line"></i>
                     <span>Supplier Performance</span>
                 </div>
@@ -960,11 +968,11 @@ $pending_deliveries = $stmt->get_result();
                                                     <button class="btn btn-sm btn-info" onclick="viewPO(<?php echo $po['po_id']; ?>)">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <?php if ($po['delivery_status'] != 'Completed'): ?>
+                                                    <!-- <?php if ($po['delivery_status'] != 'Completed'): ?>
                                                         <button class="btn btn-sm btn-success" onclick="receivePO(<?php echo $po['po_id']; ?>)">
                                                             <i class="fas fa-truck-loading"></i>
                                                         </button>
-                                                    <?php endif; ?>
+                                                    <?php endif; ?> -->
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
@@ -1703,6 +1711,10 @@ $pending_deliveries = $stmt->get_result();
 
         function viewPO(id) {
             window.location.href = '../../api/view-po.php?id=' + id;
+        }
+
+        function receivePO(id) {
+            window.location.href = '../../api/receive-po.php?id=' + id;
         }
     </script>
 </body>

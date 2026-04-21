@@ -11,7 +11,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="sidebar-header">
         <h3 style="color: #fff;"><?php echo defined('APP_NAME') ? APP_NAME : 'Company Management'; ?></h3>
         <p>
-            <?php 
+            <?php
             if ($role == 'SuperAdmin') {
                 echo 'Administrator';
             } else {
@@ -20,7 +20,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             ?>
         </p>
     </div>
-    
+
     <div class="user-info">
         <div class="avatar">
             <?php echo getAvatarLetter($current_user['full_name'] ?? 'User'); ?>
@@ -28,11 +28,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="user-details">
             <strong><?php echo htmlspecialchars($current_user['full_name'] ?? 'User'); ?></strong>
             <div class="user-role">
-                <span class="badge bg-<?php 
-                    echo $role == 'SuperAdmin' ? 'danger' : 
-                        ($role == 'CompanyAdmin' ? 'warning' : 
-                        ($role == 'Manager' ? 'info' : 'secondary')); 
-                ?>">
+                <span class="badge bg-<?php
+                                        echo $role == 'SuperAdmin' ? 'danger' : ($role == 'CompanyAdmin' ? 'warning' : ($role == 'Manager' ? 'info' : 'secondary'));
+                                        ?>">
                     <?php echo $role ?? 'Staff'; ?>
                 </span>
             </div>
@@ -41,7 +39,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <?php endif; ?>
         </div>
     </div>
-    
+
     <ul class="nav-menu">
         <?php if ($role == 'SuperAdmin'): ?>
             <!-- Admin Dashboard -->
@@ -64,7 +62,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
             <li class="nav-divider"></li>
-            
+
             <!-- Department Links for Admin -->
             <li class="nav-item">
                 <a href="<?php echo baseUrl('modules/estate/index.php'); ?>" class="nav-link">
@@ -90,7 +88,42 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span>Block Factory</span>
                 </a>
             </li>
-        
+            <li class="nav-item">
+                <a href="<?php echo baseUrl('admin/approvals.php'); ?>" class="nav-link <?php echo $current_page == 'approvals.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Approvals
+                    <?php
+                    // Live pending count badge
+                    global $db;
+                    $pending_count = 0;
+                    $tables_check = [
+                        'estate_properties',
+                        'estate_tenants',
+                        'estate_payments',
+                        'estate_maintenance',
+                        'procurement_suppliers',
+                        'procurement_products',
+                        'procurement_purchase_orders',
+                        'works_projects',
+                        'works_employees',
+                        'works_daily_reports',
+                        'blockfactory_production',
+                        'blockfactory_sales',
+                        'blockfactory_customers',
+                        'blockfactory_deliveries',
+                        'blockfactory_raw_materials'
+                    ];
+                    foreach ($tables_check as $tbl) {
+                        $r = $db->query("SELECT COUNT(*) as c FROM `{$tbl}` WHERE admin_approvals = 'Pending'");
+                        if ($r) $pending_count += (int)$r->fetch_assoc()['c'];
+                    }
+                    if ($pending_count > 0):
+                    ?>
+                        <span class="badge bg-warning text-dark ms-auto"><?php echo $pending_count; ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+
         <?php else: ?>
             <!-- Department-Specific Links -->
             <?php if ($company_type == 'Estate'): ?>
@@ -124,7 +157,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span>Maintenance</span>
                     </a>
                 </li>
-            
+
             <?php elseif ($company_type == 'Procurement'): ?>
                 <li class="nav-item">
                     <a href="<?php echo baseUrl('modules/procurement/dashboard.php'); ?>" class="nav-link <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
@@ -156,7 +189,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span>Approvals</span>
                     </a>
                 </li>
-            
+
             <?php elseif ($company_type == 'Works'): ?>
                 <li class="nav-item">
                     <a href="<?php echo baseUrl('modules/works/dashboard.php'); ?>" class="nav-link <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
@@ -188,7 +221,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span>Daily Reports</span>
                     </a>
                 </li>
-            
+
             <?php elseif ($company_type == 'Block Factory'): ?>
                 <li class="nav-item">
                     <a href="<?php echo baseUrl('modules/blockfactory/dashboard.php'); ?>" class="nav-link <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
@@ -227,7 +260,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
             <?php endif; ?>
-            
+
             <!-- Common Links for All Departments -->
             <li class="nav-divider"></li>
             <li class="nav-item">
@@ -237,7 +270,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
         <?php endif; ?>
-        
+
         <li class="nav-divider"></li>
         <li class="nav-item">
             <a href="<?php echo baseUrl('api/logout.php'); ?>" class="nav-link text-danger">
@@ -249,120 +282,133 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </div>
 
 <style>
-.sidebar {
-    width: 280px;
-    background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-    color: white;
-    height: 100vh;
-    position: fixed;
-    overflow-y: auto;
-    transition: all 0.3s;
-    z-index: 1000;
-}
-
-.sidebar .sidebar-header {
-    padding: 25px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.sidebar .sidebar-header h3 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.sidebar .sidebar-header p {
-    margin: 5px 0 0;
-    font-size: 13px;
-    opacity: 0.7;
-}
-
-.sidebar .user-info {
-    padding: 20px;
-    background: rgba(255,255,255,0.05);
-    margin: 10px;
-    border-radius: 10px;
-}
-
-.sidebar .user-info .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.sidebar .nav-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidebar .nav-item {
-    margin: 5px 10px;
-}
-
-.sidebar .nav-link {
-    display: flex;
-    align-items: center;
-    padding: 12px 15px;
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    border-radius: 8px;
-    transition: all 0.3s;
-    gap: 12px;
-}
-
-.sidebar .nav-link i {
-    width: 20px;
-    font-size: 16px;
-}
-
-.sidebar .nav-link:hover {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    padding-left: 20px;
-}
-
-.sidebar .nav-link.active {
-    background: #4361ee;
-    color: white;
-}
-
-.sidebar .nav-link.text-danger:hover {
-    background: #dc3545;
-    color: white !important;
-}
-
-.sidebar .nav-divider {
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 15px 10px;
-}
-
-.badge {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.badge.bg-danger { background: #dc3545; }
-.badge.bg-warning { background: #ffc107; color: #000; }
-.badge.bg-info { background: #17a2b8; }
-.badge.bg-secondary { background: #6c757d; }
-
-@media (max-width: 768px) {
     .sidebar {
-        left: -280px;
+        width: 280px;
+        background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+        color: white;
+        height: 100vh;
+        position: fixed;
+        overflow-y: auto;
+        transition: all 0.3s;
+        z-index: 1000;
     }
-    .sidebar.active {
-        left: 0;
+
+    .sidebar .sidebar-header {
+        padding: 25px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-}
+
+    .sidebar .sidebar-header h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .sidebar .sidebar-header p {
+        margin: 5px 0 0;
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+    .sidebar .user-info {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .sidebar .user-info .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .sidebar .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar .nav-item {
+        margin: 5px 10px;
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+        gap: 12px;
+    }
+
+    .sidebar .nav-link i {
+        width: 20px;
+        font-size: 16px;
+    }
+
+    .sidebar .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding-left: 20px;
+    }
+
+    .sidebar .nav-link.active {
+        background: #4361ee;
+        color: white;
+    }
+
+    .sidebar .nav-link.text-danger:hover {
+        background: #dc3545;
+        color: white !important;
+    }
+
+    .sidebar .nav-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 15px 10px;
+    }
+
+    .badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .badge.bg-danger {
+        background: #dc3545;
+    }
+
+    .badge.bg-warning {
+        background: #ffc107;
+        color: #000;
+    }
+
+    .badge.bg-info {
+        background: #17a2b8;
+    }
+
+    .badge.bg-secondary {
+        background: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            left: -280px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+    }
 </style>

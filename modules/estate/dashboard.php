@@ -156,100 +156,105 @@ $page_title = 'Estate Dashboard';
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row">
-             <!-- Sidebar -->
-            <div class="col-md-2 p-0">
-                <?php include dirname(__DIR__, 2) . '/includes/sidebar.php'; ?>
-            </div>
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <?php include dirname(__DIR__, 2) . '/includes/sidebar.php'; ?>
             <!-- Main Content -->
-            <div class="col-md-10 p-4">
-                <div class="department-header">
-                    <h2>Estate Dashboard</h2>
-                    <p>Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
-                    <button id="sidebarToggle" class="btn btn-dark d-md-none m-2 ">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
+            <div class="col p-4">
+                <div class="main-content">
+                    <div class="department-header justify-content-between">
+                        <div>
+                            <h2>Estate Dashboard</h2>
+                            <p class='text-white'>Welcome back, <?php echo htmlspecialchars($current_user['full_name']); ?>!</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-dark p-2">
+                                <i class="far fa-calendar me-2"></i>April 20, 2026 </span>
+                            <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                                <i class="fas fa-bars"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                <!-- Stats Row -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <h3><?php echo $stats['total_properties']; ?></h3>
-                            <p>Total Properties</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #4cc9f0, #4895ef);">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h3><?php echo $stats['active_tenants']; ?></h3>
-                            <p>Active Tenants</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #f8961e, #f3722c);">
-                                <i class="fas fa-tools"></i>
-                            </div>
-                            <h3><?php echo $stats['pending_maintenance']; ?></h3>
-                            <p>Pending Maintenance</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-card">
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #f72585, #b5179e);">
-                                <i class="fas fa-money-bill"></i>
-                            </div>
-                            <h3><?php echo formatMoney($stats['monthly_rent']); ?></h3>
-                            <p>Monthly Rent</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Second Stats Row -->
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Occupancy Rate</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="progress" style="height: 30px;">
-                                    <div class="progress-bar bg-success" style="width: <?php echo $stats['occupancy_rate']; ?>%;">
-                                        <?php echo $stats['occupancy_rate']; ?>%
-                                    </div>
+                    <!-- Stats Row -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-building"></i>
                                 </div>
-                                <p class="mt-2"><?php echo $occupied_units; ?> out of <?php echo $total_units; ?> units occupied</p>
+                                <h3><?php echo $stats['total_properties']; ?></h3>
+                                <p>Total Properties</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #4cc9f0, #4895ef);">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h3><?php echo $stats['active_tenants']; ?></h3>
+                                <p>Active Tenants</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f8961e, #f3722c);">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <h3><?php echo $stats['pending_maintenance']; ?></h3>
+                                <p>Pending Maintenance</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f72585, #b5179e);">
+                                    <i class="fas fa-money-bill"></i>
+                                </div>
+                                <h3><?php echo formatMoney($stats['monthly_rent']); ?></h3>
+                                <p>Monthly Rent</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Recent Activities</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <?php foreach ($recent_activities as $activity): ?>
-                                        <li class="mb-2">
-                                            <small class="text-muted"><?php echo timeAgo($activity['created_at']); ?></small>
-                                            <p class="mb-0"><?php echo htmlspecialchars($activity['description']); ?></p>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Quick Actions -->
-                <!-- <div class="quick-actions mt-4">
+                    <!-- Second Stats Row -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Occupancy Rate</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress" style="height: 30px;">
+                                        <div class="progress-bar bg-success" style="width: <?php echo $stats['occupancy_rate']; ?>%;">
+                                            <?php echo $stats['occupancy_rate']; ?>%
+                                        </div>
+                                    </div>
+                                    <p class="mt-2"><?php echo $occupied_units; ?> out of <?php echo $total_units; ?> units occupied</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Recent Activities</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <?php foreach ($recent_activities as $activity): ?>
+                                            <li class="mb-2">
+                                                <small class="text-muted"><?php echo timeAgo($activity['created_at']); ?></small>
+                                                <p class="mb-0"><?php echo htmlspecialchars($activity['description']); ?></p>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <!-- <div class="quick-actions mt-4">
                     <div class="quick-action-btn" onclick="window.location.href='./prop.php'">
                         <i class="fas fa-plus-circle"></i>
                         <span>Add Property</span>
@@ -267,6 +272,7 @@ $page_title = 'Estate Dashboard';
                         <span>Maintenance Request</span>
                     </div>
                 </div> -->
+                </div>
             </div>
         </div>
     </div>

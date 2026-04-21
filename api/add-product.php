@@ -83,8 +83,8 @@ if (
                 INSERT INTO procurement_products
                     (product_code, product_name, category, sub_category, description, unit,
                      minimum_stock, maximum_stock, current_stock, reorder_level,
-                     unit_price, selling_price, tax_rate, location, barcode, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     unit_price, selling_price, tax_rate, location, barcode, status, admin_approvals)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')
             ");
             $stmt->bind_param(
                 "ssssssiiiidddsss",

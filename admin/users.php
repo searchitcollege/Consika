@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     ");
                     $stmt->bind_param(
-                        "ssssssiss",
+                        "ssssssis",
                         $username,
                         $password,
                         $email,
@@ -441,7 +441,7 @@ $page_title = 'User Management';
             <?php include dirname(__DIR__) . '/includes/top-nav.php'; ?>
 
             <!-- Page Header -->
-            <div class="page-header d-flex justify-content-between align-items-center">
+            <div class=" d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h4 class="mb-1">User Management</h4>
                     <p class="text-muted mb-0">Manage system users and their permissions</p>

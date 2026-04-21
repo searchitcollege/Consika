@@ -26,7 +26,7 @@ if (!hasPermission('works', 'view')) { header('Location: index.php'); exit(); }
                 <i class="fas fa-camera fa-4x text-muted mb-4 d-block opacity-50"></i>
                 <h5 class="text-muted">Site Visits Coming Soon</h5>
                 <p class="text-muted">This section will allow you to log and manage site visit reports with photo evidence.</p>
-                <a href="index.php" class="btn btn-primary mt-2">
+                <a href="../modules/works/index.php" class="btn btn-primary mt-2">
                     <i class="fas fa-arrow-left me-1"></i>Return to Works
                 </a>
             </div>

@@ -64,8 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $delivery_note = 'DN-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
                         
                         $sql = "INSERT INTO blockfactory_deliveries (delivery_note, sale_id, delivery_date, vehicle_number, 
-                                driver_name, driver_phone, quantity, destination, delivery_charges, notes, status, created_by) 
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Scheduled', ?)";
+                                driver_name, driver_phone, quantity, destination, delivery_charges, notes, status, created_by, admin_approvals) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Scheduled', ?, 'Pending')";
                         $stmt = $db->prepare($sql);
                         $stmt->bind_param("sisssssdssi", $delivery_note, $sale_id, $delivery_date, $vehicle_number,
                                          $driver_name, $driver_phone, $quantity, $destination, $delivery_charges,

@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $notes = $db->escapeString($_POST['notes']);
                 
                 $sql = "INSERT INTO blockfactory_raw_materials (material_code, material_name, material_type, supplier, 
-                        unit, stock_quantity, minimum_stock, maximum_stock, reorder_level, unit_cost, location, notes, status) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Available')";
+                        unit, stock_quantity, minimum_stock, maximum_stock, reorder_level, unit_cost, location, notes, status, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Available', 'Pending)";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("sssssddddsss", $material_code, $material_name, $material_type, $supplier,
                                  $unit, $stock_quantity, $minimum_stock, $maximum_stock, $reorder_level,
@@ -538,89 +538,102 @@ $page_title = 'Raw Materials';
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Raw Material</h5>
+                    <h5 class="modal-title">Add New Material</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form method="POST">
+                <form id="addProductForm" action="../../api/add-product.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="form" value="product">
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Material Code</label>
-                                <input type="text" class="form-control" name="material_code" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Material Name</label>
-                                <input type="text" class="form-control" name="material_name" required>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Material Code</label>
+                            <input id="product_code" type="text" class="form-control" name="product_code" required>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label class="form-label">Material Name</label>
+                            <input id="product_name" type="text" class="form-control" name="product_name" required>
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Material Type</label>
-                                <select class="form-control" name="material_type" required>
-                                    <option value="Cement">Cement</option>
-                                    <option value="Sand">Sand</option>
-                                    <option value="Aggregate">Aggregate</option>
-                                    <option value="Water">Water</option>
-                                    <option value="Additive">Additive</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <input id="category" type="text" class="form-control" name="category">
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Supplier</label>
-                                <input type="text" class="form-control" name="supplier">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Sub-Category</label>
+                                <input id="sub_category" type="text" class="form-control" name="sub_category">
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit</label>
-                                <select class="form-control" name="unit" required>
+                                <select id="unit" class="form-control" name="unit" required>
+                                    <option value="pcs">Pieces (pcs)</option>
                                     <option value="kg">Kilograms (kg)</option>
-                                    <option value="bags">Bags</option>
-                                    <option value="tons">Tons</option>
                                     <option value="liters">Liters</option>
-                                    <option value="pieces">Pieces</option>
+                                    <option value="meters">Meters</option>
+                                    <option value="boxes">Boxes</option>
+                                    <option value="bags">Bags</option>
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Initial Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="stock_quantity" value="0">
+                                <label class="form-label">Min Stock</label>
+                                <input id="minimum_stock" type="number" class="form-control" name="minimum_stock" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Minimum Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="minimum_stock" value="0">
+                                <label class="form-label">Max Stock</label>
+                                <input id="maximum_stock" type="number" class="form-control" name="maximum_stock" value="1000">
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Maximum Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="maximum_stock" value="10000">
-                            </div>
-                        </div>
-                        
-                        <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Reorder Level</label>
-                                <input type="number" step="0.01" class="form-control" name="reorder_level" value="100">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Unit Cost</label>
-                                <input type="number" step="0.01" class="form-control" name="unit_cost" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Location</label>
-                                <input type="text" class="form-control" name="location" placeholder="e.g., Warehouse A">
+                                <input id="reorder_level" type="number" class="form-control" name="reorder_level" value="10">
                             </div>
                         </div>
-                        
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Unit Price</label>
+                                <input id="unit_price" type="number" step="0.01" class="form-control" name="unit_price" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Selling Price</label>
+                                <input id="selling_price" type="number" step="0.01" class="form-control" name="selling_price">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Notes</label>
-                            <textarea class="form-control" name="notes" rows="2"></textarea>
+                            <label class="form-label">Description</label>
+                            <textarea id="description" class="form-control" name="description" rows="3"></textarea>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tax Rate (%)</label>
+                            <input id="tax_rate" type="number" step="0.01" class="form-control" name="tax_rate" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input id="location" type="text" class="form-control" name="location">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Stock</label>
+                            <input type="number" class="form-control" name="current_stock" id="current_stock" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Barcode</label>
+                            <input type="text" class="form-control" name="barcode" id="barcode" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                            <small class="text-muted">Upload a product image (JPG, PNG, GIF)</small>
+                        </div>
+                        <input type="hidden" name="image_path" id="image_path" value="222222">
+                        <input type="hidden" name="status" id="status" value="Active">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Add Material</button>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
                     </div>
                 </form>
             </div>

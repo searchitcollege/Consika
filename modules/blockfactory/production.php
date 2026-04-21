@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $batch_number = 'BATCH-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
                 
                 $sql = "INSERT INTO blockfactory_production (batch_number, product_id, production_date, shift, supervisor, 
-                        planned_quantity, produced_quantity, good_quantity, defective_quantity, defect_rate, notes, created_by) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        planned_quantity, produced_quantity, good_quantity, defective_quantity, defect_rate, notes, created_by, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("sisssiiiidssi", $batch_number, $product_id, $production_date, $shift, $supervisor,
                                  $planned_quantity, $produced_quantity, $good_quantity, $defective_quantity, $defect_rate, $notes, $current_user['user_id']);

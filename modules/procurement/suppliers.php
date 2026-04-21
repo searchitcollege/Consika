@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Insert into database
         $sql = "INSERT INTO procurement_suppliers 
-                (company_id, supplier_code, supplier_name, contact_person, phone, email, website, address, category, tax_number, payment_terms, credit_limit) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                (company_id, supplier_code, supplier_name, contact_person, phone, email, website, address, category, tax_number, payment_terms, credit_limit, admin_approvals) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
         $stmt = $db->prepare($sql);
         $stmt->bind_param("issssssssssd", $company_id, $supplier_code, $supplier_name, $contact_person, $phone, $email, $website, $address, $category, $tax_number, $payment_terms, $credit_limit);
 

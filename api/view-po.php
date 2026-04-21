@@ -56,11 +56,11 @@ $items = $items_stmt->get_result();
                 </span>
             </div>
             <div>
-                <?php if ($po['delivery_status'] != 'Completed'): ?>
+                <!-- <?php if ($po['delivery_status'] != 'Completed'): ?>
                     <a href="receive-po.php?id=<?php echo $po_id; ?>" class="btn btn-success btn-sm me-2">
                         <i class="fas fa-truck-loading me-1"></i>Receive Stock
                     </a>
-                <?php endif; ?>
+                <?php endif; ?> -->
                 <a href="../modules/procurement/index.php" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
             </div>
         </div>

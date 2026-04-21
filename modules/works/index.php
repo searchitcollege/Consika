@@ -11,6 +11,13 @@ if (!hasPermission('works', 'view')) {
 
 $current_user = currentUser();
 $company_id = $session->getCompanyId();
+$role = $_SESSION['role'] ?? '';
+
+if ($role !== 'SuperAdmin') {
+    // $_SESSION['error'] = 'You do not have permission to create projects.';
+    header('Location: ./dashboard.php');
+    exit();
+}
 
 global $db;
 
@@ -292,6 +299,14 @@ $reports_stmt = $db->prepare("
 $reports_stmt->bind_param('i', $company_id);
 $reports_stmt->execute();
 $reports = $reports_stmt->get_result();
+
+// Materials list for the new-report modal
+$mats_result = $db->query("
+    SELECT product_id, product_name
+    FROM   procurement_products
+    WHERE  category = 'works'
+    ORDER  BY product_name ASC
+");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -335,9 +350,9 @@ $reports = $reports_stmt->get_result();
 
             <!-- Module Header -->
             <div class="department-header">
-                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                <!-- <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                     <i class="fas fa-bars"></i>
-                </button>
+                </button> -->
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Works & Construction Management</h1>
@@ -372,7 +387,7 @@ $reports = $reports_stmt->get_result();
                     <i class="fas fa-clipboard-list"></i>
                     <span>Daily Report</span>
                 </div>
-                <div class="quick-action-btn" onclick="window.location.href='site-visits.php'">
+                <div class="quick-action-btn" onclick="window.location.href='../../api/site-visits.php'">
                     <i class="fas fa-camera"></i>
                     <span>Site Visits</span>
                 </div>
@@ -693,14 +708,14 @@ $reports = $reports_stmt->get_result();
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $materials_query = "SELECT * FROM procurement_products WHERE category = 'Building Materials' ORDER BY product_name ASC";
+                                                $materials_query = "SELECT * FROM procurement_products WHERE category = 'works' ORDER BY product_name ASC";
                                                 $materials = $db->query($materials_query);
                                                 while ($mat = $materials->fetch_assoc()):
                                                 ?>
                                                     <tr>
                                                         <td><?php echo $mat['product_code']; ?></td>
                                                         <td><?php echo htmlspecialchars($mat['product_name']); ?></td>
-                                                        <td><?php echo $mat['category']; ?></td>
+                                                        <td><?php echo $mat['sub_category']; ?></td>
                                                         <td><?php echo $mat['unit']; ?></td>
                                                         <td>
                                                             <div class="d-flex align-items-center">
@@ -1435,7 +1450,7 @@ $reports = $reports_stmt->get_result();
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Category</label>
-                                <input id="category" type="text" class="form-control" name="category">
+                                <input id="category" value="works" readonly type="text" class="form-control" name="category">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Sub-Category</label>
@@ -1660,6 +1675,15 @@ $reports = $reports_stmt->get_result();
             </div>
         </div>
     </div>
+
+    <!-- Hidden material options template — PHP renders once, JS clones per row -->
+    <select id="_materialOptionsTpl" class="d-none" aria-hidden="true">
+        <option value="">Select Material…</option>
+        <?php if ($mats_result): while ($mat = $mats_result->fetch_assoc()): ?>
+                <option value="<?= $mat['product_id'] ?>"><?= htmlspecialchars($mat['product_name']) ?></option>
+        <?php endwhile;
+        endif; ?>
+    </select>
 
     <!-- View Report Modal -->
     <div class="modal fade" id="viewReportModal" tabindex="-1" aria-hidden="true">
@@ -1941,7 +1965,7 @@ $reports = $reports_stmt->get_result();
                 $(this).closest('tr').find('.unit-price').val(price).trigger('change');
             });
 
-            
+
             // Initialize Select2
             $('.select2').select2({
                 theme: 'bootstrap-5',
@@ -2389,25 +2413,24 @@ $reports = $reports_stmt->get_result();
 
         function addMaterialRow() {
             var idx = _matIndex++;
-            var $row = $(
+            $('#materialsContainer').append(
                 '<div class="row g-2 mb-2 material-row align-items-center">' +
-                '<div class="col-md-6">' +
+                '<div class="col-md-7">' +
                 '<select class="form-select form-select-sm" name="materials[' + idx + '][id]">' +
                 $('#_materialOptionsTpl').html() +
                 '</select>' +
                 '</div>' +
-                '<div class="col-md-4">' +
+                '<div class="col-md-3">' +
                 '<input type="number" step="0.01" min="0" class="form-control form-control-sm"' +
-                ' name="materials[' + idx + '][quantity]" placeholder="Quantity">' +
+                ' name="materials[' + idx + '][quantity]" placeholder="Qty">' +
                 '</div>' +
                 '<div class="col-md-2 text-end">' +
-                '<button type="button" class="btn btn-outline-danger btn-sm remove-mat-row" title="Remove">' +
+                '<button type="button" class="btn btn-outline-danger btn-sm remove-mat-row">' +
                 '<i class="fas fa-times"></i>' +
                 '</button>' +
                 '</div>' +
                 '</div>'
             );
-            $('#materialsContainer').append($row);
         }
 
         // Remove row via delegation
@@ -2663,6 +2686,37 @@ $reports = $reports_stmt->get_result();
 
         function escHtml(str) {
             return $('<div>').text(str || '').html();
+        }
+
+        function viewProject(projectId) {
+            $('#projectModalSpinner').removeClass('d-none');
+            $('#projectModalContent').addClass('d-none');
+            $('#projectModalError').addClass('d-none').text('');
+            $('#viewProjectModal').modal('show');
+
+            $.ajax({
+                    url: '../../api/get-project-details.php',
+                    method: 'GET',
+                    data: {
+                        project_id: projectId
+                    },
+                    dataType: 'json'
+                })
+                .done(function(data) {
+                    if (!data.success) {
+                        showModalError(data.error || 'Failed to load project.');
+                        return;
+                    }
+                    populateProjectModal(data);
+                })
+                .fail(function(xhr) {
+                    var msg = 'Could not load project details.';
+                    try {
+                        var parsed = JSON.parse(xhr.responseText);
+                        if (parsed.error) msg = parsed.error;
+                    } catch (e) {}
+                    showModalError(msg);
+                });
         }
     </script>
 </body>

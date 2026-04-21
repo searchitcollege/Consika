@@ -96,12 +96,12 @@ $stmt = $db->prepare("
         project_id, report_date, weather_conditions, work_description,
         employees_present, hours_worked, equipment_used,
         challenges, achievements, next_plan,
-        photos, submitted_by, status, created_at
+        photos, submitted_by, status, created_at, admin_approvals
     ) VALUES (
         ?, ?, ?, ?,
         ?, ?, ?,
         ?, ?, ?,
-        ?, ?, 'Submitted', NOW()
+        ?, ?, 'Submitted', NOW(), 'Pending'
     )
 ");
 

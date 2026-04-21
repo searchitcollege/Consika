@@ -42,6 +42,10 @@ body {
     margin-left: 288px;
     padding: 2px;
     max-width: calc(100% - 300px);
+    @media (max-width: 1024px) {
+        max-width: none;
+        margin-left: 0;
+    }
 }
 
 /* ============================================

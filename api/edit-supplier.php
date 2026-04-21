@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE supplier_id = ?
     ");
     $stmt->bind_param(
-        "ssssssssssdsi",
+        "sssssssssdsi",
         $supplier_name, $contact_person, $phone, $email, $website,
         $address, $category, $tax_number, $payment_terms,
         $credit_limit, $status, $supplier_id

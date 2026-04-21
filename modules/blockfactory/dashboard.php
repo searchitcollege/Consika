@@ -130,6 +130,7 @@ $page_title = 'Block Factory Dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -143,7 +144,7 @@ $page_title = 'Block Factory Dashboard';
             --primary-color: #43e97b;
             --secondary-color: #38f9d7;
         }
-        
+
         .department-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -152,22 +153,22 @@ $page_title = 'Block Factory Dashboard';
             margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(67, 233, 123, 0.3);
         }
-        
+
         .stat-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             transition: transform 0.3s, box-shadow 0.3s;
             border-left: 4px solid var(--primary-color);
         }
-        
+
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .stat-icon {
             width: 50px;
             height: 50px;
@@ -180,32 +181,32 @@ $page_title = 'Block Factory Dashboard';
             font-size: 24px;
             margin-bottom: 15px;
         }
-        
+
         .production-card {
             background: white;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
             border-left: 4px solid var(--primary-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
-        
+
         .sale-card {
             background: white;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
             border-left: 4px solid var(--secondary-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
-        
+
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 25px;
         }
-        
+
         .quick-action-btn {
             background: white;
             border: 2px dashed #dee2e6;
@@ -215,20 +216,20 @@ $page_title = 'Block Factory Dashboard';
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .quick-action-btn:hover {
             border-color: var(--primary-color);
             background: #f8f9fa;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(67, 233, 123, 0.2);
         }
-        
+
         .quick-action-btn i {
             font-size: 28px;
             color: var(--primary-color);
             margin-bottom: 10px;
         }
-        
+
         .material-alert {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -236,18 +237,29 @@ $page_title = 'Block Factory Dashboard';
             border-radius: 8px;
             margin-bottom: 10px;
         }
-        
+
         .delivery-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
-        
-        .delivery-scheduled { background: #cce5ff; color: #004085; }
-        .delivery-transit { background: #fff3cd; color: #856404; }
-        .delivery-delivered { background: #d4edda; color: #155724; }
-        
+
+        .delivery-scheduled {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .delivery-transit {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .delivery-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+
         .sidebar {
             width: 280px;
             background: linear-gradient(135deg, #1e1e2f, #2a2a40);
@@ -256,109 +268,47 @@ $page_title = 'Block Factory Dashboard';
             position: fixed;
             overflow-y: auto;
         }
-        
+
         .main-content {
             margin-left: 280px;
             padding: 20px;
         }
-        
+
         .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
             padding: 12px 20px;
             transition: all 0.3s;
         }
-        
+
         .nav-link:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             padding-left: 30px;
         }
-        
+
         .nav-link.active {
             background: var(--primary-color);
             color: white;
         }
-        
+
         @media (max-width: 768px) {
             .sidebar {
                 left: -280px;
             }
+
             .main-content {
                 margin-left: 0;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid p-0">
         <div class="row g-0">
             <!-- Sidebar -->
-            <!-- <div class="sidebar col-auto">
-                <div class="sidebar p-3">
-                    <div class="text-center mb-4">
-                        <h4>Block Factory</h4>
-                        <p class="small text-muted">Manufacturing & Sales</p>
-                    </div>
-                    
-                    <div class="user-info text-center mb-4 p-3 bg-white bg-opacity-10 rounded">
-                        <div class="avatar mx-auto mb-2" style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                            <?php echo getAvatarLetter($current_user['full_name'] ?? 'User'); ?>
-                        </div>
-                        <strong><?php echo htmlspecialchars($current_user['full_name'] ?? 'User'); ?></strong>
-                        <p class="small text-muted"><?php echo $current_user['company_name'] ?? 'Block Factory'; ?></p>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a href="dashboard.php" class="nav-link active">
-                                <i class="fas fa-home me-2"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="production.php" class="nav-link">
-                                <i class="fas fa-industry me-2"></i>Production
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="products.php" class="nav-link">
-                                <i class="fas fa-cubes me-2"></i>Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="sales.php" class="nav-link">
-                                <i class="fas fa-shopping-cart me-2"></i>Sales
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="customers.php" class="nav-link">
-                                <i class="fas fa-users me-2"></i>Customers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="raw-materials.php" class="nav-link">
-                                <i class="fas fa-boxes me-2"></i>Raw Materials
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="deliveries.php" class="nav-link">
-                                <i class="fas fa-truck me-2"></i>Deliveries
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="reports.php" class="nav-link">
-                                <i class="fas fa-chart-bar me-2"></i>Reports
-                            </a>
-                        </li>
-                        <li class="nav-item mt-5">
-                            <a href="../../api/logout.php" class="nav-link text-danger">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div> -->
             <?php include '../../includes/sidebar.php'; ?>
-            
+
             <!-- Main Content -->
             <div class="col">
                 <div class="main-content">
@@ -373,13 +323,13 @@ $page_title = 'Block Factory Dashboard';
                                 <span class="badge bg-light text-dark p-2">
                                     <i class="far fa-calendar me-2"></i><?php echo date('F j, Y'); ?>
                                 </span>
-                                                        <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
-                            <i class="fas fa-bars"></i>
-                        </button>
+                                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                                    <i class="fas fa-bars"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Stats Row -->
                     <div class="row">
                         <div class="col-md-3">
@@ -431,90 +381,90 @@ $page_title = 'Block Factory Dashboard';
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Second Row -->
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="stat-card">
                                 <h5 class="mb-3">Recent Production</h5>
                                 <?php if ($recent_production && $recent_production->num_rows > 0): ?>
-                                    <?php while($prod = $recent_production->fetch_assoc()): ?>
-                                    <div class="production-card">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <strong>Batch #<?php echo $prod['batch_number']; ?></strong>
-                                                <br>
-                                                <small><?php echo htmlspecialchars($prod['product_name']); ?></small>
+                                    <?php while ($prod = $recent_production->fetch_assoc()): ?>
+                                        <div class="production-card">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <strong>Batch #<?php echo $prod['batch_number']; ?></strong>
+                                                    <br>
+                                                    <small><?php echo htmlspecialchars($prod['product_name']); ?></small>
+                                                </div>
+                                                <span class="badge bg-<?php echo ($prod['defect_rate'] ?? 0) <= 2 ? 'success' : (($prod['defect_rate'] ?? 0) <= 5 ? 'warning' : 'danger'); ?>">
+                                                    <?php echo $prod['defect_rate'] ?? 0; ?>% defects
+                                                </span>
                                             </div>
-                                            <span class="badge bg-<?php echo ($prod['defect_rate'] ?? 0) <= 2 ? 'success' : (($prod['defect_rate'] ?? 0) <= 5 ? 'warning' : 'danger'); ?>">
-                                                <?php echo $prod['defect_rate'] ?? 0; ?>% defects
-                                            </span>
+                                            <div class="d-flex justify-content-between">
+                                                <small>
+                                                    <i class="far fa-calendar me-1"></i><?php echo date('d/m/Y', strtotime($prod['production_date'])); ?>
+                                                </small>
+                                                <small>
+                                                    <i class="fas fa-check-circle me-1"></i><?php echo $prod['good_quantity'] ?? 0; ?>/<?php echo $prod['produced_quantity'] ?? 0; ?> good
+                                                </small>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between">
-                                            <small>
-                                                <i class="far fa-calendar me-1"></i><?php echo date('d/m/Y', strtotime($prod['production_date'])); ?>
-                                            </small>
-                                            <small>
-                                                <i class="fas fa-check-circle me-1"></i><?php echo $prod['good_quantity'] ?? 0; ?>/<?php echo $prod['produced_quantity'] ?? 0; ?> good
-                                            </small>
-                                        </div>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No production records found</p>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <div class="stat-card mt-3">
                                 <h5 class="mb-3">Low Raw Materials</h5>
                                 <?php if ($low_materials && $low_materials->num_rows > 0): ?>
-                                    <?php while($material = $low_materials->fetch_assoc()): ?>
-                                    <div class="material-alert d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong><?php echo htmlspecialchars($material['material_name']); ?></strong>
-                                            <br>
-                                            <small>Stock: <?php echo $material['stock_quantity'] ?? 0; ?> / Min: <?php echo $material['minimum_stock'] ?? 0; ?> <?php echo $material['unit'] ?? ''; ?></small>
+                                    <?php while ($material = $low_materials->fetch_assoc()): ?>
+                                        <div class="material-alert d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong><?php echo htmlspecialchars($material['material_name']); ?></strong>
+                                                <br>
+                                                <small>Stock: <?php echo $material['stock_quantity'] ?? 0; ?> / Min: <?php echo $material['minimum_stock'] ?? 0; ?> <?php echo $material['unit'] ?? ''; ?></small>
+                                            </div>
+                                            <button class="btn btn-sm btn-warning" onclick="orderMaterial(<?php echo $material['material_id']; ?>)">
+                                                <i class="fas fa-shopping-cart"></i> Order
+                                            </button>
                                         </div>
-                                        <button class="btn btn-sm btn-warning" onclick="orderMaterial(<?php echo $material['material_id']; ?>)">
-                                            <i class="fas fa-shopping-cart"></i> Order
-                                        </button>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">All materials are adequately stocked</p>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="stat-card">
                                 <h5 class="mb-3">Recent Sales</h5>
                                 <?php if ($recent_sales && $recent_sales->num_rows > 0): ?>
-                                    <?php while($sale = $recent_sales->fetch_assoc()): ?>
-                                    <div class="sale-card">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <div>
-                                                <strong>Invoice #<?php echo $sale['invoice_number']; ?></strong>
-                                                <br>
-                                                <small><?php echo htmlspecialchars($sale['customer_name'] ?? 'Walk-in Customer'); ?></small>
+                                    <?php while ($sale = $recent_sales->fetch_assoc()): ?>
+                                        <div class="sale-card">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <strong>Invoice #<?php echo $sale['invoice_number']; ?></strong>
+                                                    <br>
+                                                    <small><?php echo htmlspecialchars($sale['customer_name'] ?? 'Walk-in Customer'); ?></small>
+                                                </div>
+                                                <span class="badge bg-<?php echo ($sale['payment_status'] ?? '') == 'Paid' ? 'success' : (($sale['payment_status'] ?? '') == 'Partial' ? 'warning' : 'danger'); ?>">
+                                                    <?php echo $sale['payment_status'] ?? 'Unknown'; ?>
+                                                </span>
                                             </div>
-                                            <span class="badge bg-<?php echo ($sale['payment_status'] ?? '') == 'Paid' ? 'success' : (($sale['payment_status'] ?? '') == 'Partial' ? 'warning' : 'danger'); ?>">
-                                                <?php echo $sale['payment_status'] ?? 'Unknown'; ?>
-                                            </span>
+                                            <div class="d-flex justify-content-between">
+                                                <small>
+                                                    <i class="fas fa-cubes me-1"></i><?php echo $sale['quantity'] ?? 0; ?> units
+                                                </small>
+                                                <strong><?php echo formatMoney($sale['total_amount'] ?? 0); ?></strong>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between">
-                                            <small>
-                                                <i class="fas fa-cubes me-1"></i><?php echo $sale['quantity'] ?? 0; ?> units
-                                            </small>
-                                            <strong><?php echo formatMoney($sale['total_amount'] ?? 0); ?></strong>
-                                        </div>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No sales records found</p>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <div class="stat-card mt-3">
                                 <h5 class="mb-3">Top Products</h5>
                                 <div class="table-responsive">
@@ -528,12 +478,12 @@ $page_title = 'Block Factory Dashboard';
                                         </thead>
                                         <tbody>
                                             <?php if ($top_products && $top_products->num_rows > 0): ?>
-                                                <?php while($product = $top_products->fetch_assoc()): ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($product['product_name']); ?></td>
-                                                    <td><?php echo $product['sale_count'] ?? 0; ?></td>
-                                                    <td><?php echo formatMoney($product['total_value'] ?? 0); ?></td>
-                                                </tr>
+                                                <?php while ($product = $top_products->fetch_assoc()): ?>
+                                                    <tr>
+                                                        <td><?php echo htmlspecialchars($product['product_name']); ?></td>
+                                                        <td><?php echo $product['sale_count'] ?? 0; ?></td>
+                                                        <td><?php echo formatMoney($product['total_value'] ?? 0); ?></td>
+                                                    </tr>
                                                 <?php endwhile; ?>
                                             <?php else: ?>
                                                 <tr>
@@ -544,25 +494,25 @@ $page_title = 'Block Factory Dashboard';
                                     </table>
                                 </div>
                             </div>
-                            
+
                             <div class="stat-card mt-3">
                                 <h5 class="mb-3">Pending Deliveries</h5>
                                 <?php if ($pending_deliveries && $pending_deliveries->num_rows > 0): ?>
-                                    <?php while($delivery = $pending_deliveries->fetch_assoc()): ?>
-                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-                                        <div>
-                                            <strong>Delivery #<?php echo $delivery['delivery_note']; ?></strong>
-                                            <br>
-                                            <small><?php echo htmlspecialchars($delivery['customer_name']); ?></small>
+                                    <?php while ($delivery = $pending_deliveries->fetch_assoc()): ?>
+                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                            <div>
+                                                <strong>Delivery #<?php echo $delivery['delivery_note']; ?></strong>
+                                                <br>
+                                                <small><?php echo htmlspecialchars($delivery['customer_name']); ?></small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="delivery-badge delivery-<?php echo strtolower($delivery['status']); ?>">
+                                                    <?php echo $delivery['status']; ?>
+                                                </span>
+                                                <br>
+                                                <small><?php echo date('d/m', strtotime($delivery['delivery_date'])); ?></small>
+                                            </div>
                                         </div>
-                                        <div class="text-end">
-                                            <span class="delivery-badge delivery-<?php echo strtolower($delivery['status']); ?>">
-                                                <?php echo $delivery['status']; ?>
-                                            </span>
-                                            <br>
-                                            <small><?php echo date('d/m', strtotime($delivery['delivery_date'])); ?></small>
-                                        </div>
-                                    </div>
                                     <?php endwhile; ?>
                                 <?php else: ?>
                                     <p class="text-muted text-center py-3">No pending deliveries</p>
@@ -570,7 +520,7 @@ $page_title = 'Block Factory Dashboard';
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Quick Actions -->
                     <div class="quick-actions mt-4">
                         <div class="quick-action-btn" onclick="window.location.href='./production.php'">
@@ -598,16 +548,17 @@ $page_title = 'Block Factory Dashboard';
             </div>
         </div>
     </div>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/modules.js"></script>
-    
+
     <script>
         function orderMaterial(id) {
             window.location.href = 'order-material.php?id=' + id;
         }
     </script>
 </body>
+
 </html>

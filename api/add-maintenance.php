@@ -68,9 +68,9 @@ $request_date_val = !empty($request_date) ? $request_date : date('Y-m-d H:i:s');
 
 $stmt = $db->prepare("
     INSERT INTO estate_maintenance
-        (property_id, tenant_id, request_date, issue_category, priority, description, created_by, status)
+        (property_id, tenant_id, request_date, issue_category, priority, description, created_by, status, admin_approvals)
     VALUES
-        (?, ?, ?, ?, ?, ?, ?, 'Pending')
+        (?, ?, ?, ?, ?, ?, ?, 'Pending', 'Pending')
 ");
 $stmt->bind_param(
     "iissssi",

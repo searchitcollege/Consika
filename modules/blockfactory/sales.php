@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     $sql = "INSERT INTO blockfactory_sales (invoice_number, customer_id, customer_name, customer_phone, 
                             sale_date, product_id, quantity, unit_price, discount, subtotal, tax_amount, total_amount, 
-                            amount_paid, balance, payment_method, payment_status, delivery_address, notes, sales_person) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                            amount_paid, balance, payment_method, payment_status, delivery_address, notes, sales_person, admin_approvals) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
                     $stmt = $db->prepare($sql);
 
                     $balance = $total_amount - $amount_paid;

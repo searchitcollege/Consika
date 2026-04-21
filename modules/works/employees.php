@@ -70,8 +70,8 @@ if ($is_ajax && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])
                  hire_date, contract_type,
                  hourly_rate, daily_rate, monthly_salary,
                  emergency_contact, emergency_phone,
-                 status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', NOW())
+                 status, created_at, admin_approvals)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', NOW(), 'Pending')
         ");
         $stmt->bind_param(
             'sssssssssssdddss',
@@ -205,7 +205,7 @@ if ($is_ajax && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])
             VALUES (?, ?, ?, ?, ?, 'Active', ?, NOW())
         ");
         $stmt->bind_param(
-            'iissdii',
+            'iissdi',
             $project_id,
             $employee_id,
             $role_name,
@@ -221,7 +221,7 @@ if ($is_ajax && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])
                 (project_id, employee_id, role, start_date, daily_rate, status, assigned_by, created_at)
             VALUES (?, ?, ?, ?, ?, 'Active', ?, NOW())
         ");
-        $stmt->bind_param('iisdii', $project_id, $employee_id, $role_name, $start_date, $daily_rate, $user_id);
+        $stmt->bind_param('iissdi', $project_id, $employee_id, $role_name, $start_date, $daily_rate, $user_id);
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Employee assigned to project successfully.']);

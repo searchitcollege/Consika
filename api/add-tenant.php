@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('estate', 'create')) {
     $_SESSION['error'] = 'You do not have permission to add tenants.';
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -27,7 +27,7 @@ if (empty($company_id)) {
 
 if (empty($company_id)) {
     $_SESSION['error'] = 'Estate company not found.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -49,7 +49,7 @@ $created_by              = (int)$current_user['user_id'];
 if (!$property_id || empty($full_name) || empty($id_number) || empty($phone) ||
     empty($lease_start_date) || empty($lease_end_date) || $monthly_rent <= 0) {
     $_SESSION['error'] = 'Please fill in all required fields.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -59,19 +59,19 @@ $end_ts   = strtotime($lease_end_date);
 
 if (!$start_ts || !$end_ts) {
     $_SESSION['error'] = 'Invalid lease dates provided.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if ($end_ts <= $start_ts) {
     $_SESSION['error'] = 'Lease end date must be after the start date.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['error'] = 'Invalid email address provided.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -83,7 +83,7 @@ $prop_check->store_result();
 
 if ($prop_check->num_rows === 0) {
     $_SESSION['error'] = 'Selected property was not found.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -104,7 +104,7 @@ $dup_check->store_result();
 
 if ($dup_check->num_rows > 0) {
     $_SESSION['error'] = "A tenant with ID number '{$id_number}' already exists.";
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 $dup_check->close();
@@ -143,12 +143,12 @@ $stmt = $db->prepare("
         (company_id, property_id, tenant_code, full_name, id_number,
          phone, email, lease_start_date, lease_end_date, lease_duration_months,
          monthly_rent, deposit_amount, emergency_contact_name, emergency_contact_phone,
-         status, created_by)
+         status, created_by, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?,
          ?, ?, ?, ?,
-         'Active', ?)
+         'Active', ?, 'Pending')
 ");
 
 $stmt->bind_param(
@@ -172,7 +172,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to add tenant. Please try again.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -207,5 +207,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Tenant '{$full_name}' ({$tenant_code}) added successfully.";
-header('Location: ../index.php');
+header('Location: ../modules/estate/index.php');
 exit();

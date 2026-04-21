@@ -1091,7 +1091,7 @@ $page_title = 'Reports';
             var end_date = '<?php echo $end_date; ?>';
             var product_id = '<?php echo $product_filter; ?>';
             
-            window.location.href = 'export-report.php?type=' + report_type + 
+            window.location.href = 'export.php?type=' + report_type + 
                                    '&start=' + start_date + 
                                    '&end=' + end_date + 
                                    '&product=' + product_id;

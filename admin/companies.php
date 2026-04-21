@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         VALUES (?, ?, ?, ?, ?, ?, ?)
                     ");
                     $user_stmt->bind_param(
-                        "sssssiss",
+                        "sssssis",
                         $default_username,
                         $default_password,
                         $default_email,

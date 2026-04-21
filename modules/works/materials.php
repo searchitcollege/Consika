@@ -73,8 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         location,
                         barcode,
                         status,
-                        image_path
-                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        image_path,
+                        admin_approvals
+                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'Pending')";
 
         $stmt = $db->prepare($sql);
 

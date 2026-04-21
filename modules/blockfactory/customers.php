@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $notes = $db->escapeString($_POST['notes']);
                 
                 $sql = "INSERT INTO blockfactory_customers (customer_code, customer_name, contact_person, phone, email, 
-                        address, city, customer_type, tax_number, credit_limit, payment_terms, notes, status) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')";
+                        address, city, customer_type, tax_number, credit_limit, payment_terms, notes, status, admin_approvals) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', 'Pending)";
                 $stmt = $db->prepare($sql);
                 $stmt->bind_param("sssssssssdss", $customer_code, $customer_name, $contact_person, $phone, $email,
                                  $address, $city, $customer_type, $tax_number, $credit_limit, $payment_terms, $notes);

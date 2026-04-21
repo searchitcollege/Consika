@@ -11,6 +11,14 @@ if (!hasPermission('blockfactory', 'view')) {
 
 $current_user = currentUser();
 $company_id = $session->getCompanyId();
+$role = $_SESSION['role'] ?? '';
+
+
+if ($role !== 'SuperAdmin') {
+    // $_SESSION['error'] = 'You do not have permission to create projects.';
+    header('Location: ./dashboard.php');
+    exit();
+}
 
 global $db;
 
@@ -268,15 +276,15 @@ $deliveries = $db->query($deliveries_query);
 
             <!-- Module Header -->
             <div class="module-header">
-                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                <!-- <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                     <i class="fas fa-bars"></i>
-                </button>
+                </button> -->
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Block Factory Management</h1>
                         <p class="mb-0 opacity-75">Manage production, sales, and inventory</p>
                     </div>
-                    <div class="col-md-4 text-end">
+                    <div class="col-md-4 text-end m-2">
                         <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#productionModal">
                             <i class="fas fa-plus-circle me-2"></i>Record Production
                         </button>
@@ -860,8 +868,7 @@ $deliveries = $db->query($deliveries_query);
                                         <tr>
                                             <th>Code</th>
                                             <th>Material</th>
-                                            <th>Type</th>
-                                            <th>Supplier</th>
+                                            <th>sub_category</th>
                                             <th>Stock</th>
                                             <th>Unit</th>
                                             <th>Unit Cost</th>
@@ -871,25 +878,24 @@ $deliveries = $db->query($deliveries_query);
                                     </thead>
                                     <tbody>
                                         <?php
-                                        $materials_query = "SELECT * FROM blockfactory_raw_materials ORDER BY material_name ASC";
+                                        $materials_query = "SELECT * FROM procurement_products WHERE category = 'blockfactory' ORDER BY product_name ASC";
                                         $materials = $db->query($materials_query);
                                         while ($material = $materials->fetch_assoc()):
                                         ?>
                                             <tr>
-                                                <td><?php echo $material['material_code']; ?></td>
-                                                <td><?php echo htmlspecialchars($material['material_name']); ?></td>
-                                                <td><?php echo $material['material_type']; ?></td>
-                                                <td><?php echo $material['supplier']; ?></td>
+                                                <td><?php echo $material['product_code']; ?></td>
+                                                <td><?php echo htmlspecialchars($material['product_name']); ?></td>
+                                                <td><?php echo $material['sub_category']; ?></td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <span class="stock-indicator stock-<?php
-                                                                                            echo $material['stock_quantity'] <= $material['minimum_stock'] ? 'critical' : ($material['stock_quantity'] <= $material['reorder_level'] ? 'low' : 'good');
+                                                                                            echo $material['current_stock'] <= $material['minimum_stock'] ? 'critical' : ($material['current_stock'] <= $material['reorder_level'] ? 'low' : 'good');
                                                                                             ?>"></span>
-                                                        <?php echo $material['stock_quantity']; ?>
+                                                        <?php echo $material['current_stock']; ?>
                                                     </div>
                                                 </td>
                                                 <td><?php echo $material['unit']; ?></td>
-                                                <td><?php echo format_money($material['unit_cost']); ?></td>
+                                                <td><?php echo format_money($material['selling_price']); ?></td>
                                                 <td>
                                                     <span class="badge bg-<?php
                                                                             echo $material['status'] == 'Available' ? 'success' : ($material['status'] == 'Low Stock' ? 'warning' : 'danger');
@@ -898,15 +904,15 @@ $deliveries = $db->query($deliveries_query);
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $material['material_id']; ?>)">
+                                                    <button class="btn btn-sm btn-info" onclick="viewMaterial(<?php echo $material['product_id']; ?>)">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $material['material_id']; ?>)">
+                                                    <button class="btn btn-sm btn-primary" onclick="editMaterial(<?php echo $material['product_id']; ?>)">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-success" onclick="receiveMaterial(<?php echo $material['material_id']; ?>)">
+                                                    <!-- <button class="btn btn-sm btn-success" onclick="receiveMaterial(<?php echo $material['product_id']; ?>)">
                                                         <i class="fas fa-arrow-down"></i>
-                                                    </button>
+                                                    </button> -->
                                                 </td>
                                             </tr>
                                         <?php endwhile; ?>
@@ -1354,81 +1360,105 @@ $deliveries = $db->query($deliveries_query);
 
     <!-- Add Material Modal -->
     <div class="modal fade" id="addMaterialModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Raw Material</h5>
+                    <h5 class="modal-title">Add New Material</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="../../api/add-raw-materials.php" method="POST">
+                <form id="addProductForm" action="../../api/add-product.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="add">
+                    <input type="hidden" name="form" value="product">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Material Code</label>
-                            <input type="text" class="form-control" name="material_code" required>
+                            <input id="product_code" type="text" class="form-control" name="product_code" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Material Name</label>
-                            <input type="text" class="form-control" name="material_name" required>
+                            <input id="product_name" type="text" class="form-control" name="product_name" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Material Type</label>
-                                <select class="form-control" name="material_type" required>
-                                    <option value="Cement">Cement</option>
-                                    <option value="Sand">Sand</option>
-                                    <option value="Aggregate">Aggregate</option>
-                                    <option value="Water">Water</option>
-                                    <option value="Additive">Additive</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <label class="form-label">Category</label>
+                                <input id="category" readonly value="blockfactory" type="text" class="form-control" name="category">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Sub-Category</label>
+                                <input id="sub_category" type="text" class="form-control" name="sub_category">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Unit</label>
-                                <select class="form-control" name="unit" required>
+                                <select id="unit" class="form-control" name="unit" required>
+                                    <option value="pcs">Pieces (pcs)</option>
                                     <option value="kg">Kilograms (kg)</option>
-                                    <option value="bags">Bags</option>
-                                    <option value="tons">Tons</option>
                                     <option value="liters">Liters</option>
+                                    <option value="meters">Meters</option>
+                                    <option value="boxes">Boxes</option>
+                                    <option value="bags">Bags</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Unit Cost</label>
-                                <input type="number" step="0.01" class="form-control" name="unit_cost" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Current Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="current_stock" value="0">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Min Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="minimum_stock" value="0">
+                                <input id="minimum_stock" type="number" class="form-control" name="minimum_stock" value="0">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Max Stock</label>
-                                <input type="number" step="0.01" class="form-control" name="maximum_stock" value="10000">
+                                <input id="maximum_stock" type="number" class="form-control" name="maximum_stock" value="1000">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Reorder Level</label>
-                                <input type="number" step="0.01" class="form-control" name="reorder_level" value="100">
+                                <input id="reorder_level" type="number" class="form-control" name="reorder_level" value="10">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Unit Price</label>
+                                <input id="unit_price" type="number" step="0.01" class="form-control" name="unit_price" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Selling Price</label>
+                                <input id="selling_price" type="number" step="0.01" class="form-control" name="selling_price">
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Supplier</label>
-                            <input type="text" class="form-control" name="supplier">
+                            <label class="form-label">Description</label>
+                            <textarea id="description" class="form-control" name="description" rows="3"></textarea>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tax Rate (%)</label>
+                            <input id="tax_rate" type="number" step="0.01" class="form-control" name="tax_rate" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input id="location" type="text" class="form-control" name="location">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Stock</label>
+                            <input type="number" class="form-control" name="current_stock" id="current_stock" value="0">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Barcode</label>
+                            <input type="text" class="form-control" name="barcode" id="barcode" value="">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                            <small class="text-muted">Upload a product image (JPG, PNG, GIF)</small>
+                        </div>
+                        <input type="hidden" name="image_path" id="image_path" value="222222">
+                        <input type="hidden" name="status" id="status" value="Active">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Add Material</button>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
                     </div>
                 </form>
             </div>
@@ -1648,7 +1678,7 @@ $deliveries = $db->query($deliveries_query);
         }
 
         function receiveMaterial(id) {
-            window.location.href = '../../api/receive-material.php?id=' + id;
+            window.location.href = '../../api/red-material.php?id=' + id;
         }
 
         function orderMaterial(id) {

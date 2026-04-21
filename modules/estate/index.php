@@ -11,6 +11,14 @@ if (!hasPermission('estate', 'view')) {
 
 $current_user = currentUser();
 $company_id = $session->getCompanyId();
+$role = $_SESSION['role'] ?? '';
+
+
+if ($role !== 'SuperAdmin') {
+    // $_SESSION['error'] = 'You do not have permission to create projects.';
+    header('Location: ./dashboard.php');
+    exit();
+}
 
 global $db;
 
@@ -285,16 +293,16 @@ $stats = $stmt->get_result()->fetch_assoc();
 
             <!-- Module Header -->
             <div class="module-header">
-                <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
+                <!-- <button id="sidebarToggle" class="btn btn-dark d-md-none m-2">
                     <i class="fas fa-bars"></i>
-                </button>
+                </button> -->
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h1 class="h3 mb-2">Accounts Management</h1>
                         <p class="mb-0 opacity-75">Manage properties, tenants, and maintenance requests</p>
                     </div>
                     <div class="col-md-4 text-end">
-                        <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
+                        <button class="btn btn-light " data-bs-toggle="modal" data-bs-target="#addPropertyModal">
                             <i class="fas fa-plus-circle me-2"></i>Add Property
                         </button>
                         <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addTenantModal">

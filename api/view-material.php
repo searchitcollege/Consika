@@ -50,7 +50,7 @@ $usage = $usage_stmt->get_result();
                 <a href="edit-material.php?id=<?php echo $product_id; ?>" class="btn btn-primary btn-sm me-2">
                     <i class="fas fa-edit me-1"></i>Edit
                 </a>
-                <a href="../modules//works/index.php" class="btn btn-secondary btn-sm">
+                <a href="../modules/blockfactory/index.php" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left me-1"></i>Back
                 </a>
             </div>

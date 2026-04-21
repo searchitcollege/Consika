@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE product_id = ?
     ");
     $stmt->bind_param(
-        "ssssssiiiддdssi",
+        "ssssssiiiiidssi",
         $product_code, $product_name, $category, $sub_category,
         $description, $unit, $minimum_stock, $maximum_stock,
         $reorder_level, $unit_price, $selling_price,

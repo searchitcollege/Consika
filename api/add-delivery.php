@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('blockfactory', 'create')) {
     $_SESSION['error'] = 'You do not have permission to schedule deliveries.';
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
@@ -32,13 +32,13 @@ $notes            = trim($_POST['notes']             ?? '') ?: null;
 if (!$sale_id || empty($delivery_date) || empty($vehicle_number) ||
     empty($driver_name) || empty($destination)) {
     $_SESSION['error'] = 'Please fill in all required fields.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
 if (!strtotime($delivery_date)) {
     $_SESSION['error'] = 'Invalid delivery date.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
@@ -57,13 +57,13 @@ $sale_check->close();
 
 if (!$sale) {
     $_SESSION['error'] = 'Sale not found.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
 if ($sale['delivery_status'] === 'Delivered') {
     $_SESSION['error'] = 'This sale has already been fully delivered.';
-    header('Location: ../index.php');
+    header('Location:../modules/blockfactory/index.php');
     exit();
 }
 
@@ -87,11 +87,11 @@ $stmt = $db->prepare("
     INSERT INTO blockfactory_deliveries
         (sale_id, delivery_note, delivery_date, vehicle_number, driver_name,
          driver_phone, quantity, destination, delivery_charges,
-         status, notes, created_by)
+         status, notes, created_by, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?,
-         'Scheduled', ?, ?)
+         'Scheduled', ?, ?,'Pending')
 ");
 $stmt->bind_param(
     "isssssisdss",
@@ -110,7 +110,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to schedule delivery. Please try again.';
-    header('Location: ./index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $stmt->close();

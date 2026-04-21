@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['error'] = 'Invalid property selected';
                 } else {
                     $sql = "INSERT INTO estate_tenants (property_id, tenant_code, full_name, id_number, phone, email, 
-                            lease_start_date, lease_end_date, monthly_rent, deposit_amount, emergency_contact_name, emergency_contact_phone, status) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')";
+                            lease_start_date, lease_end_date, monthly_rent, deposit_amount, emergency_contact_name, emergency_contact_phone, status, admin_approvals) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active', 'Pending')";
                     $stmt = $db->prepare($sql);
                     $stmt->bind_param("isssssssddss", $property_id, $tenant_code, $full_name, $id_number, $phone, $email, 
                                      $lease_start, $lease_end, $monthly_rent, $deposit, $emergency_contact, $emergency_phone);

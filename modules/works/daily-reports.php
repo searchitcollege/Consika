@@ -74,7 +74,7 @@ $projects_list = $projects_stmt->get_result();
 $mats_result = $db->query("
     SELECT product_id, product_name
     FROM   procurement_products
-    WHERE  category = 'Building Materials'
+    WHERE  category = 'works'
     ORDER  BY product_name ASC
 ");
 ?>

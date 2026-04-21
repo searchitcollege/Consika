@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('blockfactory', 'create')) {
     $_SESSION['error'] = 'You do not have permission to add customers.';
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
@@ -34,19 +34,19 @@ $allowed_types = ['Individual', 'Company', 'Contractor', 'Government'];
 
 if (empty($customer_code) || empty($customer_name) || empty($phone)) {
     $_SESSION['error'] = 'Customer code, name, and phone are required.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
 if (!in_array($customer_type, $allowed_types)) {
     $_SESSION['error'] = 'Invalid customer type selected.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
 if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['error'] = 'Invalid email address.';
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 
@@ -57,7 +57,7 @@ $dup->execute();
 $dup->store_result();
 if ($dup->num_rows > 0) {
     $_SESSION['error'] = "Customer code '{$customer_code}' already exists.";
-    header('Location: ../index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $dup->close();
@@ -66,10 +66,10 @@ $dup->close();
 $stmt = $db->prepare("
     INSERT INTO blockfactory_customers
         (customer_code, customer_name, contact_person, phone,
-         email, address, customer_type, tax_number, credit_limit, status)
+         email, address, customer_type, tax_number, credit_limit, status, admin_approvals)
     VALUES
         (?, ?, ?, ?,
-         ?, ?, ?, ?, ?, 'Active')
+         ?, ?, ?, ?, ?, 'Active','Pending')
 ");
 $stmt->bind_param(
     "ssssssssd",
@@ -86,7 +86,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to add customer. Please try again.';
-    header('Location: ./index.php');
+    header('Location: ../modules/blockfactory/index.php');
     exit();
 }
 $stmt->close();
@@ -107,5 +107,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Customer '{$customer_name}' added successfully.";
-header('Location: ./index.php');
+header('Location: ../modules/blockfactory/index.php');
 exit();

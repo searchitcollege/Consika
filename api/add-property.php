@@ -4,12 +4,12 @@ $session->requireLogin();
 
 if (!hasPermission('estate', 'create')) {
     $_SESSION['error'] = 'You do not have permission to add properties.';
-    header('Location: ../index.php');
+    header('Location: ./logout.php');
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php');
+    header('Location: ../admin/dashboard.php');
     exit();
 }
 
@@ -27,7 +27,7 @@ if (empty($company_id)) {
 
 if (empty($company_id)) {
     $_SESSION['error'] = 'Estate company not found.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -51,19 +51,19 @@ $allowed_statuses = ['Available', 'Under Maintenance', 'Under Construction'];
 
 if (empty($property_code) || empty($property_name) || empty($address) || empty($property_type)) {
     $_SESSION['error'] = 'Please fill in all required fields.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if (!in_array($property_type, $allowed_types)) {
     $_SESSION['error'] = 'Invalid property type selected.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
 if (!in_array($status, $allowed_statuses)) {
     $_SESSION['error'] = 'Invalid status selected.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -75,7 +75,7 @@ $check->store_result();
 
 if ($check->num_rows > 0) {
     $_SESSION['error'] = "Property code '{$property_code}' already exists. Please use a unique code.";
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 $check->close();
@@ -102,13 +102,13 @@ if (!empty($_FILES['images']['name'][0])) {
 
         if (!in_array($ext, $allowed_exts)) {
             $_SESSION['error'] = "Invalid file type for '{$original_name}'. Allowed: JPG, JPEG, PNG, WEBP.";
-            header('Location: ../index.php');
+            header('Location: ../modules/estate/index.php');
             exit();
         }
 
         if ($file_size > $max_size_bytes) {
             $_SESSION['error'] = "File '{$original_name}' exceeds the 5 MB limit.";
-            header('Location: ../index.php');
+            header('Location: ../modules/estate/index.php');
             exit();
         }
 
@@ -128,11 +128,11 @@ $stmt = $db->prepare("
     INSERT INTO estate_properties
         (company_id, property_code, property_name, property_type, address,
          city, total_area, units, purchase_price, current_value,
-         description, images, status, created_by)
+         description, images, status, created_by, admin_approvals)
     VALUES
         (?, ?, ?, ?, ?,
          ?, ?, ?, ?, ?,
-         ?, ?, ?, ?)
+         ?, ?, ?, ?, 'Pending')
 ");
 
 $stmt->bind_param(
@@ -155,7 +155,7 @@ $stmt->bind_param(
 
 if (!$stmt->execute()) {
     $_SESSION['error'] = 'Failed to add property. Please try again.';
-    header('Location: ../index.php');
+    header('Location: ../modules/estate/index.php');
     exit();
 }
 
@@ -180,5 +180,5 @@ $log->execute();
 $log->close();
 
 $_SESSION['success'] = "Property '{$property_name}' added successfully.";
-header('Location: ../index.php');
+header('Location: ../modules/estate/index.php');
 exit();
